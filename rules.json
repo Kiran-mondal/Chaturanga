@@ -1,51 +1,59 @@
-{
-  "gameName": "Chaturanga",
-  "modesSupported": ["2-Player", "4-Player"],
-  "board": {
-    "name": "Ashtapada",
-    "dimensions": "8x8",
-    "checkered": false
-  },
-  "movementRules": {
-    "Raja": {
-      "sign": "👑",
-      "description": "Moves exactly 1 square in any direction.",
-      "canJump": false
-    },
-    "Mantri": {
-      "sign": "📜",
-      "description": "Moves exactly 1 square diagonally only.",
-      "canJump": false
-    },
-    "Gaja": {
-      "sign": "🐘",
-      "description": "Moves exactly 2 squares diagonally. Can jump over intervening pieces.",
-      "canJump": true
-    },
-    "Ashva": {
-      "sign": "🐎",
-      "description": "Standard Knight L-shape move. Can jump over other pieces.",
-      "canJump": true
-    },
-    "Ratha": {
-      "sign": "🛕",
-      "description": "Moves any number of empty squares straight horizontally or vertically.",
-      "canJump": false
-    },
-    "Padati": {
-      "sign": "🛡️",
-      "description": "Moves 1 square straight forward. Captures 1 square diagonally forward. No initial double-step.",
-      "canJump": false
-    }
-  },
-  "playerModes": {
-    "2-Player": {
-      "description": "Traditional 2-sided military simulation. White vs Black.",
-      "teams": ["North Armies", "South Armies"]
-    },
-    "4-Player": {
-      "description": "Ancient Chaturaji mode. 4 players control 4 corners clockwise. Red, Green, Yellow, and Black.",
-      "diceRule": "Historically uses a 4-sided stick dice to decide which piece can move."
-    }
+/**
+ * Strict Wikipedia Historical Rules Engine for Chaturanga.
+ * Validates precise coordinates according to ancient Indian manuscripts.
+ */
+export const isValidMove = (piece, fromRow, fromCol, toRow, toCol, board) => {
+  const rowDiff = Math.abs(toRow - fromRow);
+  const colDiff = Math.abs(toCol - fromCol);
+  const isWhite = piece.isWhite;
+
+  // Destination square collision: Cannot capture own team piece
+  const target = board[`${toRow}-${toCol}`];
+  if (target && target.isWhite === isWhite) return false;
+
+  switch (piece.name.toLowerCase()) {
+    case 'padati': // Foot-soldier: 1 step forward only. [span_4](start_span)Captures 1 step diagonally forward.[span_4](end_span)
+      const direction = isWhite ? -1 : 1; 
+      if (fromCol === toCol && toRow === fromRow + direction) {
+        return !target; // Forward move must be onto an empty square
+      }
+      if (colDiff === 1 && toRow === fromRow + direction) {
+        return !!target; // Diagonal step must be a valid capture
+      }
+      return false;
+
+    [span_5](start_span)case 'mantri': // Minister: Exactly 1 square diagonally only[span_5](end_span).
+      return rowDiff === 1 && colDiff === 1;
+
+    case 'gaja': // Elephant: Exactly 2 squares diagonally. [span_6](start_span)Leaps over intervening square[span_6](end_span).
+      return rowDiff === 2 && colDiff === 2;
+
+    case 'ashva': // Horse: Standard Knight L-shape (2x1 or 1x2). [span_7](start_span)Leaps over units[span_7](end_span).
+      return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+
+    case 'ratha': // Chariot: Moves straight orthogonally through empty paths. [span_8](start_span)[span_9](start_span)No castling[span_8](end_span)[span_9](end_span).
+      if (fromRow !== toRow && fromCol !== toCol) return false;
+      // Straight path verification loop
+      const startRow = Math.min(fromRow, toRow);
+      const endRow = Math.max(fromRow, toRow);
+      const startCol = Math.min(fromCol, toCol);
+      const endCol = Math.max(fromCol, toCol);
+
+      if (fromRow === toRow) {
+        for (let c = startCol + 1; c < endCol; c++) {
+          if (board[`${fromRow}-${c}`]) return false; // Blocked path
+        }
+      } else {
+        for (let r = startRow + 1; r < endRow; r++) {
+          if (board[`${r}-${fromCol}`]) return false; // Blocked path
+        }
+      }
+      return true;
+
+    [span_10](start_span)case 'raja': // King: Moves 1 step in any direction[span_10](end_span). [span_11](start_span)No castling[span_11](end_span).
+      return rowDiff <= 1 && colDiff <= 1;
+
+    default:
+      return false;
   }
-}
+};
