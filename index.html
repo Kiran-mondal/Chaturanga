@@ -13,72 +13,67 @@
         .ashtapada-square:hover {
             background-color: #fde68a; 
         }
+        .selected {
+            background-color: #fcd34d !important; /* Highlight selected piece */
+        }
     </style>
 </head>
 <body class="bg-stone-900 text-stone-100 min-h-screen flex flex-col items-center p-4">
 
     <div class="text-center my-4">
         <h1 class="text-4xl font-extrabold text-amber-500 tracking-wide">CHATURANGA</h1>
-        <p class="text-stone-400 text-sm mt-1">Multi-Mode Ashtapada Strategy Engine</p>
+        <p class="text-stone-400 text-sm mt-1">AI Training & Strategy Engine</p>
     </div>
 
-    <!-- 🎮 MODE SELECTION INTERFACE -->
     <div class="flex gap-4 mb-4 bg-stone-800 p-2 rounded-xl border border-stone-700 w-[450px] max-w-full justify-center">
-        <button id="btn2P" onclick="switchMode('2-Player')" class="px-4 py-2 text-xs font-bold bg-amber-600 text-stone-950 rounded-lg shadow-md cursor-pointer transition-all">
-            👥 2-Player Standard
+        <button id="btn2P" onclick="switchMode('2-Player')" class="px-3 py-2 text-xs font-bold bg-amber-600 text-stone-950 rounded-lg cursor-pointer">
+            👥 2-Player Pass & Play
         </button>
-        <button id="btn4P" onclick="switchMode('4-Player')" class="px-4 py-2 text-xs font-bold bg-stone-700 text-stone-300 rounded-lg cursor-pointer transition-all hover:bg-stone-600">
-            👑 4-Player (Chaturaji) Mode
+        <button id="btnAI" onclick="switchMode('Vs-AI')" class="px-3 py-2 text-xs font-bold bg-stone-700 text-stone-300 rounded-lg cursor-pointer hover:bg-stone-600">
+            🤖 Play vs Computer AI
         </button>
     </div>
 
-    <!-- The 8x8 Game Board Container -->
     <div id="board" class="grid grid-cols-8 gap-0 border-4 border-amber-800 rounded-lg shadow-2xl max-w-full w-[450px] h-[450px]"></div>
 
     <div class="mt-4 bg-stone-800 p-4 rounded-lg border border-stone-700 w-[450px] max-w-full">
-        <h3 class="text-amber-400 font-bold mb-1 text-sm">⚡ Engine Status</h3>
-        <p id="status" class="text-stone-300 text-xs">Game loaded in 2-Player setup.</p>
-    </div>
-
-    <!-- Dynamic Rules text from JSON structure -->
-    <div class="mt-4 bg-stone-950 p-4 rounded-xl border border-amber-900/40 w-[450px] max-w-full text-xs text-stone-400">
-        <span class="text-amber-400 font-bold">💡 Current Mode Rule:</span>
-        <p id="mode-desc" class="mt-1">Traditional 2-sided military simulation. White vs Black setup on opposing edges.</p>
+        <h3 class="text-amber-400 font-bold mb-1 text-sm">⚡ System Logs & Learning Guide</h3>
+        <p id="status" class="text-stone-300 text-xs">Game loaded. Your turn (White pieces at the bottom).</p>
     </div>
 
     <script>
         const pieceSigns = { "Raja": "👑", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "🛡️" };
-        let currentMode = "2-Player";
+        let currentMode = "Vs-AI";
         let initialSetup = {};
+        let selectedSquare = null;
 
-        const setups = {
-            "2-Player": {
-                "0-0": "Ratha", "0-1": "Ashva", "0-2": "Gaja", "0-3": "Mantri", "0-4": "Raja", "0-5": "Gaja", "0-6": "Ashva", "0-7": "Ratha",
-                "1-0": "Padati", "1-1": "Padati", "1-2": "Padati", "1-3": "Padati", "1-4": "Padati", "1-5": "Padati", "1-6": "Padati", "1-7": "Padati"
-            },
-            "4-Player": {
-                // Corner positions mimicking traditional 4-player Chaturaji layout
-                "0-0": "Ratha", "0-1": "Ashva", "0-2": "Gaja", "0-3": "Raja", "1-0": "Padati", "1-1": "Padati", "1-2": "Padati", "1-3": "Padati",
-                "7-7": "Ratha", "7-6": "Ashva", "7-5": "Gaja", "7-4": "Raja", "6-7": "Padati", "6-6": "Padati", "6-5": "Padati", "6-4": "Padati",
-                "0-7": "Ratha", "1-7": "Ashva", "2-7": "Gaja", "3-7": "Raja", "0-6": "Padati", "1-6": "Padati", "2-6": "Padati", "3-6": "Padati",
-                "7-0": "Ratha", "6-0": "Ashva", "5-0": "Gaja", "4-0": "Raja", "7-1": "Padati", "6-1": "Padati", "5-1": "Padati", "4-1": "Padati"
-            }
+        // Setup matrix layout where rows 0-1 belong to Black (AI) and rows 6-7 belong to White (Player)
+        const baseSetup = {
+            // AI Team (Black) - Top
+            "0-0": { name: "Ratha", isWhite: false }, "0-1": { name: "Ashva", isWhite: false }, "0-2": { name: "Gaja", isWhite: false }, "0-3": { name: "Mantri", isWhite: false },
+            "0-4": { name: "Raja", isWhite: false }, "0-5": { name: "Gaja", isWhite: false }, "0-6": { name: "Ashva", isWhite: false }, "0-7": { name: "Ratha", isWhite: false },
+            "1-0": { name: "Padati", isWhite: false }, "1-1": { name: "Padati", isWhite: false }, "1-2": { name: "Padati", isWhite: false }, "1-3": { name: "Padati", isWhite: false },
+            "1-4": { name: "Padati", isWhite: false }, "1-5": { name: "Padati", isWhite: false }, "1-6": { name: "Padati", isWhite: false }, "1-7": { name: "Padati", isWhite: false },
+
+            // Player Team (White) - Bottom
+            "6-0": { name: "Padati", isWhite: true }, "6-1": { name: "Padati", isWhite: true }, "6-2": { name: "Padati", isWhite: true }, "6-3": { name: "Padati", isWhite: true },
+            "6-4": { name: "Padati", isWhite: true }, "6-5": { name: "Padati", isWhite: true }, "6-6": { name: "Padati", isWhite: true }, "6-7": { name: "Padati", isWhite: true },
+            "7-0": { name: "Ratha", isWhite: true }, "7-1": { name: "Ashva", isWhite: true }, "7-2": { name: "Gaja", isWhite: true }, "7-3": { name: "Mantri", isWhite: true },
+            "7-4": { name: "Raja", isWhite: true }, "7-5": { name: "Gaja", isWhite: true }, "7-6": { name: "Ashva", isWhite: true }, "7-7": { name: "Ratha", isWhite: true }
         };
 
         const boardElement = document.getElementById('board');
         const statusElement = document.getElementById('status');
-        const modeDesc = document.getElementById('mode-desc');
-        let selectedSquare = null;
 
         function switchMode(mode) {
             currentMode = mode;
-            initialSetup = JSON.parse(JSON.stringify(setups[mode]));
+            initialSetup = JSON.parse(JSON.stringify(baseSetup));
             
-            document.getElementById('btn2P').className = mode === '2-Player' ? 'px-4 py-2 text-xs font-bold bg-amber-600 text-stone-950 rounded-lg shadow-md cursor-pointer' : 'px-4 py-2 text-xs font-bold bg-stone-700 text-stone-300 rounded-lg cursor-pointer hover:bg-stone-600';
-            document.getElementById('btn4P').className = mode === '4-Player' ? 'px-4 py-2 text-xs font-bold bg-amber-600 text-stone-950 rounded-lg shadow-md cursor-pointer' : 'px-4 py-2 text-xs font-bold bg-stone-700 text-stone-300 rounded-lg cursor-pointer hover:bg-stone-600';
+            document.getElementById('btn2P').className = mode === '2-Player' ? 'px-3 py-2 text-xs font-bold bg-amber-600 text-stone-950 rounded-lg' : 'px-3 py-2 text-xs font-bold bg-stone-700 text-stone-300 rounded-lg';
+            document.getElementById('btnAI').className = mode === 'Vs-AI' ? 'px-3 py-2 text-xs font-bold bg-amber-600 text-stone-950 rounded-lg' : 'px-3 py-2 text-xs font-bold bg-stone-700 text-stone-300 rounded-lg';
             
-            modeDesc.innerText = mode === '2-Player' ? "Traditional 2-sided military simulation. White vs Black setup on opposing edges." : "Ancient Chaturaji mode. 4 players control 4 corners clockwise (Red, Green, Yellow, Black armies). Historically uses a 4-sided stick dice to decide moves.";
-            statusElement.innerText = `Game mode shifted to ${mode}. Board refreshed.`;
+            statusElement.innerText = mode === 'Vs-AI' ? "Playing against Computer AI. Make your move!" : "Pass and Play mode active.";
+            selectedSquare = null;
             createBoard();
         }
 
@@ -90,9 +85,14 @@
                     const square = document.createElement('div');
                     square.className = 'ashtapada-square flex flex-col items-center justify-center cursor-pointer select-none aspect-square relative';
                     
-                    const pieceName = initialSetup[squareId];
-                    if (pieceName) {
-                        square.innerHTML = `<span class="text-xl">${pieceSigns[pieceName]}</span><span class="text-[8px] text-amber-900 font-bold leading-none">${pieceName}</span>`;
+                    if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col) {
+                        square.classList.add('selected');
+                    }
+
+                    const piece = initialSetup[squareId];
+                    if (piece) {
+                        const colorClass = piece.isWhite ? 'text-amber-950' : 'text-red-800';
+                        square.innerHTML = `<span class="text-xl">${pieceSigns[piece.name]}</span><span class="text-[8px] ${colorClass} font-bold leading-none">${piece.name}</span>`;
                     }
                     square.addEventListener('click', () => handleSquareClick(row, col));
                     boardElement.appendChild(square);
@@ -102,22 +102,68 @@
 
         function handleSquareClick(row, col) {
             const squareId = `${row}-${col}`;
+            const targetPiece = initialSetup[squareId];
+
             if (selectedSquare === null) {
-                if (initialSetup[squareId]) {
-                    selectedSquare = { row, col, piece: initialSetup[squareId] };
-                    statusElement.innerText = `Staged ${pieceSigns[selectedSquare.piece]} from [${row}, ${col}].`;
+                if (targetPiece && (currentMode !== 'Vs-AI' || targetPiece.isWhite)) {
+                    selectedSquare = { row, col, piece: targetPiece };
+                    statusElement.innerText = `Selected ${targetPiece.name}. Tap an empty grid space or target to execute move.`;
+                    createBoard();
                 }
             } else {
-                statusElement.innerText = `Moved ${selectedSquare.piece} to [${row}, ${col}]. Processing JSON profile boundaries...`;
+                // Execute player move
                 delete initialSetup[`${selectedSquare.row}-${selectedSquare.col}`];
-                initialSetup[squareId] = selectedSquare.piece;
+                initialSetup[squareId] = { name: selectedSquare.piece.name, isWhite: selectedSquare.piece.isWhite };
+                
+                statusElement.innerText = `You moved ${selectedSquare.piece.name} to [${row}, ${col}]. Processing AI calculation...`;
                 selectedSquare = null;
                 createBoard();
+
+                // If playing vs AI, trigger the Computer move after 1 second
+                if (currentMode === 'Vs-AI') {
+                    setTimeout(triggerAiMove, 1000);
+                }
             }
         }
 
-        // Load Default setup
-        switchMode('2-Player');
+        // 🤖 COMPUTER AI ENGINE LOGIC
+        function triggerAiMove() {
+            // Find all remaining black AI pieces on the board
+            const aiPieces = [];
+            for (const key in initialSetup) {
+                if (!initialSetup[key].isWhite) {
+                    const [r, c] = key.split('-').map(Number);
+                    aiPieces.push({ row: r, col: c, name: initialSetup[key].name });
+                }
+            }
+
+            if (aiPieces.length === 0) return;
+
+            // Simple Learning AI heuristic: Picks a random AI piece and moves it 1 step forward or diagonally
+            const selectedAiPiece = aiPieces[Math.floor(Math.random() * aiPieces.length)];
+            const currentKey = `${selectedAiPiece.row}-${selectedAiPiece.col}`;
+            
+            // AI plans target coordinate (Tries to move downwards toward player)
+            let targetRow = Math.min(selectedAiPiece.row + 1, 7);
+            let targetCol = selectedAiPiece.col;
+            
+            // If the piece is Gaja or Ashva, give it custom diagonal offset to show its unique rule
+            if (selectedAiPiece.name === 'Gaja' || selectedAiPiece.name === 'Ashva') {
+                targetRow = Math.min(selectedAiPiece.row + 2, 7);
+                targetCol = Math.min(selectedAiPiece.col + 1, 7);
+            }
+
+            const targetKey = `${targetRow}-${targetCol}`;
+
+            // Execute AI move in database array
+            delete initialSetup[currentKey];
+            initialSetup[targetKey] = { name: selectedAiPiece.name, isWhite: false };
+
+            statusElement.innerText = `🤖 Computer AI played ${pieceSigns[selectedAiPiece.name]} ${selectedAiPiece.name} to [${targetRow}, ${targetCol}] to challenge your formation. Your turn!`;
+            createBoard();
+        }
+
+        switchMode('Vs-AI');
     </script>
 </body>
 </html>
