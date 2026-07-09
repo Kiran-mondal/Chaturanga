@@ -1,14 +1,18 @@
 import express from 'express';
 import { query } from './db.js';
+import matchRoutes from './routes.js';
 
 const app = express();
 app.use(express.json());
 
+// Directing traffic to our game database routes
+app.use('/api', matchRoutes);
+
 const PORT = process.env.PORT || 5000;
 
-// গেমটি লাইভ হয়েছে কিনা তা চেক করার মূল রুট
+// Default web root confirmation message
 app.get('/', (req, res) => {
-  res.send('👑 চতুরঙ্গ (Chaturanga) গেম সার্ভার সফলভাবে লাইভ হয়েছে!');
+  res.send('👑 Chaturanga Game Server is successfully live and running globally!');
 });
 
 app.listen(PORT, () => {
