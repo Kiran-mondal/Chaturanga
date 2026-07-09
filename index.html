@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chaturanga - Ancient Indian Strategy Board Game</title>
+    <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         /* Ashtapada traditional uncheckered styling */
@@ -18,21 +19,43 @@
 </head>
 <body class="bg-stone-900 text-stone-100 min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="text-center mb-6">
+    <div class="text-center mb-4">
         <h1 class="text-4xl font-extrabold text-amber-500 tracking-wide">CHATURANGA</h1>
         <p class="text-stone-400 text-sm mt-1">The Ancestor of Chess • 8x8 Ashtapada Grid</p>
     </div>
 
-    <div id="board" class="grid grid-cols-8 gap-0 border-4 border-amber-800 rounded-lg shadow-2xl max-w-full w-[450px] h-[450px]">
-        </div>
+    <!-- Character Sign Legend -->
+    <div class="grid grid-cols-3 gap-2 text-xs bg-stone-800 p-3 rounded-lg border border-stone-700 mb-4 w-[450px] max-w-full text-center">
+        <div>👑 Raja</div>
+        <div>📜 Mantri</div>
+        <div>🐘 Gaja</div>
+        <div>🐎 Ashva</div>
+        <div>🛕 Ratha</div>
+        <div>🛡️ Padati</div>
+    </div>
 
-    <div class="mt-6 bg-stone-800 p-4 rounded-lg border border-stone-700 w-[450px] max-w-full">
-        <h3 class="text-amber-400 font-bold mb-2">⚡ System Logs & Live Updates</h3>
-        <p id="status" class="text-stone-300 text-sm">Select any piece on the board to stage an initial move coordinate.</p>
+    <!-- The 8x8 Game Board Container -->
+    <div id="board" class="grid grid-cols-8 gap-0 border-4 border-amber-800 rounded-lg shadow-2xl max-w-full w-[450px] h-[450px]">
+        <!-- Squares will be injected here dynamically -->
+    </div>
+
+    <div class="mt-4 bg-stone-800 p-4 rounded-lg border border-stone-700 w-[450px] max-w-full">
+        <h3 class="text-amber-400 font-bold mb-1">⚡ System Logs</h3>
+        <p id="status" class="text-stone-300 text-xs">Tap any military asset character sign to stage a move coordinate.</p>
     </div>
 
     <script>
-        // Simple client-side representation of the initial Chaturanga layout
+        // Character signs mapping
+        const pieceSigns = {
+            "Raja": "👑",
+            "Mantri": "📜",
+            "Gaja": "🐘",
+            "Ashva": "🐎",
+            "Ratha": "🛕",
+            "Padati": "🛡️"
+        };
+
+        // Starting setup map
         const initialSetup = {
             "0-0": "Ratha", "0-1": "Ashva", "0-2": "Gaja", "0-3": "Mantri",
             "0-4": "Raja",  "0-5": "Gaja",  "0-6": "Ashva", "0-7": "Ratha",
@@ -44,19 +67,22 @@
         const statusElement = document.getElementById('status');
         let selectedSquare = null;
 
-        // Render the 8x8 board grid systematically
         function createBoard() {
             boardElement.innerHTML = '';
             for (let row = 0; row < 8; row++) {
                 for (let col = 0; col < 8; col++) {
                     const squareId = `${row}-${col}`;
                     const square = document.createElement('div');
-                    square.className = 'ashtapada-square flex items-center justify-center text-xs font-bold text-amber-950 cursor-pointer select-none aspect-square';
+                    square.className = 'ashtapada-square flex flex-col items-center justify-center cursor-pointer select-none aspect-square relative';
                     square.dataset.id = squareId;
 
-                    // Insert piece name if it exists in the configuration coordinates
-                    if (initialSetup[squareId]) {
-                        square.innerText = initialSetup[squareId];
+                    const pieceName = initialSetup[squareId];
+                    if (pieceName) {
+                        // Create visual block for character signs
+                        square.innerHTML = `
+                            <span class="text-2xl">${pieceSigns[pieceName]}</span>
+                            <span class="text-[9px] text-amber-900 font-bold leading-none">${pieceName}</span>
+                        `;
                     }
 
                     square.addEventListener('click', () => handleSquareClick(row, col));
@@ -71,12 +97,12 @@
             if (selectedSquare === null) {
                 if (initialSetup[squareId]) {
                     selectedSquare = { row, col, piece: initialSetup[squareId] };
-                    statusElement.innerText = `Selected ${initialSetup[squareId]} at matrix [${row}, ${col}]. Tap a destination tile.`;
+                    statusElement.innerText = `Selected ${pieceSigns[selectedSquare.piece]} ${selectedSquare.piece} at [${row}, ${col}]. Tap target square to move.`;
                 }
             } else {
-                statusElement.innerText = `Moving ${selectedSquare.piece} from [${selectedSquare.row}, ${selectedSquare.col}] to [${row}, ${col}]... Data sent to server verification endpoint.`;
+                statusElement.innerText = `Moving ${pieceSigns[selectedSquare.piece]} from [${selectedSquare.row}, ${selectedSquare.col}] to [${row}, ${col}]...`;
                 
-                // Process visual update step locally
+                // Shift positions
                 delete initialSetup[`${selectedSquare.row}-${selectedSquare.col}`];
                 initialSetup[squareId] = selectedSquare.piece;
                 
@@ -85,7 +111,6 @@
             }
         }
 
-        // Initialize board UI rendering loop
         createBoard();
     </script>
 </body>
