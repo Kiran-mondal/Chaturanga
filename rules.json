@@ -1,0 +1,51 @@
+{
+  "gameName": "Chaturanga",
+  "modesSupported": ["2-Player", "4-Player"],
+  "board": {
+    "name": "Ashtapada",
+    "dimensions": "8x8",
+    "checkered": false
+  },
+  "movementRules": {
+    "Raja": {
+      "sign": "👑",
+      "description": "Moves exactly 1 square in any direction.",
+      "canJump": false
+    },
+    "Mantri": {
+      "sign": "📜",
+      "description": "Moves exactly 1 square diagonally only.",
+      "canJump": false
+    },
+    "Gaja": {
+      "sign": "🐘",
+      "description": "Moves exactly 2 squares diagonally. Can jump over intervening pieces.",
+      "canJump": true
+    },
+    "Ashva": {
+      "sign": "🐎",
+      "description": "Standard Knight L-shape move. Can jump over other pieces.",
+      "canJump": true
+    },
+    "Ratha": {
+      "sign": "🛕",
+      "description": "Moves any number of empty squares straight horizontally or vertically.",
+      "canJump": false
+    },
+    "Padati": {
+      "sign": "🛡️",
+      "description": "Moves 1 square straight forward. Captures 1 square diagonally forward. No initial double-step.",
+      "canJump": false
+    }
+  },
+  "playerModes": {
+    "2-Player": {
+      "description": "Traditional 2-sided military simulation. White vs Black.",
+      "teams": ["North Armies", "South Armies"]
+    },
+    "4-Player": {
+      "description": "Ancient Chaturaji mode. 4 players control 4 corners clockwise. Red, Green, Yellow, and Black.",
+      "diceRule": "Historically uses a 4-sided stick dice to decide which piece can move."
+    }
+  }
+}
