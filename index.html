@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chaturanga - Ancient Indian Heritage</title>
+    <title>Chaturanga - Ancient Indian Heritage Engine</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         @keyframes ambientGlow {
@@ -75,7 +75,7 @@
         }
     </style>
 </head>
-    <body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
+<body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
 
     <div class="text-center my-3 select-none">
         <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 tracking-widest drop-shadow-lg">चतुरङ्ग (CHATURANGA)</h1>
@@ -124,16 +124,24 @@
             </button>
         </div>
     </div>
-            <script>
+        <script>
+        // 🔗 আপনার রেন্ডার ব্যাকএন্ড অ্যাপের আসল ইউআরএল এখানে রিপ্লেস করে দিন
+        const RENDER_API_URL = "https://your-render-app-name.onrender.com/api"; 
+
         const pieceSigns = { 
             "Raja": "⚜️", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" 
         };
 
-        // Track engine stats for dynamic difficulty scaling
         let gameMetrics = {
             matchesPlayed: 0,
             userAggressionCount: 0, 
-            userMistakes: []
+            userMistakes: [],
+            matchMoveHistory: []
+        };
+
+        // গ্লোবাল ক্লাউড ইন্টেলিজেন্স ডেটাবেস মেমোরি
+        let aiDatabase = {
+            userWinningTraps: []
         };
 
         let currentMode = "Vs-AI"; 
@@ -149,6 +157,34 @@
         let selectedSquare = null;
         let highlightedMoves = [];
         let isPlayer1Turn = true; 
+
+        // ১. নিয়ন ডাটাবেস (রেন্ডার এপিআই) থেকে বৈশ্বিক কৌশলগুলো লোড করার ফাংশন
+        async function loadGlobalAIDatabase() {
+            try {
+                const response = await fetch(`${RENDER_API_URL}/get-strategies`);
+                if (response.ok) {
+                    const data = await response.json();
+                    aiDatabase.userWinningTraps = data.traps || [];
+                    console.log("Global AI strategies pulled from Neon Database successfully.");
+                }
+            } catch (error) {
+                console.error("Cloud database offline. Falling back to local core logic.", error);
+            }
+        }
+
+        // ২. নতুন সফল কৌশল সরাসরি নিয়ন ডাটাবেজে ক্লাউড সিঙ্ক করার ফাংশন
+        async function syncTrapToNeonDatabase(winningMove) {
+            try {
+                await fetch(`${RENDER_API_URL}/save-strategy`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ move: winningMove })
+                });
+                console.log("Strategic vector synced globally with Neon Database.");
+            } catch (error) {
+                console.error("Cloud sync engine failed.", error);
+            }
+        }
 
         function resetInitialSetup() {
             initialSetup = {
@@ -177,6 +213,7 @@
             isGameOver = false;
             capturedWhite = [];
             capturedBlack = [];
+            gameMetrics.matchMoveHistory = [];
             resetInitialSetup();
             modalElement.classList.add('hidden');
             
@@ -188,9 +225,9 @@
                 document.getElementById('loss-title-2').innerText = "💀 Computer Losses";
                 
                 if(gameMetrics.matchesPlayed < 2) {
-                    statusElement.innerText = "🎓 TRAINING MODE: Match " + (gameMetrics.matchesPlayed + 1) + "/2. Learn the grid rules safely.";
+                    statusElement.innerText = "🎓 TRAINING MODE: Match " + (gameMetrics.matchesPlayed + 1) + "/2. AI is analyzing your core moves.";
                 } else {
-                    statusElement.innerText = "🔥 REAL COMBAT BATTLE: No more mercy! AI will strike hard using tactical algorithms.";
+                    statusElement.innerText = "🔥 REAL COMBAT: Cloud AI synchronized with Neon DB. Zero mercy mode active!";
                 }
             } else {
                 document.getElementById('loss-title-1').innerText = "💀 Player 1 Losses";
@@ -201,11 +238,16 @@
         }
 
         function generateAITeachingReport(userWon) {
-            if (currentMode !== 'Vs-AI') return "Match over in Pass & Play mode.";
+            if (currentMode !== 'Vs-AI') return "Match over in Local Pass & Play.";
             gameMetrics.matchesPlayed++;
             
             if (userWon) {
-                return "🎯 GENIUS WIN! You parsed my defense formation. Next match, I am upgrading my search tree algorithms to counter this strategy!";
+                if(gameMetrics.matchMoveHistory.length > 0) {
+                    const lastWinningMove = gameMetrics.matchMoveHistory[gameMetrics.matchMoveHistory.length - 1];
+                    aiDatabase.userWinningTraps.push(lastWinningMove);
+                    syncTrapToNeonDatabase(lastWinningMove); // নিয়ন ক্লাউডে সফল ট্র্যাপ পাঠিয়ে দেওয়া হচ্ছে
+                }
+                return "🎯 GENIUS WIN! Your breakthrough trap has been indexed into our Neon Cloud Database. Next time, my algorithms will auto-block this specific strategy!";
             }
 
             let advise = "🏛️ [AI MILITARY COACH ANALYSIS]:\n";
@@ -217,7 +259,7 @@
                 advise += "You underutilized your Ratha (🛕) and Gaja (🐘). These are your heavy armor assets; position them in clear channels to dominate.";
             }
             
-            advise += "\n\n🚀 NEXT MATCH UPGRADE: Training over! Adaptive AI will now execute strict check-mating strategies. Prepare yourself.";
+            advise += "\n\n🚀 REAL BATTLE ENGAGED: Mercy sub-routines deactivated. AI will execute strict tactical check-mating systems.";
             return advise;
         }
 
@@ -231,7 +273,7 @@
             gameMetrics.userMistakes = [];
             gameMetrics.userAggressionCount = 0;
         }
-                        function checkLegalMove(piece, fromR, fromC, toR, toC) {
+                    function checkLegalMove(piece, fromR, fromC, toR, toC) {
             if (toR < 0 || toR > 7 || toC < 0 || toC > 7) return false;
             if (fromR === toR && fromC === toC) return false;
             
@@ -262,7 +304,7 @@
                 case 'Ashva': 
                     return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
                 case 'Gaja': 
-                    return rowDiff === 2 && colDiff === 2; // Strict 2 square diagonal jump rule
+                    return rowDiff === 2 && colDiff === 2; // Strict 2 square jump rule
                 case 'Raja':
                     return rowDiff <= 1 && colDiff <= 1;
                 case 'Mantri':
@@ -336,7 +378,7 @@
                 const isLegal = checkLegalMove(selectedSquare.piece, selectedSquare.row, selectedSquare.col, row, col);
                 
                 if (!isLegal) {
-                    statusElement.innerText = `🏛️ System: Invalid Military Move. Obey the grid!`;
+                    statusElement.innerText = `🏛️ System: Invalid Military Move. Obey the grid rules!`;
                     selectedSquare = null;
                     highlightedMoves = [];
                     createBoard();
@@ -348,13 +390,15 @@
                     gameMetrics.userMistakes.push("Raja_exposed");
                 }
 
+                gameMetrics.matchMoveHistory.push({ from: fromKey, to: squareId, piece: selectedSquare.piece.name });
+
                 if (targetPiece) {
                     if (targetPiece.isWhite) {
                         capturedWhite.push(targetPiece.name);
                         if (targetPiece.name === 'Raja') {
                             isGameOver = true;
                             createBoard();
-                            showEndGameModal("DEFEAT", "Computer AI captured your Raja! Your kingdom collapsed.", "💀", false);
+                            showEndGameModal("DEFEAT", "Computer AI captured your Raja! Kingdom collapsed.", "💀", false);
                             return;
                         }
                     } else {
@@ -362,7 +406,7 @@
                         if (targetPiece.name === 'Raja') {
                             isGameOver = true;
                             createBoard();
-                            showEndGameModal("VICTORY!", "Magnificent! You captured the AI's Raja!", "👑", true);
+                            showEndGameModal("VICTORY!", "Magnificent! You captured the AI's throne Raja!", "👑", true);
                             return;
                         }
                     }
@@ -381,8 +425,8 @@
                 if (isGameOver) return;
 
                 if (currentMode === 'Vs-AI') {
-                    statusElement.innerText = `AI Thinking...`;
-                    setTimeout(runAdvancedAiTurn, 300); // Super fast calculation trigger
+                    statusElement.innerText = `AI Calculating Strategy...`;
+                    setTimeout(runAdvancedAiTurn, 300); 
                 } else {
                     isPlayer1Turn = !isPlayer1Turn;
                     statusElement.innerText = isPlayer1Turn ? "Player 1 Turn!" : "Player 2 Turn!";
@@ -411,9 +455,17 @@
                                         weight = target.name === 'Raja' ? 500 : (target.name === 'Mantri' ? 80 : (target.name === 'Ratha' ? 60 : 30));
                                     }
                                 } else {
-                                    // Positional weight enhancement for active gameplay
                                     weight = (toR * 2); 
                                 }
+
+                                // 🧠 ক্লাউড লার্নিং কাউন্টার লজিক:
+                                // নিয়ন ডাটাবেস থেকে পাওয়া সফল ট্র্যাপের ঘরগুলো এআই আগে থেকেই প্রটেক্ট বা ব্লক করবে
+                                aiDatabase.userWinningTraps.forEach(trap => {
+                                    if (trap.to === `${toR}-${toC}`) {
+                                        weight += 200; // প্রটেকশন বুস্ট
+                                    }
+                                });
+
                                 allLegalAiMoves.push({ fromKey: key, toKey: `${toR}-${toC}`, piece: piece, weight: weight, targetPiece: target });
                             }
                         }
@@ -423,15 +475,14 @@
 
             if (allLegalAiMoves.length === 0) {
                 isGameOver = true;
-                showEndGameModal("STALEMATE", "No safe deployments left. Draw!", "🏳️", false);
+                showEndGameModal("STALEMATE", "No safe deployments left. It's a DRAW!", "🏳️", false);
                 return;
             }
 
-            // AI Decision logic based on game tier
             if (gameMetrics.matchesPlayed >= 2) {
-                allLegalAiMoves.sort((a, b) => b.weight - a.weight); // Pure Expert Aggression
+                allLegalAiMoves.sort((a, b) => b.weight - a.weight); 
             } else {
-                allLegalAiMoves.sort((a, b) => (Math.random() > 0.5 ? b.weight - a.weight : a.weight - b.weight)); // Relaxed training flow
+                allLegalAiMoves.sort((a, b) => (Math.random() > 0.5 ? b.weight - a.weight : a.weight - b.weight)); 
             }
             
             const bestMove = allLegalAiMoves[0]; 
@@ -461,8 +512,9 @@
             }
         }
 
+        // গেম লোড হওয়ার শুরুতেই নিয়ন ডাটাবেসের ডেটা ক্লাউড থেকে সিঙ্ক হবে
+        loadGlobalAIDatabase();
         triggerReset();
     </script>
 </body>
 </html>
-
