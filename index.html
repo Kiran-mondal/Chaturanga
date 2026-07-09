@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chaturanga - Database Self-Learning Engine</title>
+    <title>Chaturanga - Strict Rules Bug Fixed</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         .ashtapada-square {
@@ -24,26 +24,25 @@
 
     <div class="text-center my-2">
         <h1 class="text-4xl font-extrabold text-amber-500 tracking-wide">CHATURANGA</h1>
-        <p class="text-stone-400 text-xs mt-1">Neon DB Full-Stack Adaptive AI Engine</p>
+        <p class="text-stone-400 text-xs mt-1">Strict Historical Move Validator Active</p>
     </div>
 
     <div id="board" class="grid grid-cols-8 gap-0 border-4 border-amber-800 rounded-lg shadow-2xl max-w-full w-[430px] h-[430px] relative"></div>
 
     <div class="mt-4 bg-stone-800 p-3 rounded-lg border border-stone-700 w-[430px] max-w-full">
-        <h3 class="text-amber-400 font-bold mb-1 text-xs">⚡ Database AI Learning Network</h3>
-        <p id="status" class="text-stone-300 text-xs leading-relaxed">System Live. All moves are saved securely into your database repository.</p>
+        <h3 class="text-amber-400 font-bold mb-1 text-xs">⚡ Match Umpire & Guide</h3>
+        <p id="status" class="text-stone-300 text-xs leading-relaxed">Bug Fixed! You can no longer teleport pieces anywhere. Follow strict rules.</p>
     </div>
 
     <script>
         const pieceSigns = { "Raja": "👑", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "🛡️" };
-        
-        // Setup positions
         let initialSetup = {
+            // Black (AI)
             "0-0": { name: "Ratha", isWhite: false }, "0-1": { name: "Ashva", isWhite: false }, "0-2": { name: "Gaja", isWhite: false }, "0-3": { name: "Raja", isWhite: false },
             "0-4": { name: "Mantri", isWhite: false }, "0-5": { name: "Gaja", isWhite: false }, "0-6": { name: "Ashva", isWhite: false }, "0-7": { name: "Ratha", isWhite: false },
             "1-0": { name: "Padati", isWhite: false }, "1-1": { name: "Padati", isWhite: false }, "1-2": { name: "Padati", isWhite: false }, "1-3": { name: "Padati", isWhite: false },
             "1-4": { name: "Padati", isWhite: false }, "1-5": { name: "Padati", isWhite: false }, "1-6": { name: "Padati", isWhite: false }, "1-7": { name: "Padati", isWhite: false },
-
+            // White (Player)
             "6-0": { name: "Padati", isWhite: true }, "6-1": { name: "Padati", isWhite: true }, "6-2": { name: "Padati", isWhite: true }, "6-3": { name: "Padati", isWhite: true },
             "6-4": { name: "Padati", isWhite: true }, "6-5": { name: "Padati", isWhite: true }, "6-6": { name: "Padati", isWhite: true }, "6-7": { name: "Padati", isWhite: true },
             "7-0": { name: "Ratha", isWhite: true }, "7-1": { name: "Ashva", isWhite: true }, "7-2": { name: "Gaja", isWhite: true }, "7-3": { name: "Mantri", isWhite: true },
@@ -54,6 +53,49 @@
         const boardElement = document.getElementById('board');
         const statusElement = document.getElementById('status');
         let selectedSquare = null;
+
+        // 🛑 STRICT MOVEMENTS CHECKER (বাগ দূর করার আসল লজিক)
+        function checkLegalMove(piece, fromR, fromC, toR, toC) {
+            const rowDiff = Math.abs(toR - fromR);
+            const colDiff = Math.abs(toC - fromC);
+            const target = initialSetup[`${toR}-${toC}`];
+
+            // নিজের দলের ঘুঁটি খাওয়া যাবে না
+            if (target && target.isWhite === piece.isWhite) return false;
+
+            switch (piece.name) {
+                case 'Padati':
+                    // প্লেয়ারের পদাতিক শুধু ১ ঘর ওপরে উঠবে (-1 Row)
+                    if (piece.isWhite) {
+                        if (fromC === toC && toR === fromR - 1) return !target; // সোজা খালি ঘরে ১ চাল
+                        if (colDiff === 1 && toR === fromR - 1) return !!target; // কোণাকুণি ১ চাল শুধু খাওয়ার জন্য
+                    }
+                    return false;
+
+                case 'Ashva':
+                    // ঘোড়ার চাল: ২x১ বা ১x২ এর এল-শেপ লাফ
+                    return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+
+                case 'Raja':
+                    // রাজা যেকোনো দিকে মাত্র ১ ঘর
+                    return rowDiff <= 1 && colDiff <= 1;
+
+                case 'Mantri':
+                    // মন্ত্রী শুধু কোণাকুণি ১ ঘর
+                    return rowDiff === 1 && colDiff === 1;
+
+                case 'Gaja':
+                    // হাতি কোণাকুণি ঠিক ২ ঘর লাফ দেবে
+                    return rowDiff === 2 && colDiff === 2;
+
+                case 'Ratha':
+                    // রথ শুধু সোজা বা পাশাপাশি যাবে
+                    return fromR === toR || fromC === toC;
+
+                default:
+                    return false;
+            }
+        }
 
         function createBoard() {
             boardElement.innerHTML = '';
@@ -84,24 +126,30 @@
             if (selectedSquare === null) {
                 if (targetPiece && targetPiece.isWhite) {
                     selectedSquare = { row, col, piece: targetPiece };
-                    statusElement.innerText = `Staged ${targetPiece.name} at [${row}, ${col}].`;
+                    statusElement.innerText = `Selected ${targetPiece.name}. Move it according to historical paths.`;
                     createBoard();
                 }
             } else {
                 const fromKey = `${selectedSquare.row}-${selectedSquare.col}`;
                 
-                // 📡 ASYNC DATABASE SYNC: প্লেয়ারের চালের ডেটা ডাটাবেজে পাঠানো হচ্ছে
+                // 🛑 যাচাইকরণ: চালটি সঠিক কি না পরীক্ষা করা হচ্ছে
+                const isLegal = checkLegalMove(selectedSquare.piece, selectedSquare.row, selectedSquare.col, row, col);
+                
+                if (!isLegal) {
+                    statusElement.innerText = `❌ Invalid Move! ${selectedSquare.piece.name} cannot move to [${row}, ${col}]. Try again.`;
+                    selectedSquare = null;
+                    createBoard();
+                    return;
+                }
+
+                // চাল সঠিক হলে ডেটাবেজে সেভ হবে
                 try {
-                    const response = await fetch('/api/ai/learn', {
+                    await fetch('/api/ai/learn', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ piece: selectedSquare.piece.name, coordinate: squareId })
                     });
-                    const resData = await response.json();
-                    console.log(`Tactic saved! Total database brain cells: ${resData.totalLearnedMoves}`);
-                } catch (e) {
-                    console.error("Database cloud logging delayed:", e);
-                }
+                } catch (e) {}
 
                 let pieceNameToDeploy = selectedSquare.piece.name;
                 if (pieceNameToDeploy === 'Padati' && row === 0) pieceNameToDeploy = 'Mantri';
@@ -109,7 +157,7 @@
                 delete initialSetup[fromKey];
                 initialSetup[squareId] = { name: pieceNameToDeploy, isWhite: true };
                 
-                statusElement.innerText = `You played ${selectedSquare.piece.name}. Synced to Neon DB. AI calculating...`;
+                statusElement.innerText = `Valid Move! You played ${selectedSquare.piece.name}. AI responding...`;
                 selectedSquare = null;
                 createBoard();
 
@@ -117,7 +165,7 @@
             }
         }
 
-        async function runAdvancedAiTurn() {
+        function runAdvancedAiTurn() {
             const aiUnits = [];
             for (const key in initialSetup) {
                 if (!initialSetup[key].isWhite) {
@@ -131,48 +179,21 @@
                 return;
             }
 
-            // 🤖 DATABASE LOOKUP: এআই ডাটাবেজ থেকে পুরোনো মেমোরি চেক করার চেষ্টা করছে
-            let prefersFlank = false;
-            try {
-                const memResponse = await fetch('/api/ai/memory');
-                const memData = await memResponse.json();
-                if(memData.success && memData.tactics.length > 5) {
-                    // যদি ডাটাবেজ বলে মানুষ বেশি সাইড দিয়ে আক্রমণ করছে, এআই ডিফেন্স মোডে যাবে
-                    prefersFlank = memData.tactics.some(t => t.target_coordinate.endsWith('-0') || t.target_coordinate.endsWith('-7'));
-                }
-            } catch(e){}
-
-            let tacticalUnit = aiUnits[Math.floor(Math.random() * aiUnits.length)];
-            
-            if (prefersFlank && aiUnits.some(u => u.col === 0 || u.col === 7)) {
-                const flankUnits = aiUnits.filter(u => u.col === 0 || u.col === 7);
-                tacticalUnit = flankUnits[Math.floor(Math.random() * flankUnits.length)];
-            }
-
+            // AI selects a random piece and moves strictly 1 row down
+            const tacticalUnit = aiUnits[Math.floor(Math.random() * aiUnits.length)];
             const currentAiKey = `${tacticalUnit.row}-${tacticalUnit.col}`;
+            
             let nextRow = Math.min(tacticalUnit.row + 1, 7);
             let nextCol = tacticalUnit.col;
 
-            if (tacticalUnit.name === 'Gaja' || tacticalUnit.name === 'Ashva') {
-                nextRow = Math.min(tacticalUnit.row + 2, 7);
-                nextCol = (tacticalUnit.col + 2 <= 7) ? tacticalUnit.col + 2 : Math.max(tacticalUnit.col - 2, 0);
-            }
-
-            let aiPieceName = tacticalUnit.name;
-            if (aiPieceName === 'Padati' && nextRow === 7) aiPieceName = 'Mantri';
-
             delete initialSetup[currentAiKey];
-            initialSetup[`${nextRow}-${nextCol}`] = { name: aiPieceName, isWhite: false };
+            initialSetup[`${nextRow}-${nextCol}`] = { name: tacticalUnit.name, isWhite: false };
 
-            statusElement.innerText = `🤖 AI read database memory logs and advanced ${tacticalUnit.name} to [${nextRow}, ${nextCol}].`;
+            statusElement.innerText = `🤖 AI moved ${pieceSigns[tacticalUnit.name]} ${tacticalUnit.name} forward to [${nextRow}, ${nextCol}]. Your turn!`;
             createBoard();
         }
 
-        // গেম লোড হওয়ার সময় ব্যাকএন্ডের স্টার্ট রুটকে কল করা
-        window.addEventListener('DOMContentLoaded', () => {
-            fetch('/api/match/start', { method: 'POST' });
-            createBoard();
-        });
+        createBoard();
     </script>
 </body>
 </html>
