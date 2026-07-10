@@ -78,7 +78,7 @@
 <body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
 
     <div class="text-center my-3 select-none">
-        <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 tracking-widest drop-shadow-lg">चतुरङ्ग (CHATURANGA)</h1>
+        <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 tracking-widest drop-shadow-lg">चтурङ्ग (CHATURANGA)</h1>
         <p class="text-amber-600/80 text-[10px] mt-0.5 font-sans tracking-widest uppercase">Ancient Indian Military Path-Blocking Engine</p>
     </div>
 
@@ -132,11 +132,11 @@
         };
 
         let gameMetrics = {
-            matchesPlayed: 0,
+            currentStage: 1,           // ১ থেকে শুরু হবে প্রোগ্রেসিভ লেভেল লুপ
             userAggressionCount: 0, 
             userMistakes: [],
             matchMoveHistory: [],
-            consecutiveUserLosses: 0 // ইউজারের টানা হারের ট্র্যাকিং ভেরিয়েবল
+            consecutiveUserLosses: 0   // টানা হারের কাউন্টার
         };
 
         let aiDatabase = {
@@ -163,10 +163,10 @@
                 if (response.ok) {
                     const data = await response.json();
                     aiDatabase.userWinningTraps = data.traps || [];
-                    console.log("Global strategies loaded.");
+                    console.log("Global strategies loaded successfully.");
                 }
             } catch (error) {
-                console.error("Using localized temporary cache.", error);
+                console.error("Local network cache bypassed.", error);
             }
         }
 
@@ -177,9 +177,9 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ move: winningMove })
                 });
-                console.log("Strategy synced with Neon DB.");
+                console.log("Strategy securely synchronized with Neon Database server.");
             } catch (error) {
-                console.error("Cloud engine connection bypass.", error);
+                console.error("Cloud synchronization bypass.", error);
             }
         }
 
@@ -200,7 +200,7 @@
         function switchMode(mode) {
             currentMode = mode;
             if(mode === "Vs-AI") {
-                gameMetrics.matchesPlayed = 0; 
+                gameMetrics.currentStage = 1; 
                 gameMetrics.consecutiveUserLosses = 0;
             }
             triggerReset();
@@ -224,12 +224,12 @@
                 document.getElementById('loss-title-1').innerText = "💀 Your Losses";
                 document.getElementById('loss-title-2').innerText = "💀 Computer Losses";
                 
-                if (gameMetrics.consecutiveUserLosses >= 2) {
-                    statusElement.innerText = "🤝 MENTOR MODE ACTIVE: এআই তার শক্তি কমিয়েছে। এই ম্যাচে আপনাকে জেতার চমৎকার সুযোগ দেওয়া হচ্ছে! সাহস নিয়ে খেলুন।";
-                } else if (gameMetrics.matchesPlayed < 2) {
-                    statusElement.innerText = "🎓 TRAINING MODE: Match " + (gameMetrics.matchesPlayed + 1) + "/2. এআই আপনার চালের ধরন পর্যবেক্ষণ করছে।";
+                if (gameMetrics.currentStage === 1) {
+                    statusElement.innerText = "🎓 STAGE 1: Learning Mode. AI plays basic tactics to introduce grid operations.";
+                } else if (gameMetrics.currentStage === 2) {
+                    statusElement.innerText = "⚔️ STAGE 2: Moderate Combat. AI activates depth calculations. Stay alert.";
                 } else {
-                    statusElement.innerText = "🔥 REAL COMBAT: MiniMax 3-Step Predictive Engine active. বুদ্ধিমত্তা খাটিয়ে চাল দিন!";
+                    statusElement.innerText = "🔥 STAGE 3: Grandmaster Combat. Full MiniMax engine active. No exceptions!";
                 }
             } else {
                 document.getElementById('loss-title-1').innerText = "💀 Player 1 Losses";
@@ -240,31 +240,35 @@
         }
 
         function generateAITeachingReport(userWon) {
-            if (currentMode !== 'Vs-AI') return "Match over.";
-            gameMetrics.matchesPlayed++;
+            if (currentMode !== 'Vs-AI') return "Local Match Over.";
             
             if (userWon) {
-                gameMetrics.consecutiveUserLosses = 0; // ইউজার জিতলে হারের কাউন্টার শূন্য হয়ে যাবে
+                gameMetrics.consecutiveUserLosses = 0; 
+                gameMetrics.currentStage = Math.min(gameMetrics.currentStage + 1, 3); // জিতলে স্টেজ ১ লেভেল উপরে উঠবে (সর্বোচ্চ ৩)
+                
                 if(gameMetrics.matchMoveHistory.length > 0) {
                     const lastWinningMove = gameMetrics.matchMoveHistory[gameMetrics.matchMoveHistory.length - 1];
                     aiDatabase.userWinningTraps.push(lastWinningMove);
                     syncTrapToNeonDatabase(lastWinningMove); 
                 }
-                return "🎉 চমৎকার জয়! আপনি অসাধারণ বুদ্ধি খাটিয়ে এআই-এর প্রতিরক্ষা ভেঙে দিয়েছেন। আপনার এই নতুন কৌশলটি ক্লাউড ডাটাবেসে সেভ করা হলো।";
+                return "🎯 CONGRATULATIONS! You defeated the AI. Progression updated. Moving to Stage " + gameMetrics.currentStage + " for the next match.";
             }
 
-            gameMetrics.consecutiveUserLosses++; // ইউজার হারলে কাউন্টার ১ বাড়বে
+            gameMetrics.consecutiveUserLosses++; 
             
-            let advise = "🏛️ [AI ROYAL COURT COACH]:\n";
+            let advise = "🏛️ [AI COURT CHRONICLE REPORT]:\n";
             if (gameMetrics.consecutiveUserLosses >= 2) {
-                advise += "অনিল বা নতুন কোনো যোদ্ধা যখন যুদ্ধক্ষেত্রে বারবার বাধা পায়, তখন সেনাপতি তার রণকৌশল সহজ করে দেন। পরবর্তী ম্যাচে আপনার জয়ের পথ সহজ করা হয়েছে। ভেঙে না পড়ে আবার চেষ্টা করুন!";
+                gameMetrics.currentStage = 1; // ২ বার হারলে সোজা স্টেজ ১ এ ব্যাক করবে
+                gameMetrics.consecutiveUserLosses = 0;
+                advise += "CRITICAL PATTERN RECOVERY: Consecutive losses detected. Resetting AI Engine to Stage 1 (Learning Mode) to re-establish tactical interest.";
             } else {
+                advise += "CURRENT RATING: Stage " + gameMetrics.currentStage + " ongoing. ";
                 if (gameMetrics.userAggressionCount < 3) {
-                    advise += "আপনার পদাতিক ও অশ্ব বাহিনীগুলো শুরুতে একটু অলস ছিল। চতুরঙ্গে গুটি আটকে রাখলে পরাজয় নিশ্চিত। গুটিগুলো সামনে এগিয়ে দিন।";
+                    advise += "Vanguard files remained static. In Chaturanga, blocked files cause rapid defeat. Deploy Ashva & Padati early.";
                 } else if (gameMetrics.userMistakes.includes("Raja_exposed")) {
-                    advise += "বড় ভুল: আক্রমণ করার উৎসাহে আপনি রাজাকে অরক্ষিত রেখেছিলেন। মন্ত্রীকে রাজার আশেপাশে ঢাল হিসেবে রাখুন।";
+                    advise += "Tactical blunder detected. Left your Raja completely unguarded during your mid-board pushing maneuvers.";
                 } else {
-                    advise += "রথ ও গজ (হাতি) আপনার সবচেয়ে বড় শক্তি। এদের চলার পথ খোলা রাখুন, রাজকীয় জয় আসবেই!";
+                    advise += "Heavy armor assets (Ratha & Gaja) were severely underutilized. Open active lanes to control the grid.";
                 }
             }
             return advise;
@@ -385,7 +389,7 @@
                 const isLegal = checkLegalMove(selectedSquare.piece, selectedSquare.row, selectedSquare.col, row, col);
                 
                 if (!isLegal) {
-                    statusElement.innerText = `🏛️ System: Invalid Grid Navigation.`;
+                    statusElement.innerText = "System Warning: Invalid Grid Placement Attempted.";
                     selectedSquare = null;
                     highlightedMoves = [];
                     createBoard();
@@ -405,7 +409,7 @@
                         if (targetPiece.name === 'Raja') {
                             isGameOver = true;
                             createBoard();
-                            showEndGameModal("DEFEAT", "Computer AI captured your Raja!", "💀", false);
+                            showEndGameModal("DEFEAT", "The Computer AI captured your Raja! Lines broken.", "💀", false);
                             return;
                         }
                     } else {
@@ -413,7 +417,7 @@
                         if (targetPiece.name === 'Raja') {
                             isGameOver = true;
                             createBoard();
-                            showEndGameModal("VICTORY!", "You captured the enemy Raja!", "👑", true);
+                            showEndGameModal("VICTORY!", "Spectacular battle! You captured the opposing throne!", "👑", true);
                             return;
                         }
                     }
@@ -432,7 +436,7 @@
                 if (isGameOver) return;
 
                 if (currentMode === 'Vs-AI') {
-                    statusElement.innerText = `🤖 AI planning steps...`;
+                    statusElement.innerText = "AI is computing structural paths...";
                     setTimeout(triggerAiEngineLogic, 300); 
                 } else {
                     isPlayer1Turn = !isPlayer1Turn;
@@ -533,21 +537,29 @@
 
             if (allLegalAiMoves.length === 0) {
                 isGameOver = true;
-                showEndGameModal("STALEMATE", "Draw!", "🏳️", false);
+                showEndGameModal("STALEMATE", "The tactical engagement is a royal draw.", "🏳️", false);
                 return;
             }
 
-            // 🧠 ডাইনামিক ডিফিকাল্টি অ্যাডজাস্টমেন্ট লজিক (DDA)
-            if (gameMetrics.consecutiveUserLosses >= 2) {
-                // 🤝 মেন্টর মোড: ইউজার টানা ২ বার হারলে এআই তার শক্তি কমিয়ে একদম সহজ চাল দেবে
-                allLegalAiMoves.sort((a, b) => {
-                    // যদি কোনো চালের ফলে ইউজারের গুটি কাটা যায়, সেই চালকে এআই এড়িয়ে চলার চেষ্টা করবে (কম পয়েন্ট দেবে)
-                    let aScore = a.targetPiece ? -100 : Math.random();
-                    let bScore = b.targetPiece ? -100 : Math.random();
-                    return aScore - bScore;
-                });
-            } else if (gameMetrics.matchesPlayed >= 2) {
-                // 🔥 সাধারণ রিয়াল মোড: ৩-ধাপের এডভান্সড মিনিম্যাক্স
+            // 👑 PROGRESSIVE AUTO-SCALING HARDNESS LOGIC
+            if (gameMetrics.currentStage === 1) {
+                // Stage 1: Easy Learning Mode - Random deployment pacing
+                allLegalAiMoves.sort((a, b) => Math.random() - 0.5);
+            } else if (gameMetrics.currentStage === 2) {
+                // Stage 2: Moderate Mode - 1-Turn depth evaluation active
+                for (const move of allLegalAiMoves) {
+                    const backup = initialSetup[move.toKey];
+                    initialSetup[move.toKey] = initialSetup[move.fromKey];
+                    delete initialSetup[move.fromKey];
+                    
+                    move.minimaxWeight = evaluateBoardState(); 
+                    
+                    initialSetup[move.fromKey] = initialSetup[move.toKey];
+                    if (backup) initialSetup[move.toKey] = backup; else delete initialSetup[move.toKey];
+                }
+                allLegalAiMoves.sort((a, b) => b.minimaxWeight - a.minimaxWeight);
+            } else {
+                // Stage 3: Master Hardcore Mode - Full 3-Step Predictive MiniMax + Neon Cloud Cache Injection
                 for (const move of allLegalAiMoves) {
                     const backup = initialSetup[move.toKey];
                     initialSetup[move.toKey] = initialSetup[move.fromKey];
@@ -563,9 +575,6 @@
                     if (backup) initialSetup[move.toKey] = backup; else delete initialSetup[move.toKey];
                 }
                 allLegalAiMoves.sort((a, b) => b.minimaxWeight - a.minimaxWeight);
-            } else {
-                // 🎓 ট্রেনিং মোড: সাধারণ র‍্যান্ডম অ্যালগরিদম
-                allLegalAiMoves.sort((a, b) => Math.random() - 0.5);
             }
             
             const bestMove = allLegalAiMoves[0]; 
@@ -575,7 +584,7 @@
                 if (bestMove.targetPiece.name === 'Raja') {
                     isGameOver = true;
                     createBoard();
-                    showEndGameModal("DEFEAT", "Computer AI captured your Raja!", "💀", false);
+                    showEndGameModal("DEFEAT", "The Computer AI captured your Raja!", "💀", false);
                     return;
                 } else {
                     statusElement.innerText = `⚔️ AI captured your ${bestMove.targetPiece.name}!`;
@@ -590,7 +599,7 @@
             createBoard();
             if (!isGameOver) {
                 setTimeout(() => {
-                    statusElement.innerText = "Your Turn! Make a calculated move...";
+                    statusElement.innerText = "Your Turn! Execute your grid maneuvers...";
                 }, 800);
             }
         }
