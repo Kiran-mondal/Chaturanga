@@ -6,7 +6,7 @@
     <title>Chaturanga - Royal Sandalwood Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* 🌌 আপনার আগের সেই আশেপাশের নড়াচড়া করা ব্যাকগ্রাউন্ড অ্যানিমেশন (অপরিবর্তিত) */
+        /* 🌌 Intact Ambient Background Animation */
         @keyframes ambientGlow {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -27,16 +27,16 @@
             -webkit-user-select: none;
         }
 
-        /* 👑 এবার শুধু মেইন খেলার বোর্ডটি চন্দন কাঠের ফ্রেমে এবং চারপাশে ডাবল সোনালী আবরণে থাকবে */
+        /* 👑 Main Ashtapada Board: Sandalwood frame with premium double-layered gold coating */
         .ashtapada-board {
             display: grid;
             grid-template-columns: repeat(8, minmax(0, 1fr));
             width: 100%;
             max-width: 400px;
             aspect-ratio: 1 / 1;
-            padding: 10px; /* সোনালী ফ্রেমের রাজকীয় স্পেস */
-            background: linear-gradient(135deg, #2b1408 0%, #170a04 100%); /* রোজউড/চন্দন ফ্রেম */
-            border: 5px double #d4af37; /* বর্ডারের ওপরে খাঁটি সোনালী আবরণ */
+            padding: 10px; 
+            background: linear-gradient(135deg, #2b1408 0%, #170a04 100%); 
+            border: 5px double #d4af37; 
             box-shadow: 
                 0 0 0 2px #170a04,
                 inset 0 0 15px rgba(0,0,0,0.85),
@@ -44,7 +44,7 @@
             border-radius: 6px;
         }
 
-        /* স্কয়ার ইন্টারঅ্যাকশন */
+        /* Square Interaction Defaults */
         .ashtapada-square {
             position: relative;
             display: flex;
@@ -57,21 +57,20 @@
             z-index: 5;
         }
 
-        /* 🦴 হাতির দাঁতের (Antique Ivory) তৈরি মসৃণ হালকা ঘর */
+        /* 🦴 Smooth Antique Ivory Light Squares */
         .light-square { 
             background: linear-gradient(145deg, #fdfbf7 0%, #e6dcce 100%); 
             box-shadow: inset 1px 1px 2px rgba(255,255,255,0.8), inset -1px -1px 2px rgba(0,0,0,0.05);
         }
         
-        /* 🪵 রাজকীয় চন্দন ও রোজউড (Dark Sandalwood) কাঠের ডার্ক ঘর */
+        /* 🪵 Deep Grain Dark Sandalwood/Rosewood Squares */
         .dark-square { 
             background: linear-gradient(145deg, #3d1b0c 0%, #1f0d05 100%); 
-            /* কাঠের সূক্ষ্ম টেক্সচার বা ফাইবার ইলিউশন */
             background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 2px, transparent 2px, transparent 4px);
             box-shadow: inset 2px 2px 4px rgba(0,0,0,0.55), inset -1px -1px 2px rgba(255,255,255,0.05);
         }
         
-        /* প্রথাগত অষ্টপদ ইনলেই স্টার চিহ্ন (কাঠের ওপর খোদাই করা নকশা) */
+        /* Traditional Ashtapada Inlay Engravings */
         .marked-square::after {
             content: "✦";
             position: absolute;
@@ -81,18 +80,18 @@
             z-index: 1;
         }
         .dark-square.marked-square::after {
-            color: #d4af37; /* ডার্ক উডের ওপর গোল্ডেন খোদাই */
+            color: #d4af37; 
             opacity: 0.25;
         }
         
-        /* গুটি সিলেক্ট হলে ব্রোঞ্জ বা তামার খোদাই করা রাজকীয় বর্ডার */
+        /* Active Piece Selection (Engraved Look) */
         .selected { 
             box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.7) !important;
             border: 3px solid #d4af37 !important; 
             z-index: 20;
         }
         
-        /* যান্ত্রিক নিয়ন গ্লো বাদ—তার বদলে কাঠের ওপর পিত্তলের গোল রিং মার্কার */
+        /* Tactical Brass Inlay Rings for Valid Movements */
         .possible-move-marker::before {
             content: "";
             position: absolute;
@@ -106,7 +105,7 @@
             pointer-events: none;
         }
         
-        /* শত্রু কাটার ঘর—গাঢ় তামার রঙের ড্যাশ বর্ডার */
+        /* Target Attack Targets (Dashed Copper Finish) */
         .possible-capture-marker {
             box-shadow: inset 0 0 10px rgba(139, 0, 0, 0.4) !important;
             border: 2.5px dashed #aa2b2b !important;
@@ -158,7 +157,7 @@
         <div class="bg-stone-950 border border-amber-500 p-6 rounded-xl max-w-xs w-full text-center shadow-2xl">
             <div id="modalIcon" class="text-4xl mb-2">⚜️</div>
             <h2 id="modalTitle" class="text-xl font-black text-amber-500 tracking-wide uppercase">Battle Settled</h2>
-            <p id="modalDesc" class="text-stone-400 text-xs my-3 font-sans leading-relaxed"></p>
+            <div id="modalDesc" class="text-stone-400 text-xs my-3 font-sans leading-relaxed"></div>
             <button onclick="triggerReset()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold rounded-lg shadow-md text-xs font-sans uppercase tracking-wider cursor-pointer">
                 🔄 Restart Battle
             </button>
@@ -171,11 +170,10 @@
             "Raja": "⚜️", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" 
         };
 
-        // 🧠 এআই-এর সেলফ-লার্নিং মেমোরি
+        // 🧠 AI Adaptive Learning & Core Memory Matrix
         let gameMetrics = {
-            currentStage: 2,           
-            userAggressionCount: 0, 
-            userMistakes: [],
+            currentStage: 2,           // Starts at Stage 2 (Balanced & Capable Competitor)
+            userAggressionCount: 0,    // Evaluates real-time player tactical proficiency
             matchMoveHistory: [],
             consecutiveUserLosses: 0   
         };
@@ -194,7 +192,7 @@
         let highlightedMoves = [];
         let isPlayer1Turn = true; 
 
-        // 📡 এআই-এর মেমোরি সিঙ্ক করা
+        // Synchronize Global Strategic Repositories
         async function loadGlobalAIDatabase() {
             try {
                 const response = await fetch(`${RENDER_API_URL}/get-strategies`);
@@ -208,7 +206,7 @@
             }
         }
 
-        // 💾 ইউজারের ফাঁদ এআই তার ডাটাবেজে সেভ করে নিজেকে ট্রেন করবে
+        // Upload and record winning traps to train the engine
         async function syncTrapToNeonDatabase(winningMove) {
             try {
                 await fetch(`${RENDER_API_URL}/save-strategy`, {
@@ -239,7 +237,7 @@
             currentMode = mode;
             if(mode === "Vs-AI") {
                 gameMetrics.currentStage = 2; 
-                gameMetrics.consecutiveUserLosses = 0;
+                gameMetrics.userAggressionCount = 0;
             }
             triggerReset();
         }
@@ -269,17 +267,15 @@
         }
 
         function generateAITeachingReport(userWon) {
-            if (currentMode !== 'Vs-AI') return "Local Match Over.";
+            if (currentMode !== 'Vs-AI') return "Match Processed Successfully.";
             if (userWon) {
-                gameMetrics.consecutiveUserLosses = 0; 
-                gameMetrics.currentStage = 3; // সর্বোচ্চ হার্ড লেভেল অ্যাক্টিভেট
+                gameMetrics.currentStage = 3; // Shift engine permanently to hard mode upon losing
                 if(gameMetrics.matchMoveHistory.length > 0) {
                     syncTrapToNeonDatabase(gameMetrics.matchMoveHistory.slice(-2).join("->"));
                 }
-                return "🎯 চমৎকার বিজয়! এআই আপনার জেতার কৌশলটি বিশ্লেষণ করেছে এবং পরবর্তী ম্যাচের জন্য নিজেকে আরও শক্তিশালী করে তুলেছে।";
+                return "🎯 Exceptional Tactics! The AI has detected you as an advanced master-level competitor and calibrated its calculations to Stage 3 for maximum challenge.";
             }
-            gameMetrics.consecutiveUserLosses++; 
-            return "🏛️ চাণক্য নীতি বিশ্লেষণ: আপনার রাজাকে সুরক্ষিত করতে পদাতিকের ঢাল ব্যবহার করুন। অশ্ব ও রথকে একসাথে আক্রমণাত্মক চালে পাঠান।";
+            return "🏛️ Strategic Analysis: Control the 4 central cells of the Ashtapada. Utilize your Padati rows to construct unified defensive walls.";
         }
 
         function showEndGameModal(title, description, icon, userWon) {
@@ -419,6 +415,16 @@
 
                 gameMetrics.matchMoveHistory.push(`${fromKey}:${selectedSquare.piece.name}->${squareId}`);
 
+                // 🧠 Adaptability Tracker: Watch for dynamic user skill indications
+                if (targetPiece && !targetPiece.isWhite) {
+                    gameMetrics.userAggressionCount++;
+                    // If player executes successive captures, switch from Balanced to Hard Mode instantly
+                    if (gameMetrics.userAggressionCount >= 2 && gameMetrics.currentStage === 2) {
+                        gameMetrics.currentStage = 3;
+                        console.log("AI Engine Alert: User detected as a skilled tactician. Activating Hard Mode.");
+                    }
+                }
+
                 if (targetPiece) {
                     if (targetPiece.isWhite) {
                         capturedWhite.push(targetPiece.name);
@@ -454,6 +460,7 @@
             }
         }
 
+        // 🎯 Balanced vs Absolute Tactical AI Decision Processor
         function triggerAiMoveLogic() {
             if (isGameOver) return;
             let availableAiMoves = [];
@@ -475,8 +482,9 @@
                                     if (target.name === 'Raja') priorityValue += 1000;
                                 }
 
+                                // Strategic Central Domain Weighting
                                 if (tR >= 3 && tR <= 4 && tC >= 3 && tC <= 4) {
-                                    priorityValue += 5;
+                                    priorityValue += 8;
                                 }
 
                                 availableAiMoves.push({ from: fromKey, to: `${tR}-${tC}`, piece: piece, weight: priorityValue });
@@ -492,9 +500,12 @@
                 return;
             }
 
+            // 🧠 Dynamic State Determination Matrix
             if (gameMetrics.currentStage === 2) {
+                // 👥 Balanced Mode: Focuses on piece value optimization while introducing human-like variability
                 availableAiMoves.sort((a, b) => b.weight - a.weight || Math.random() - 0.5); 
             } else {
+                // 🔱 Hard Mode: Pure calculation matrix. Absolute optimization without mistakes
                 availableAiMoves.sort((a, b) => b.weight - a.weight); 
             }
 
