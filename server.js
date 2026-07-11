@@ -1,10 +1,16 @@
-const express = require('express');
-const path = require('path');
-const cors = require('cors');
-const { Pool } = require('pg');
+import express from 'express';
+import path from 'path';
+import cors from 'cors';
+import pkg from 'pg';
+import { fileURLToPath } from 'url';
 
+const { Pool } = pkg;
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// 📁 ES Module-এ __dirname তৈরি করার আধুনিক নিয়ম
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 🔐 Middleware Configuration
 app.use(cors());
