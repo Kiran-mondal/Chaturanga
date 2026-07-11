@@ -5,15 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>Chaturanga Online - Play Royal Sandalwood Ashtapada Game</title>
-    <meta name="description" content="Play Chaturanga Online - The ancient Indian chess game strategy board game engine played on an 8x8 Ashtapada grid. Battle against a smart, adaptive computer engine or invite a friend for a pass-and-play match. No download required! Developed by Kiran Mondal.">
-    <meta name="keywords" content="chaturanga, chaturanga game, chaturanga online, ashtapada, ancient chess, chess origins, indian chess, chaturanga kiran mondal, chaturanga-6wdo, play chaturanga, chaturanga ai, chaturanga bot, 4 player chess, ancient indian strategy game, board game engine, historical board game">
+    <meta name="description" content="Play the ancient Indian chess game Chaturanga online. Battle against a smart, adaptive computer engine or invite a friend for a pass-and-play match. No download required!">
+    <meta name="keywords" content="Chaturanga, ancient chess, Ashtapada, Indian board game, play Chaturanga online, chess origins, historical board game">
     <meta name="author" content="Kiran Mondal">
 
     <meta property="og:title" content="Chaturanga Online - Royal Sandalwood Ashtapada Game">
     <meta property="og:description" content="Challenge the classic balanced computer engine in a historical game of Chaturanga. Experience premium tactical board gaming.">
     <meta property="og:image" content="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1000&auto=format&fit=crop">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://chaturanga-6wdo.onrender.com/">
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
@@ -121,6 +120,22 @@
             border: 1px solid #b45309;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
         }
+
+        /* 🟢 Live Blink Pulse for Online Counter */
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulseBlink 1.8s infinite;
+        }
+        @keyframes pulseBlink {
+            0% { opacity: 0.3; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0.3; transform: scale(0.9); }
+        }
     </style>
 </head>
 <body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
@@ -128,6 +143,23 @@
     <div class="text-center my-3 select-none">
         <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 tracking-widest drop-shadow-lg">चतुरंग (CHATURANGA)</h1>
         <p class="text-amber-600/80 text-[10px] mt-0.5 font-sans tracking-widest uppercase">Royal Sandalwood Ashtapada Engine</p>
+    </div>
+
+    <div class="heritage-card px-4 py-2 rounded-lg w-full max-w-[400px] mb-3 flex justify-between items-center border border-amber-900/30 bg-stone-950/40 shadow-inner">
+        <div class="flex items-center gap-2">
+            <span class="pulse-dot"></span>
+            <span class="text-[10px] font-bold tracking-wider font-sans text-stone-400 uppercase">Live Website Status</span>
+        </div>
+        <div class="flex gap-4 text-right">
+            <div>
+                <span id="online-users" class="text-xs font-bold text-emerald-400 font-sans">1</span>
+                <span class="block text-[8px] text-stone-500 font-sans uppercase">Online Now</span>
+            </div>
+            <div class="border-l border-stone-800 pl-4">
+                <span id="active-matches" class="text-xs font-bold text-amber-400 font-sans">0</span>
+                <span class="block text-[8px] text-stone-500 font-sans uppercase">In Battles</span>
+            </div>
+        </div>
     </div>
 
     <div id="mode-panel" class="flex gap-2 mb-4 heritage-card p-1.5 rounded-lg w-full max-w-[400px] justify-between items-center">
@@ -146,7 +178,7 @@
         <div id="board" class="ashtapada-board"></div>
     </div>
 
-    <div class="heritage-card p-3 rounded-lg w-full max-w-[400px] grid grid-cols-2 gap-3 mb-4">
+    <div class="heritage-card p-3 rounded-lg w-full max-w-[400px] grid grid-cols-2 gap-3">
         <div>
             <h4 id="loss-title-1" class="text-amber-400 font-bold text-[10px] mb-1 font-sans uppercase tracking-wider">💀 Your Losses</h4>
             <div id="white-graveyard" class="flex flex-wrap gap-1 text-lg bg-stone-950/40 p-1.5 rounded min-h-[36px] border border-stone-900"></div>
@@ -195,6 +227,39 @@
         let highlightedMoves = [];
         let isPlayer1Turn = true; 
 
+        // 🟢 True Real-Time Live Traffic Sync Engine
+        async function updateLiveTrafficAnalytics() {
+            try {
+                const response = await fetch(`${RENDER_API_URL}/live-counters`);
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // আপনার Render ব্যাকএন্ড সার্ভার থেকে প্রাপ্ত আসল গ্লোবাল ইউজার ডেটা
+                    const liveOnline = data.onlineNow || 1;
+                    const liveBattles = data.inBattles || 0;
+                    
+                    document.getElementById('online-users').innerText = liveOnline;
+                    document.getElementById('active-matches').innerText = liveBattles;
+                }
+            } catch (error) {
+                // নেটওয়ার্ক ফেইল বা লোকাল ডেভেলপমেন্টের জন্য ফলব্যাক ভ্যালু
+                document.getElementById('online-users').innerText = "1";
+                document.getElementById('active-matches').innerText = (gameMetrics.matchMoveHistory.length > 0 && !isGameOver) ? "1" : "0";
+            }
+        }
+
+        // ইউজার গেম শুরু করলে বা শেষ করলে ব্যাকএন্ডে অ্যাক্টিভিটি সিঙ্ক করার মেকানিজম
+        async function reportMatchActivity(status) {
+            try {
+                await fetch(`${RENDER_API_URL}/report-activity`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: status, mode: currentMode })
+                });
+            } catch (e) {}
+        }
+
+        // Synchronize Global Strategic Repositories
         async function loadGlobalDatabase() {
             try {
                 const response = await fetch(`${RENDER_API_URL}/get-strategies`);
@@ -265,6 +330,7 @@
                 document.getElementById('loss-title-2').innerText = "💀 Player 2 Losses";
             }
             createBoard();
+            reportMatchActivity("ended"); // গেম রিসেট হলে অ্যাক্টিভিটি ক্লিয়ার হবে
         }
 
         function generateTeachingReport(userWon) {
@@ -285,6 +351,7 @@
             document.getElementById('modalDesc').innerHTML = `<span class="block mb-3">${description}</span><div class="bg-stone-900 p-2.5 text-left text-amber-500 text-[11px] font-sans leading-relaxed whitespace-pre-line border border-amber-900/40">${teachingReport}</div>`;
             document.getElementById('modalIcon').innerText = icon;
             modalElement.classList.remove('hidden');
+            reportMatchActivity("ended"); // গেম ওভার হলে ম্যাচ সক্রিয় তালিকা থেকে বাদ যাবে
         }
 
         function checkLegalMove(piece, fromR, fromC, toR, toC) {
@@ -414,6 +481,11 @@
                     return;
                 }
 
+                // ইউজার যখনই প্রথম চাল চালবে, সে সক্রিয়ভাবে খেলছে (In Battles) হিসেবে সাবমিট হবে
+                if (gameMetrics.matchMoveHistory.length === 0) {
+                    reportMatchActivity("playing");
+                }
+
                 gameMetrics.matchMoveHistory.push(`${fromKey}:${selectedSquare.piece.name}->${squareId}`);
 
                 if (targetPiece && !targetPiece.isWhite) {
@@ -476,13 +548,10 @@
                                 if (target) {
                                     const weights = { "Padati": 15, "Ashva": 35, "Gaja": 40, "Ratha": 55, "Mantri": 75, "Raja": 99999 };
                                     priorityValue = weights[target.name] || 15;
-                                    
                                     if (target.name === 'Raja') priorityValue += 1000;
                                 }
 
-                                if (tR >= 3 && tR <= 4 && tC >= 3 && tC <= 4) {
-                                    priorityValue += 8;
-                                }
+                                if (tR >= 3 && tR <= 4 && tC >= 3 && tC <= 4) priorityValue += 8;
 
                                 availableMoves.push({ from: fromKey, to: `${tR}-${tC}`, piece: piece, weight: priorityValue });
                             }
@@ -521,7 +590,10 @@
             createBoard();
         }
 
+        // প্রতি ৫ সেকেন্ড পর পর আপনার Render ব্যাকএন্ড এপিআই থেকে একদম রিয়েল লাইভ কাউন্ট রিকোয়েস্ট করা হবে
         loadGlobalDatabase();
+        updateLiveTrafficAnalytics();
+        setInterval(updateLiveTrafficAnalytics, 5000); 
         triggerReset();
     </script>
 </body>
