@@ -130,8 +130,8 @@
         <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-900/40">
             👥 Pass & Play
         </button>
-        <button id="btnAI" onclick="switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition font-sans shadow-md shadow-amber-600/20">
-            🤖 VS Computer
+        <button id="btnComputer" onclick="switchMode('Vs-Computer')" class="flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition font-sans shadow-md shadow-amber-600/20">
+            💻 VS Computer
         </button>
         <button onclick="triggerReset()" class="px-3 py-2 text-[11px] font-bold bg-stone-950 text-red-400 rounded border border-red-900/30 cursor-pointer transition font-sans">
             🔄 Reset
@@ -170,7 +170,7 @@
             "Raja": "⚜️", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" 
         };
 
-        // 🧠 AI Adaptive Learning & Core Memory Matrix
+        // 🧠 Computer Adaptive Learning & Core Memory Matrix
         let gameMetrics = {
             currentStage: 2,           // Starts at Stage 2 (Balanced & Capable Competitor)
             userAggressionCount: 0,    // Evaluates real-time player tactical proficiency
@@ -178,8 +178,8 @@
             consecutiveUserLosses: 0   
         };
 
-        let aiDatabase = { userWinningTraps: [] };
-        let currentMode = "Vs-AI"; 
+        let strategyDatabase = { userWinningTraps: [] };
+        let currentMode = "Vs-Computer"; 
         let isGameOver = false; 
         let capturedWhite = [];
         let capturedBlack = [];
@@ -193,21 +193,21 @@
         let isPlayer1Turn = true; 
 
         // Synchronize Global Strategic Repositories
-        async function loadGlobalAIDatabase() {
+        async function loadGlobalDatabase() {
             try {
                 const response = await fetch(`${RENDER_API_URL}/get-strategies`);
                 if (response.ok) {
                     const data = await response.json();
-                    aiDatabase.userWinningTraps = data.traps || [];
-                    console.log("AI Engine: Prior combat strategies synchronized.");
+                    strategyDatabase.userWinningTraps = data.traps || [];
+                    console.log("Computer Engine: Prior combat strategies synchronized.");
                 }
             } catch (error) {
-                console.log("Local standalone AI mode active.");
+                console.log("Local standalone computer mode active.");
             }
         }
 
         // Upload and record winning traps to train the engine
-        async function syncTrapToNeonDatabase(winningMove) {
+        async function syncTrapToDatabase(winningMove) {
             try {
                 await fetch(`${RENDER_API_URL}/save-strategy`, {
                     method: 'POST',
@@ -235,7 +235,7 @@
 
         function switchMode(mode) {
             currentMode = mode;
-            if(mode === "Vs-AI") {
+            if(mode === "Vs-Computer") {
                 gameMetrics.currentStage = 2; 
                 gameMetrics.userAggressionCount = 0;
             }
@@ -254,9 +254,9 @@
             modalElement.classList.add('hidden');
             
             document.getElementById('btn2P').className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded font-sans shadow' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-900/40';
-            document.getElementById('btnAI').className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded font-sans shadow' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-900/40';
+            document.getElementById('btnComputer').className = currentMode === 'Vs-Computer' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded font-sans shadow' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-900/40';
             
-            if (currentMode === 'Vs-AI') {
+            if (currentMode === 'Vs-Computer') {
                 document.getElementById('loss-title-1').innerText = "💀 Your Losses";
                 document.getElementById('loss-title-2').innerText = "💀 Computer Losses";
             } else {
@@ -266,20 +266,20 @@
             createBoard();
         }
 
-        function generateAITeachingReport(userWon) {
-            if (currentMode !== 'Vs-AI') return "Match Processed Successfully.";
+        function generateTeachingReport(userWon) {
+            if (currentMode !== 'Vs-Computer') return "Match Processed Successfully.";
             if (userWon) {
                 gameMetrics.currentStage = 3; // Shift engine permanently to hard mode upon losing
                 if(gameMetrics.matchMoveHistory.length > 0) {
-                    syncTrapToNeonDatabase(gameMetrics.matchMoveHistory.slice(-2).join("->"));
+                    syncTrapToDatabase(gameMetrics.matchMoveHistory.slice(-2).join("->"));
                 }
-                return "🎯 Exceptional Tactics! The AI has detected you as an advanced master-level competitor and calibrated its calculations to Stage 3 for maximum challenge.";
+                return "🎯 Exceptional Tactics! The computer has detected you as an advanced master-level competitor and calibrated its calculations to Stage 3 for maximum challenge.";
             }
             return "🏛️ Strategic Analysis: Control the 4 central cells of the Ashtapada. Utilize your Padati rows to construct unified defensive walls.";
         }
 
         function showEndGameModal(title, description, icon, userWon) {
-            const teachingReport = generateAITeachingReport(userWon);
+            const teachingReport = generateTeachingReport(userWon);
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalDesc').innerHTML = `<span class="block mb-3">${description}</span><div class="bg-stone-900 p-2.5 text-left text-amber-500 text-[11px] font-sans leading-relaxed whitespace-pre-line border border-amber-900/40">${teachingReport}</div>`;
             document.getElementById('modalIcon').innerText = icon;
@@ -390,7 +390,7 @@
             if (selectedSquare === null) {
                 if (targetPiece) {
                     if (currentMode === '2-Player' && targetPiece.isWhite !== isPlayer1Turn) return;
-                    if (currentMode === 'Vs-AI' && !targetPiece.isWhite) return;
+                    if (currentMode === 'Vs-Computer' && !targetPiece.isWhite) return;
 
                     selectedSquare = { row, col, piece: targetPiece };
                     highlightedMoves = calculatePossibleMoves(row, col, targetPiece);
@@ -402,7 +402,7 @@
                 const isLegal = checkLegalMove(selectedSquare.piece, selectedSquare.row, selectedSquare.col, row, col);
                 
                 if (!isLegal) {
-                    if (targetPiece && ((currentMode === '2-Player' && targetPiece.isWhite === isPlayer1Turn) || (currentMode === 'Vs-AI' && targetPiece.isWhite))) {
+                    if (targetPiece && ((currentMode === '2-Player' && targetPiece.isWhite === isPlayer1Turn) || (currentMode === 'Vs-Computer' && targetPiece.isWhite))) {
                         selectedSquare = { row, col, piece: targetPiece };
                         highlightedMoves = calculatePossibleMoves(row, col, targetPiece);
                     } else {
@@ -421,7 +421,7 @@
                     // If player executes successive captures, switch from Balanced to Hard Mode instantly
                     if (gameMetrics.userAggressionCount >= 2 && gameMetrics.currentStage === 2) {
                         gameMetrics.currentStage = 3;
-                        console.log("AI Engine Alert: User detected as a skilled tactician. Activating Hard Mode.");
+                        console.log("Computer Engine Alert: User detected as a skilled tactician. Activating Hard Mode.");
                     }
                 }
 
@@ -430,7 +430,7 @@
                         capturedWhite.push(targetPiece.name);
                         if (targetPiece.name === 'Raja') {
                             isGameOver = true;
-                            showEndGameModal("Battle Settled", "The AI has captured your Raja. Defeat is absolute.", "💀", false);
+                            showEndGameModal("Battle Settled", "The computer has captured your Raja. Defeat is absolute.", "💀", false);
                         }
                     } else {
                         capturedBlack.push(targetPiece.name);
@@ -451,8 +451,8 @@
                     isPlayer1Turn = !isPlayer1Turn;
                     createBoard();
                     
-                    if (currentMode === 'Vs-AI' && !isPlayer1Turn) {
-                        setTimeout(triggerAiMoveLogic, 500);
+                    if (currentMode === 'Vs-Computer' && !isPlayer1Turn) {
+                        setTimeout(triggerComputerMoveLogic, 500);
                     }
                 } else {
                     createBoard();
@@ -460,10 +460,10 @@
             }
         }
 
-        // 🎯 Balanced vs Absolute Tactical AI Decision Processor
-        function triggerAiMoveLogic() {
+        // 🎯 Balanced vs Absolute Tactical Computer Decision Processor
+        function triggerComputerMoveLogic() {
             if (isGameOver) return;
-            let availableAiMoves = [];
+            let availableMoves = [];
 
             for (let fromKey in initialSetup) {
                 const piece = initialSetup[fromKey];
@@ -487,36 +487,36 @@
                                     priorityValue += 8;
                                 }
 
-                                availableAiMoves.push({ from: fromKey, to: `${tR}-${tC}`, piece: piece, weight: priorityValue });
+                                availableMoves.push({ from: fromKey, to: `${tR}-${tC}`, piece: piece, weight: priorityValue });
                             }
                         }
                     }
                 }
             }
 
-            if (availableAiMoves.length === 0) {
+            if (availableMoves.length === 0) {
                 isGameOver = true;
-                showEndGameModal("Victory Achieved", "The AI has no movements left.", "⚜️", true);
+                showEndGameModal("Victory Achieved", "The computer has no movements left.", "⚜️", true);
                 return;
             }
 
             // 🧠 Dynamic State Determination Matrix
             if (gameMetrics.currentStage === 2) {
                 // 👥 Balanced Mode: Focuses on piece value optimization while introducing human-like variability
-                availableAiMoves.sort((a, b) => b.weight - a.weight || Math.random() - 0.5); 
+                availableMoves.sort((a, b) => b.weight - a.weight || Math.random() - 0.5); 
             } else {
                 // 🔱 Hard Mode: Pure calculation matrix. Absolute optimization without mistakes
-                availableAiMoves.sort((a, b) => b.weight - a.weight); 
+                availableMoves.sort((a, b) => b.weight - a.weight); 
             }
 
-            const chosenMove = availableAiMoves[0];
+            const chosenMove = availableMoves[0];
             const targetPiece = initialSetup[chosenMove.to];
 
             if (targetPiece) {
                 capturedWhite.push(targetPiece.name);
                 if (targetPiece.name === 'Raja') {
                     isGameOver = true;
-                    showEndGameModal("Battle Settled", "The AI has captured your Raja.", "💀", false);
+                    showEndGameModal("Battle Settled", "The computer has captured your Raja.", "💀", false);
                 }
             }
 
@@ -527,7 +527,7 @@
             createBoard();
         }
 
-        loadGlobalAIDatabase();
+        loadGlobalDatabase();
         triggerReset();
     </script>
 </body>
