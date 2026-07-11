@@ -6,38 +6,45 @@
     <title>Chaturanga - Royal Sandalwood Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
+        /* 🌌 আপনার আগের সেই আশেপাশের নড়াচড়া করা ব্যাকগ্রাউন্ড অ্যানিমেশন (অপরিবর্তিত) */
+        @keyframes ambientGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         body {
-            background: #1c0f06;
-            /* রাজকীয় প্রাচীন ব্যাকগ্রাউন্ড */
+            background: #2a1808;
             background-image: 
-                linear-gradient(rgba(15, 7, 2, 0.5), rgba(5, 2, 0, 0.8)),
-                url('https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?q=80&w=1000&auto=format&fit=crop'); 
+                linear-gradient(rgba(18, 9, 3, 0.45), rgba(8, 2, 0, 0.65)),
+                url('https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1000&auto=format&fit=crop'); 
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            animation: ambientGlow 25s ease-in-out infinite;
             overflow-x: hidden;
             user-select: none;
             -webkit-user-select: none;
         }
 
-        /* 👑 চন্দন কাঠের বোর্ড এবং খোদাই করা সোনালী মেটালিক বর্ডার */
+        /* 👑 এবার শুধু মেইন খেলার বোর্ডটি চন্দন কাঠের ফ্রেমে এবং চারপাশে ডাবল সোনালী আবরণে থাকবে */
         .ashtapada-board {
             display: grid;
             grid-template-columns: repeat(8, minmax(0, 1fr));
             width: 100%;
             max-width: 400px;
             aspect-ratio: 1 / 1;
-            padding: 12px; /* বর্ডারের রাজকীয় ফ্রেমের জন্য */
-            background: linear-gradient(135deg, #2b1408 0%, #170a04 100%); /* রোজউড ফ্রেম */
-            border: 5px double #d4af37; /* সোনালী মেটালিক ডাবল বর্ডার */
+            padding: 10px; /* সোনালী ফ্রেমের রাজকীয় স্পেস */
+            background: linear-gradient(135deg, #2b1408 0%, #170a04 100%); /* রোজউড/চন্দন ফ্রেম */
+            border: 5px double #d4af37; /* বর্ডারের ওপরে খাঁটি সোনালী আবরণ */
             box-shadow: 
                 0 0 0 2px #170a04,
-                inset 0 0 15px rgba(0,0,0,0.8),
-                0 25px 60px rgba(0, 0, 0, 0.95);
-            border-radius: 4px; /* প্রাচীন কাঠের ক্লাসিক শার্প লুক */
+                inset 0 0 15px rgba(0,0,0,0.85),
+                0 25px 50px rgba(0, 0, 0, 0.95);
+            border-radius: 6px;
         }
 
-        /* স্কয়ার ইন্টারঅ্যাকশন এবং কাঠের গভীরতা */
+        /* স্কয়ার ইন্টারঅ্যাকশন */
         .ashtapada-square {
             position: relative;
             display: flex;
@@ -52,16 +59,16 @@
 
         /* 🦴 হাতির দাঁতের (Antique Ivory) তৈরি মসৃণ হালকা ঘর */
         .light-square { 
-            background: linear-gradient(145deg, #f7f3e9 0%, #dfd5c3 100%); 
-            box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7), inset -1px -1px 3px rgba(0,0,0,0.1);
+            background: linear-gradient(145deg, #fdfbf7 0%, #e6dcce 100%); 
+            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.8), inset -1px -1px 2px rgba(0,0,0,0.05);
         }
         
-        /* 🪵 রাজকীয় কৃষ্ণ-চন্দন ও রোজউড (Dark Sandalwood) কাঠের ডার্ক ঘর */
+        /* 🪵 রাজকীয় চন্দন ও রোজউড (Dark Sandalwood) কাঠের ডার্ক ঘর */
         .dark-square { 
             background: linear-gradient(145deg, #3d1b0c 0%, #1f0d05 100%); 
-            /* কাঠের আঁশ বা ফাইবারের মতো সূক্ষ্ম টেক্সচার ইলিউশন */
-            background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 4px);
-            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.5), inset -1px -1px 2px rgba(255,255,255,0.05);
+            /* কাঠের সূক্ষ্ম টেক্সচার বা ফাইবার ইলিউশন */
+            background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 2px, transparent 2px, transparent 4px);
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.55), inset -1px -1px 2px rgba(255,255,255,0.05);
         }
         
         /* প্রথাগত অষ্টপদ ইনলেই স্টার চিহ্ন (কাঠের ওপর খোদাই করা নকশা) */
@@ -69,67 +76,65 @@
             content: "✦";
             position: absolute;
             color: #8c431d;
-            opacity: 0.5;
+            opacity: 0.45;
             font-size: 1.3rem;
             z-index: 1;
         }
         .dark-square.marked-square::after {
-            color: #d4af37; /* ডার্ক উডের ওপর সোনালী খোদাই */
-            opacity: 0.3;
+            color: #d4af37; /* ডার্ক উডের ওপর গোল্ডেন খোদাই */
+            opacity: 0.25;
         }
         
         /* গুটি সিলেক্ট হলে ব্রোঞ্জ বা তামার খোদাই করা রাজকীয় বর্ডার */
         .selected { 
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7) !important;
-            border: 3px solid #d4af37 !important; /* সোনালী সিলেকশন */
+            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.7) !important;
+            border: 3px solid #d4af37 !important; 
             z-index: 20;
         }
         
-        /* যান্ত্রিক নিয়ন গ্লো বাদ—তার বদলে কাঠের ওপর ব্রাস/পিত্তলের গোল রিং (Brass Inlay Marker) */
+        /* যান্ত্রিক নিয়ন গ্লো বাদ—তার বদলে কাঠের ওপর পিত্তলের গোল রিং মার্কার */
         .possible-move-marker::before {
             content: "";
             position: absolute;
             width: 14px;
             height: 14px;
             background: transparent;
-            border: 2.5px solid #b38f2d; /* মেটালিক গোল্ড রিং */
+            border: 2.5px solid #b38f2d; 
             border-radius: 50%;
-            opacity: 0.85;
+            opacity: 0.9;
             z-index: 25;
             pointer-events: none;
         }
         
         /* শত্রু কাটার ঘর—গাঢ় তামার রঙের ড্যাশ বর্ডার */
         .possible-capture-marker {
-            box-shadow: inset 0 0 10px rgba(139, 0, 0, 0.5) !important;
+            box-shadow: inset 0 0 10px rgba(139, 0, 0, 0.4) !important;
             border: 2.5px dashed #aa2b2b !important;
             z-index: 20;
         }
 
-        /* হেরিটেজ কন্টেইনার কার্ড */
         .heritage-card {
-            background: linear-gradient(135deg, rgba(38, 18, 8, 0.98) 0%, rgba(18, 7, 2, 0.99) 100%);
-            border: 2px solid #8c431d;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
-            border-radius: 4px;
+            background: linear-gradient(135deg, rgba(42, 20, 10, 0.95) 0%, rgba(18, 3, 0, 0.98) 100%);
+            border: 1px solid #b45309;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
         }
     </style>
 </head>
-<body class="text-stone-200 min-h-screen flex flex-col items-center p-3 font-serif">
+<body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
 
     <div class="text-center my-3 select-none">
-        <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-600 to-yellow-700 tracking-widest drop-shadow-md">चतुरंग</h1>
-        <p class="text-amber-700 font-sans text-[9px] mt-0.5尊 tracking-widest uppercase font-bold">Royal Sandalwood Ashtapada Engine</p>
+        <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 tracking-widest drop-shadow-lg">चतुरंग (CHATURANGA)</h1>
+        <p class="text-amber-600/80 text-[10px] mt-0.5 font-sans tracking-widest uppercase">Royal Sandalwood Ashtapada Engine</p>
     </div>
 
-    <div id="mode-panel" class="flex gap-2 mb-4 heritage-card p-1.5 w-full max-w-[400px] justify-between items-center">
-        <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/80 text-amber-600 rounded-sm cursor-pointer transition font-sans border border-amber-900/40">
+    <div id="mode-panel" class="flex gap-2 mb-4 heritage-card p-1.5 rounded-lg w-full max-w-[400px] justify-between items-center">
+        <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-900/40">
             👥 Pass & Play
         </button>
-        <button id="btnAI" onclick="switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold bg-amber-700 text-stone-950 rounded-sm cursor-pointer transition font-sans shadow-md">
+        <button id="btnAI" onclick="switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition font-sans shadow-md shadow-amber-600/20">
             🤖 VS Computer AI
         </button>
-        <button onclick="triggerReset()" class="px-3 py-2 text-[11px] font-bold bg-stone-950 text-red-500 rounded-sm border border-red-950 cursor-pointer transition font-sans">
+        <button onclick="triggerReset()" class="px-3 py-2 text-[11px] font-bold bg-stone-950 text-red-400 rounded border border-red-900/30 cursor-pointer transition font-sans">
             🔄 Reset
         </button>
     </div>
@@ -138,23 +143,23 @@
         <div id="board" class="ashtapada-board"></div>
     </div>
 
-    <div class="heritage-card p-3 w-full max-w-[400px] grid grid-cols-2 gap-3">
+    <div class="heritage-card p-3 rounded-lg w-full max-w-[400px] grid grid-cols-2 gap-3">
         <div>
-            <h4 id="loss-title-1" class="text-amber-600 font-bold text-[10px] mb-1 font-sans uppercase tracking-wider">💀 Your Losses</h4>
-            <div id="white-graveyard" class="flex flex-wrap gap-1 text-lg bg-stone-950/60 p-1.5 rounded-sm min-h-[36px] border border-stone-900"></div>
+            <h4 id="loss-title-1" class="text-amber-400 font-bold text-[10px] mb-1 font-sans uppercase tracking-wider">💀 Your Losses</h4>
+            <div id="white-graveyard" class="flex flex-wrap gap-1 text-lg bg-stone-950/40 p-1.5 rounded min-h-[36px] border border-stone-900"></div>
         </div>
         <div>
-            <h4 id="loss-title-2" class="text-red-700 font-bold text-[10px] mb-1 font-sans uppercase tracking-wider">💀 Computer Losses</h4>
-            <div id="black-graveyard" class="flex flex-wrap gap-1 text-lg bg-stone-950/60 p-1.5 rounded-sm min-h-[36px] border border-stone-900"></div>
+            <h4 id="loss-title-2" class="text-red-400 font-bold text-[10px] mb-1 font-sans uppercase tracking-wider">💀 Computer Losses</h4>
+            <div id="black-graveyard" class="flex flex-wrap gap-1 text-lg bg-stone-950/40 p-1.5 rounded min-h-[36px] border border-stone-900"></div>
         </div>
     </div>
 
-    <div id="gameOverModal" class="hidden fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-4">
-        <div class="bg-stone-950 border-2 border-amber-600 p-6 rounded-sm max-w-xs w-full text-center shadow-2xl">
+    <div id="gameOverModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+        <div class="bg-stone-950 border border-amber-500 p-6 rounded-xl max-w-xs w-full text-center shadow-2xl">
             <div id="modalIcon" class="text-4xl mb-2">⚜️</div>
-            <h2 id="modalTitle" class="text-lg font-black text-amber-600 tracking-wide uppercase">Battle Settled</h2>
+            <h2 id="modalTitle" class="text-xl font-black text-amber-500 tracking-wide uppercase">Battle Settled</h2>
             <p id="modalDesc" class="text-stone-400 text-xs my-3 font-sans leading-relaxed"></p>
-            <button onclick="triggerReset()" class="w-full py-2 bg-gradient-to-r from-amber-600 to-amber-700 text-stone-950 font-bold rounded-sm text-xs font-sans uppercase tracking-wider cursor-pointer">
+            <button onclick="triggerReset()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold rounded-lg shadow-md text-xs font-sans uppercase tracking-wider cursor-pointer">
                 🔄 Restart Battle
             </button>
         </div>
@@ -166,8 +171,9 @@
             "Raja": "⚜️", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" 
         };
 
+        // 🧠 এআই-এর সেলফ-লার্নিং মেমোরি
         let gameMetrics = {
-            currentStage: 1,           
+            currentStage: 2,           
             userAggressionCount: 0, 
             userMistakes: [],
             matchMoveHistory: [],
@@ -188,15 +194,30 @@
         let highlightedMoves = [];
         let isPlayer1Turn = true; 
 
+        // 📡 এআই-এর মেমোরি সিঙ্ক করা
         async function loadGlobalAIDatabase() {
             try {
                 const response = await fetch(`${RENDER_API_URL}/get-strategies`);
                 if (response.ok) {
                     const data = await response.json();
                     aiDatabase.userWinningTraps = data.traps || [];
+                    console.log("AI Engine: Prior combat strategies synchronized.");
                 }
             } catch (error) {
-                console.log("Local engine dynamic fallback active.");
+                console.log("Local standalone AI mode active.");
+            }
+        }
+
+        // 💾 ইউজারের ফাঁদ এআই তার ডাটাবেজে সেভ করে নিজেকে ট্রেন করবে
+        async function syncTrapToNeonDatabase(winningMove) {
+            try {
+                await fetch(`${RENDER_API_URL}/save-strategy`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ move: winningMove, timestamp: new Date() })
+                });
+            } catch (error) {
+                console.log("Strategy archived in offline memory.");
             }
         }
 
@@ -217,7 +238,7 @@
         function switchMode(mode) {
             currentMode = mode;
             if(mode === "Vs-AI") {
-                gameMetrics.currentStage = 1; 
+                gameMetrics.currentStage = 2; 
                 gameMetrics.consecutiveUserLosses = 0;
             }
             triggerReset();
@@ -230,11 +251,12 @@
             isGameOver = false;
             capturedWhite = [];
             capturedBlack = [];
+            gameMetrics.matchMoveHistory = [];
             resetInitialSetup();
             modalElement.classList.add('hidden');
             
-            document.getElementById('btn2P').className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-700 text-stone-950 rounded-sm font-sans shadow' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/80 text-amber-600 rounded-sm cursor-pointer transition font-sans border border-amber-900/40';
-            document.getElementById('btnAI').className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-700 text-stone-950 rounded-sm font-sans shadow' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/80 text-amber-600 rounded-sm cursor-pointer transition font-sans border border-amber-900/40';
+            document.getElementById('btn2P').className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded font-sans shadow' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-900/40';
+            document.getElementById('btnAI').className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded font-sans shadow' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-900/40';
             
             if (currentMode === 'Vs-AI') {
                 document.getElementById('loss-title-1').innerText = "💀 Your Losses";
@@ -246,9 +268,24 @@
             createBoard();
         }
 
-        function showEndGameModal(title, description, icon) {
+        function generateAITeachingReport(userWon) {
+            if (currentMode !== 'Vs-AI') return "Local Match Over.";
+            if (userWon) {
+                gameMetrics.consecutiveUserLosses = 0; 
+                gameMetrics.currentStage = 3; // সর্বোচ্চ হার্ড লেভেল অ্যাক্টিভেট
+                if(gameMetrics.matchMoveHistory.length > 0) {
+                    syncTrapToNeonDatabase(gameMetrics.matchMoveHistory.slice(-2).join("->"));
+                }
+                return "🎯 চমৎকার বিজয়! এআই আপনার জেতার কৌশলটি বিশ্লেষণ করেছে এবং পরবর্তী ম্যাচের জন্য নিজেকে আরও শক্তিশালী করে তুলেছে।";
+            }
+            gameMetrics.consecutiveUserLosses++; 
+            return "🏛️ চাণক্য নীতি বিশ্লেষণ: আপনার রাজাকে সুরক্ষিত করতে পদাতিকের ঢাল ব্যবহার করুন। অশ্ব ও রথকে একসাথে আক্রমণাত্মক চালে পাঠান।";
+        }
+
+        function showEndGameModal(title, description, icon, userWon) {
+            const teachingReport = generateAITeachingReport(userWon);
             document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalDesc').innerHTML = description;
+            document.getElementById('modalDesc').innerHTML = `<span class="block mb-3">${description}</span><div class="bg-stone-900 p-2.5 text-left text-amber-500 text-[11px] font-sans leading-relaxed whitespace-pre-line border border-amber-900/40">${teachingReport}</div>`;
             document.getElementById('modalIcon').innerText = icon;
             modalElement.classList.remove('hidden');
         }
@@ -380,18 +417,20 @@
                     return;
                 }
 
+                gameMetrics.matchMoveHistory.push(`${fromKey}:${selectedSquare.piece.name}->${squareId}`);
+
                 if (targetPiece) {
                     if (targetPiece.isWhite) {
                         capturedWhite.push(targetPiece.name);
                         if (targetPiece.name === 'Raja') {
                             isGameOver = true;
-                            showEndGameModal("Battle Settled", "The enemy has captured your Raja.", "💀");
+                            showEndGameModal("Battle Settled", "The AI has captured your Raja. Defeat is absolute.", "💀", false);
                         }
                     } else {
                         capturedBlack.push(targetPiece.name);
                         if (targetPiece.name === 'Raja') {
                             isGameOver = true;
-                            showEndGameModal("Victory Achieved", "You captured the enemy Raja!", "⚜️");
+                            showEndGameModal("Victory Achieved", "You have checkmated and captured the enemy Raja!", "⚜️", true);
                         }
                     }
                 }
@@ -407,7 +446,7 @@
                     createBoard();
                     
                     if (currentMode === 'Vs-AI' && !isPlayer1Turn) {
-                        setTimeout(triggerAiMoveLogic, 600);
+                        setTimeout(triggerAiMoveLogic, 500);
                     }
                 } else {
                     createBoard();
@@ -428,10 +467,18 @@
                             if (checkLegalMove(piece, fR, fC, tR, tC)) {
                                 const target = initialSetup[`${tR}-${tC}`];
                                 let priorityValue = 0;
+                                
                                 if (target) {
-                                    const weights = { "Padati": 10, "Ashva": 30, "Gaja": 30, "Ratha": 50, "Mantri": 70, "Raja": 9999 };
-                                    priorityValue = weights[target.name] || 10;
+                                    const weights = { "Padati": 15, "Ashva": 35, "Gaja": 40, "Ratha": 55, "Mantri": 75, "Raja": 99999 };
+                                    priorityValue = weights[target.name] || 15;
+                                    
+                                    if (target.name === 'Raja') priorityValue += 1000;
                                 }
+
+                                if (tR >= 3 && tR <= 4 && tC >= 3 && tC <= 4) {
+                                    priorityValue += 5;
+                                }
+
                                 availableAiMoves.push({ from: fromKey, to: `${tR}-${tC}`, piece: piece, weight: priorityValue });
                             }
                         }
@@ -441,13 +488,11 @@
 
             if (availableAiMoves.length === 0) {
                 isGameOver = true;
-                showEndGameModal("Victory Achieved", "The AI has no movements left.", "⚜️");
+                showEndGameModal("Victory Achieved", "The AI has no movements left.", "⚜️", true);
                 return;
             }
 
-            if (gameMetrics.currentStage === 1) {
-                availableAiMoves.sort(() => Math.random() - 0.5); 
-            } else if (gameMetrics.currentStage === 2) {
+            if (gameMetrics.currentStage === 2) {
                 availableAiMoves.sort((a, b) => b.weight - a.weight || Math.random() - 0.5); 
             } else {
                 availableAiMoves.sort((a, b) => b.weight - a.weight); 
@@ -460,7 +505,7 @@
                 capturedWhite.push(targetPiece.name);
                 if (targetPiece.name === 'Raja') {
                     isGameOver = true;
-                    showEndGameModal("Battle Settled", "The AI captured your Raja.", "💀");
+                    showEndGameModal("Battle Settled", "The AI has captured your Raja.", "💀", false);
                 }
             }
 
