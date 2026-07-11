@@ -4,6 +4,10 @@ import cors from 'cors';
 import pkg from 'pg';
 import { fileURLToPath } from 'url';
 
+// ⚠️ লোকাল ফাইলের নামের শেষে অবশ্যই .js এক্সটেনশন থাকতে হবে ES Module-এ
+import './routes.js'; 
+import './rules.js';
+
 const { Pool } = pkg;
 const app = express();
 const PORT = process.env.PORT || 5000;
