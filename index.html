@@ -16,7 +16,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* 🌌 Intact Ambient Background Animation */
+        /* 🌌 Ambient Background Animation */
         @keyframes ambientGlow {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -26,7 +26,7 @@
         body {
             background: #2a1808;
             background-image: 
-                linear-gradient(rgba(18, 9, 3, 0.35), rgba(8, 2, 0, 0.55)),
+                linear-gradient(rgba(18, 9, 3, 0.25), rgba(8, 2, 0, 0.45)),
                 url('https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1000&auto=format&fit=crop'); 
             background-size: cover;
             background-position: center;
@@ -45,15 +45,12 @@
             max-width: 400px;
             aspect-ratio: 1 / 1;
             padding: 10px; 
-            background: linear-gradient(135deg, rgba(43, 20, 8, 0.85) 0%, rgba(23, 10, 4, 0.9) 100%); 
+            background: linear-gradient(135deg, rgba(43, 20, 8, 0.8) 0%, rgba(23, 10, 4, 0.85) 100%); 
             border: 5px double #d4af37; 
-            box-shadow: 
-                0 0 0 2px #170a04,
-                inset 0 0 15px rgba(0,0,0,0.85),
-                0 25px 50px rgba(0, 0, 0, 0.95);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.95);
             border-radius: 6px;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
 
         .ashtapada-square {
@@ -70,13 +67,10 @@
 
         .light-square { 
             background: linear-gradient(145deg, rgba(253, 251, 247, 0.9) 0%, rgba(230, 220, 206, 0.85) 100%); 
-            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.8), inset -1px -1px 2px rgba(0,0,0,0.05);
         }
         
         .dark-square { 
             background: linear-gradient(145deg, rgba(61, 27, 12, 0.85) 0%, rgba(31, 13, 5, 0.9) 100%); 
-            background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 2px, transparent 2px, transparent 4px);
-            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.55), inset -1px -1px 2px rgba(255,255,255,0.05);
         }
         
         .marked-square::after {
@@ -85,15 +79,9 @@
             color: #8c431d;
             opacity: 0.45;
             font-size: 1.3rem;
-            z-index: 1;
-        }
-        .dark-square.marked-square::after {
-            color: #d4af37; 
-            opacity: 0.25;
         }
         
         .selected { 
-            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.7) !important;
             border: 3px solid #d4af37 !important; 
             z-index: 20;
         }
@@ -103,36 +91,29 @@
             position: absolute;
             width: 14px;
             height: 14px;
-            background: transparent;
             border: 2.5px solid #b38f2d; 
             border-radius: 50%;
-            opacity: 0.9;
-            z-index: 25;
-            pointer-events: none;
         }
         
         .possible-capture-marker {
-            box-shadow: inset 0 0 10px rgba(139, 0, 0, 0.4) !important;
             border: 2.5px dashed #aa2b2b !important;
-            z-index: 20;
         }
 
-        /* 🔮 Premium Transparent Glass Card Concept */
+        /* 🔮 Premium Glassmorphism Box */
         .heritage-card {
-            background: linear-gradient(135deg, rgba(42, 20, 10, 0.55) 0%, rgba(18, 3, 0, 0.65) 100%);
-            border: 1px solid rgba(180, 83, 9, 0.4);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            background: linear-gradient(135deg, rgba(35, 15, 5, 0.4) 0%, rgba(15, 2, 0, 0.5) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
 
-        /* 🟢 Live Blink Pulse for Online Counter */
+        /* 🟢 Pulse Blink Animation */
         .pulse-dot {
             width: 7px;
             height: 7px;
             background-color: #10b981;
             border-radius: 50%;
-            display: inline-block;
             box-shadow: 0 0 8px #10b981;
             animation: pulseBlink 1.8s infinite;
         }
@@ -150,20 +131,27 @@
         <p class="text-amber-600/80 text-[10px] mt-0.5 font-sans tracking-widest uppercase">Royal Sandalwood Ashtapada Engine</p>
     </div>
 
-    <div class="heritage-card px-4 py-2 rounded-lg w-full max-w-[400px] mb-3 flex justify-between items-center border border-amber-900/20 shadow-inner">
-        <div class="flex items-center gap-2">
-            <span class="pulse-dot"></span>
-            <span class="text-[10px] font-bold tracking-wider font-sans text-stone-300/90 uppercase">Live Website Status</span>
+    <div class="heritage-card p-3 rounded-lg w-full max-w-[400px] mb-3 border border-amber-500/20 shadow-xl flex flex-col gap-2">
+        <div class="flex justify-between items-center border-b border-amber-900/20 pb-2">
+            <div class="flex items-center gap-2">
+                <span class="pulse-dot"></span>
+                <span class="text-[10px] font-bold tracking-wider font-sans text-stone-300 uppercase">Live Website Status</span>
+            </div>
+            <div class="flex gap-4 text-right">
+                <div>
+                    <span id="online-users" class="text-xs font-bold text-emerald-400 font-sans">1</span>
+                    <span class="block text-[8px] text-stone-400 font-sans uppercase">Online Now</span>
+                </div>
+                <div class="border-l border-amber-900/30 pl-4">
+                    <span id="active-matches" class="text-xs font-bold text-amber-400 font-sans">0</span>
+                    <span class="block text-[8px] text-stone-400 font-sans uppercase">In Battles</span>
+                </div>
+            </div>
         </div>
-        <div class="flex gap-4 text-right">
-            <div>
-                <span id="online-users" class="text-xs font-bold text-emerald-400 font-sans">1</span>
-                <span class="block text-[8px] text-stone-400 font-sans uppercase">Online Now</span>
-            </div>
-            <div class="border-l border-amber-900/30 pl-4">
-                <span id="active-matches" class="text-xs font-bold text-amber-400 font-sans">0</span>
-                <span class="block text-[8px] text-stone-400 font-sans uppercase">In Battles</span>
-            </div>
+        
+        <div class="flex items-center justify-between bg-stone-950/40 px-2 py-1.5 rounded border border-amber-900/20 text-[10px]">
+            <span class="text-stone-400 font-sans uppercase tracking-tight">Current Match Action:</span>
+            <span id="live-action-feed" class="text-amber-300 font-medium font-sans truncate max-w-[230px]">Waiting for first move...</span>
         </div>
     </div>
 
@@ -211,6 +199,13 @@
             "Raja": "⚜️", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" 
         };
 
+        // 🆔 Device-Specific Unique Session Initialization
+        if (!localStorage.getItem('chaturanga_visitor_uid')) {
+            const uniqueId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'uid-' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+            localStorage.setItem('chaturanga_visitor_uid', uniqueId);
+        }
+        const VISITOR_ID = localStorage.getItem('chaturanga_visitor_uid');
+
         let gameMetrics = {
             currentStage: 2,           
             userAggressionCount: 0,    
@@ -232,18 +227,14 @@
         let highlightedMoves = [];
         let isPlayer1Turn = true; 
 
-        // 🟢 True Real-Time Live Traffic Sync Engine
+        // 🟢 True Device-Specific Real-Time Traffic Syncer
         async function updateLiveTrafficAnalytics() {
             try {
-                const response = await fetch(`${RENDER_API_URL}/live-counters`);
+                const response = await fetch(`${RENDER_API_URL}/live-counters?visitorId=${VISITOR_ID}`);
                 if (response.ok) {
                     const data = await response.json();
-                    
-                    const liveOnline = data.onlineNow || 1;
-                    const liveBattles = data.inBattles || 0;
-                    
-                    document.getElementById('online-users').innerText = liveOnline;
-                    document.getElementById('active-matches').innerText = liveBattles;
+                    document.getElementById('online-users').innerText = data.onlineNow || 1;
+                    document.getElementById('active-matches').innerText = data.inBattles || 0;
                 }
             } catch (error) {
                 document.getElementById('online-users').innerText = "1";
@@ -251,12 +242,18 @@
             }
         }
 
-        async function reportMatchActivity(status) {
+        // 📡 Global Real-Time Activity Dispatcher
+        async function reportMatchActivity(status, currentMoveLog = "") {
             try {
                 await fetch(`${RENDER_API_URL}/report-activity`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: status, mode: currentMode })
+                    body: JSON.stringify({ 
+                        status: status, 
+                        mode: currentMode,
+                        visitorId: VISITOR_ID,
+                        lastAction: currentMoveLog
+                    })
                 });
             } catch (e) {}
         }
@@ -267,11 +264,8 @@
                 if (response.ok) {
                     const data = await response.json();
                     strategyDatabase.userWinningTraps = data.traps || [];
-                    console.log("Computer Engine: Prior combat strategies synchronized.");
                 }
-            } catch (error) {
-                console.log("Local standalone computer mode active.");
-            }
+            } catch (error) {}
         }
 
         async function syncTrapToDatabase(winningMove) {
@@ -281,9 +275,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ move: winningMove, timestamp: new Date() })
                 });
-            } catch (error) {
-                console.log("Strategy archived in offline memory.");
-            }
+            } catch (error) {}
         }
 
         function resetInitialSetup() {
@@ -310,13 +302,8 @@
         }
 
         function triggerReset() {
-            selectedSquare = null;
-            highlightedMoves = [];
-            isPlayer1Turn = true;
-            isGameOver = false;
-            capturedWhite = [];
-            capturedBlack = [];
-            gameMetrics.matchMoveHistory = [];
+            selectedSquare = null; highlightedMoves = []; isPlayer1Turn = true; isGameOver = false;
+            capturedWhite = []; capturedBlack = []; gameMetrics.matchMoveHistory = [];
             resetInitialSetup();
             modalElement.classList.add('hidden');
             
@@ -330,16 +317,15 @@
                 document.getElementById('loss-title-1').innerText = "💀 Player 1 Losses";
                 document.getElementById('loss-title-2').innerText = "💀 Player 2 Losses";
             }
+            document.getElementById('live-action-feed').innerText = "Match reset. Ready!";
             createBoard();
-            reportMatchActivity("ended"); 
+            reportMatchActivity("ended", "Battle restarted"); 
         }
 
         function generateTeachingReport(userWon) {
             if (currentMode !== '2-Player' && userWon) {
                 gameMetrics.currentStage = 3; 
-                if(gameMetrics.matchMoveHistory.length > 0) {
-                    syncTrapToDatabase(gameMetrics.matchMoveHistory.slice(-2).join("->"));
-                }
+                if(gameMetrics.matchMoveHistory.length > 0) syncTrapToDatabase(gameMetrics.matchMoveHistory.slice(-2).join("->"));
                 return "🎯 Exceptional Tactics! The computer has detected you as an advanced master-level competitor and calibrated its calculations to Stage 3 for maximum challenge.";
             }
             return "🏛️ Strategic Analysis: Control the 4 central cells of the Ashtapada. Utilize your Padati rows to construct unified defensive walls.";
@@ -351,17 +337,13 @@
             document.getElementById('modalDesc').innerHTML = `<span class="block mb-3">${description}</span><div class="bg-stone-900/90 p-2.5 text-left text-amber-500 text-[11px] font-sans leading-relaxed whitespace-pre-line border border-amber-900/40">${teachingReport}</div>`;
             document.getElementById('modalIcon').innerText = icon;
             modalElement.classList.remove('hidden');
-            reportMatchActivity("ended"); 
+            document.getElementById('live-action-feed').innerText = `Game Over: ${title}`;
+            reportMatchActivity("ended", `Match finished - ${title}`); 
         }
 
         function checkLegalMove(piece, fromR, fromC, toR, toC) {
-            if (toR < 0 || toR > 7 || toC < 0 || toC > 7) return false;
-            if (fromR === toR && fromC === toC) return false;
-            
-            const rowDiff = Math.abs(toR - fromR);
-            const colDiff = Math.abs(toC - fromC);
-            const target = initialSetup[`${toR}-${toC}`];
-
+            if (toR < 0 || toR > 7 || toC < 0 || toC > 7 || (fromR === toR && fromC === toC)) return false;
+            const rowDiff = Math.abs(toR - fromR), colDiff = Math.abs(toC - fromC), target = initialSetup[`${toR}-${toC}`];
             if (target && target.isWhite === piece.isWhite) return false;
 
             switch (piece.name) {
@@ -372,35 +354,24 @@
                     return false;
                 case 'Ratha': 
                     if (fromR !== toR && fromC !== toC) return false;
-                    const stepR = fromR === toR ? 0 : (toR > fromR ? 1 : -1);
-                    const stepC = fromC === toC ? 0 : (toC > fromC ? 1 : -1);
-                    let checkR = fromR + stepR;
-                    let checkC = fromC + stepC;
+                    const stepR = fromR === toR ? 0 : (toR > fromR ? 1 : -1), stepC = fromC === toC ? 0 : (toC > fromC ? 1 : -1);
+                    let checkR = fromR + stepR, checkC = fromC + stepC;
                     while (checkR !== toR || checkC !== toC) {
-                        if (initialSetup[`${checkR}-${checkC}`]) return false; 
-                        checkR += stepR;
-                        checkC += stepC;
+                        if (initialSetup[`${checkR}-${checkC}`]) return false; checkR += stepR; checkC += stepC;
                     }
                     return true;
-                case 'Ashva': 
-                    return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
-                case 'Gaja': 
-                    return rowDiff === 2 && colDiff === 2; 
-                case 'Raja':
-                    return rowDiff <= 1 && colDiff <= 1;
-                case 'Mantri':
-                    return rowDiff === 1 && colDiff === 1;
-                default:
-                    return false;
+                case 'Ashva': return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+                case 'Gaja': return rowDiff === 2 && colDiff === 2; 
+                case 'Raja': return rowDiff <= 1 && colDiff <= 1;
+                case 'Mantri': return rowDiff === 1 && colDiff === 1;
+                default: return false;
             }
         }
 
         function calculatePossibleMoves(row, col, piece) {
             const validDestinations = [];
             for (let r = 0; r < 8; r++) {
-                for (let c = 0; c < 8; c++) {
-                    if (checkLegalMove(piece, row, col, r, c)) validDestinations.push(`${r}-${c}`);
-                }
+                for (let c = 0; c < 8; c++) { if (checkLegalMove(piece, row, col, r, c)) validDestinations.push(`${r}-${c}`); }
             }
             return validDestinations;
         }
@@ -414,126 +385,80 @@
             boardElement.innerHTML = '';
             for (let row = 0; row < 8; row++) {
                 for (let col = 0; col < 8; col++) {
-                    const squareId = `${row}-${col}`;
-                    const square = document.createElement('div');
-                    
-                    const isLight = (row + col) % 2 === 0;
+                    const squareId = `${row}-${col}`, square = document.createElement('div'), isLight = (row + col) % 2 === 0;
                     square.className = `ashtapada-square ${isLight ? 'light-square' : 'dark-square'}`;
-                    
                     if (markedSquares.includes(squareId)) square.classList.add('marked-square');
                     if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col) square.classList.add('selected');
-
                     if (!isGameOver && selectedSquare && highlightedMoves.includes(squareId)) {
-                        if (initialSetup[squareId]) {
-                            square.classList.add('possible-capture-marker');
-                        } else {
-                            square.classList.add('possible-move-marker');
-                        }
+                        square.classList.add(initialSetup[squareId] ? 'possible-capture-marker' : 'possible-move-marker');
                     }
-
                     const piece = initialSetup[squareId];
                     if (piece) {
-                        const labelColor = piece.isWhite ? 'text-stone-900/90' : 'text-amber-100/90';
-                        square.innerHTML = `
-                            <span class="text-xl md:text-2xl z-10 pointer-events-none filter drop-shadow-sm">${pieceSigns[piece.name]}</span>
-                            <span class="text-[7px] ${labelColor} font-bold z-10 uppercase font-sans tracking-tighter leading-none mt-0.5 pointer-events-none">${piece.name}</span>
-                        `;
+                        square.innerHTML = `<span class="text-xl md:text-2xl z-10 pointer-events-none filter drop-shadow-sm">${pieceSigns[piece.name]}</span><span class="text-[7px] ${piece.isWhite ? 'text-stone-900/90' : 'text-amber-100/90'} font-bold z-10 uppercase font-sans tracking-tighter mt-0.5 pointer-events-none">${piece.name}</span>`;
                     }
-                    
-                    square.onclick = function() {
-                        handleSquareClick(row, col);
-                    };
-                    
+                    square.onclick = function() { handleSquareClick(row, col); };
                     boardElement.appendChild(square);
                 }
             }
             updateGraveyardUI();
         }
-
-        function handleSquareClick(row, col) {
+                    function handleSquareClick(row, col) {
             if (isGameOver) return;
-            const squareId = `${row}-${col}`;
-            const targetPiece = initialSetup[squareId];
+            const squareId = `${row}-${col}`, targetPiece = initialSetup[squareId];
 
             if (selectedSquare === null) {
                 if (targetPiece) {
                     if (currentMode === '2-Player' && targetPiece.isWhite !== isPlayer1Turn) return;
                     if (currentMode === 'Vs-Computer' && !targetPiece.isWhite) return;
-
                     selectedSquare = { row, col, piece: targetPiece };
                     highlightedMoves = calculatePossibleMoves(row, col, targetPiece);
                     createBoard(); 
                 }
             } 
             else {
-                const fromKey = `${selectedSquare.row}-${selectedSquare.col}`;
-                const isLegal = checkLegalMove(selectedSquare.piece, selectedSquare.row, selectedSquare.col, row, col);
-                
+                const fromKey = `${selectedSquare.row}-${selectedSquare.col}`, isLegal = checkLegalMove(selectedSquare.piece, selectedSquare.row, selectedSquare.col, row, col);
                 if (!isLegal) {
                     if (targetPiece && ((currentMode === '2-Player' && targetPiece.isWhite === isPlayer1Turn) || (currentMode === 'Vs-Computer' && targetPiece.isWhite))) {
-                        selectedSquare = { row, col, piece: targetPiece };
-                        highlightedMoves = calculatePossibleMoves(row, col, targetPiece);
-                    } else {
-                        selectedSquare = null;
-                        highlightedMoves = [];
-                    }
-                    createBoard();
-                    return;
+                        selectedSquare = { row, col, piece: targetPiece }; highlightedMoves = calculatePossibleMoves(row, col, targetPiece);
+                    } else { selectedSquare = null; highlightedMoves = []; }
+                    createBoard(); return;
                 }
 
-                if (gameMetrics.matchMoveHistory.length === 0) {
-                    reportMatchActivity("playing");
-                }
+                // 📢 Live Action Messaging Core
+                let moveLogText = `White moved ${selectedSquare.piece.name} to [${row},${col}]`;
+                if (targetPiece) moveLogText = `White ${selectedSquare.piece.name} captured Black ${targetPiece.name}! 🔥`;
+                document.getElementById('live-action-feed').innerText = moveLogText;
+                reportMatchActivity("playing", moveLogText);
 
                 gameMetrics.matchMoveHistory.push(`${fromKey}:${selectedSquare.piece.name}->${squareId}`);
-
                 if (targetPiece && !targetPiece.isWhite) {
                     gameMetrics.userAggressionCount++;
-                    if (gameMetrics.userAggressionCount >= 2 && gameMetrics.currentStage === 2) {
-                        gameMetrics.currentStage = 3;
-                        console.log("Computer Engine Alert: User detected as a skilled tactician. Activating Hard Mode.");
-                    }
+                    if (gameMetrics.userAggressionCount >= 2 && gameMetrics.currentStage === 2) gameMetrics.currentStage = 3;
                 }
 
                 if (targetPiece) {
                     if (targetPiece.isWhite) {
                         capturedWhite.push(targetPiece.name);
-                        if (targetPiece.name === 'Raja') {
-                            isGameOver = true;
-                            showEndGameModal("Battle Settled", "The computer has captured your Raja. Defeat is absolute.", "💀", false);
-                        }
+                        if (targetPiece.name === 'Raja') { isGameOver = true; showEndGameModal("Battle Settled", "The computer has captured your Raja.", "💀", false); }
                     } else {
                         capturedBlack.push(targetPiece.name);
-                        if (targetPiece.name === 'Raja') {
-                            isGameOver = true;
-                            showEndGameModal("Victory Achieved", "You have checkmated and captured the enemy Raja!", "⚜️", true);
-                        }
+                        if (targetPiece.name === 'Raja') { isGameOver = true; showEndGameModal("Victory Achieved", "You have captured the enemy Raja!", "⚜️", true); }
                     }
                 }
 
-                initialSetup[squareId] = selectedSquare.piece;
-                delete initialSetup[fromKey];
-                
-                selectedSquare = null;
-                highlightedMoves = [];
+                initialSetup[squareId] = selectedSquare.piece; delete initialSetup[fromKey];
+                selectedSquare = null; highlightedMoves = [];
 
                 if (!isGameOver) {
-                    isPlayer1Turn = !isPlayer1Turn;
-                    createBoard();
-                    
-                    if (currentMode === 'Vs-Computer' && !isPlayer1Turn) {
-                        setTimeout(triggerComputerMoveLogic, 500);
-                    }
-                } else {
-                    createBoard();
-                }
+                    isPlayer1Turn = !isPlayer1Turn; createBoard();
+                    if (currentMode === 'Vs-Computer' && !isPlayer1Turn) setTimeout(triggerComputerMoveLogic, 600);
+                } else { createBoard(); }
             }
         }
 
         function triggerComputerMoveLogic() {
             if (isGameOver) return;
             let availableMoves = [];
-
             for (let fromKey in initialSetup) {
                 const piece = initialSetup[fromKey];
                 if (!piece.isWhite) {
@@ -541,17 +466,13 @@
                     for (let tR = 0; tR < 8; tR++) {
                         for (let tC = 0; tC < 8; tC++) {
                             if (checkLegalMove(piece, fR, fC, tR, tC)) {
-                                const target = initialSetup[`${tR}-${tC}`];
-                                let priorityValue = 0;
-                                
+                                const target = initialSetup[`${tR}-${tC}`]; let priorityValue = 0;
                                 if (target) {
                                     const weights = { "Padati": 15, "Ashva": 35, "Gaja": 40, "Ratha": 55, "Mantri": 75, "Raja": 99999 };
                                     priorityValue = weights[target.name] || 15;
                                     if (target.name === 'Raja') priorityValue += 1000;
                                 }
-
                                 if (tR >= 3 && tR <= 4 && tC >= 3 && tC <= 4) priorityValue += 8;
-
                                 availableMoves.push({ from: fromKey, to: `${tR}-${tC}`, piece: piece, weight: priorityValue });
                             }
                         }
@@ -559,39 +480,29 @@
                 }
             }
 
-            if (availableMoves.length === 0) {
-                isGameOver = true;
-                showEndGameModal("Victory Achieved", "The computer has no movements left.", "⚜️", true);
-                return;
-            }
+            if (availableMoves.length === 0) { isGameOver = true; showEndGameModal("Victory Achieved", "The computer has no movements left.", "⚜️", true); return; }
+            if (gameMetrics.currentStage === 2) { availableMoves.sort((a, b) => b.weight - a.weight || Math.random() - 0.5); } 
+            else { availableMoves.sort((a, b) => b.weight - a.weight); }
 
-            if (gameMetrics.currentStage === 2) {
-                availableMoves.sort((a, b) => b.weight - a.weight || Math.random() - 0.5); 
-            } else {
-                availableMoves.sort((a, b) => b.weight - a.weight); 
-            }
-
-            const chosenMove = availableMoves[0];
-            const targetPiece = initialSetup[chosenMove.to];
+            const chosenMove = availableMoves[0], targetPiece = initialSetup[chosenMove.to];
+            
+            // 📢 Bot Action Feed Dispatcher
+            let botLogText = `Computer moved ${chosenMove.piece.name} to [${chosenMove.to}]`;
+            if (targetPiece) botLogText = `Computer captured your ${targetPiece.name}! ⚠️`;
+            document.getElementById('live-action-feed').innerText = botLogText;
+            reportMatchActivity("playing", botLogText);
 
             if (targetPiece) {
                 capturedWhite.push(targetPiece.name);
-                if (targetPiece.name === 'Raja') {
-                    isGameOver = true;
-                    showEndGameModal("Battle Settled", "The computer has captured your Raja.", "💀", false);
-                }
+                if (targetPiece.name === 'Raja') { isGameOver = true; showEndGameModal("Battle Settled", "The computer has captured your Raja.", "💀", false); }
             }
-
-            initialSetup[chosenMove.to] = chosenMove.piece;
-            delete initialSetup[chosenMove.from];
-
-            isPlayer1Turn = true;
-            createBoard();
+            initialSetup[chosenMove.to] = chosenMove.piece; delete initialSetup[chosenMove.from];
+            isPlayer1Turn = true; createBoard();
         }
 
         loadGlobalDatabase();
         updateLiveTrafficAnalytics();
-        setInterval(updateLiveTrafficAnalytics, 5000); 
+        setInterval(updateLiveTrafficAnalytics, 3500); 
         triggerReset();
     </script>
 </body>
