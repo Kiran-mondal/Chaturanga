@@ -1,7 +1,7 @@
 {
-  "name": "chaturanga",
+  "name": "chaturanga-backend",
   "version": "1.0.0",
-  "type": "module",
+  "description": "Backend engine for Chaturanga online tactical game",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -9,6 +9,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "pg": "^8.11.5"
-  }
+    "express-rate-limit": "^7.1.5"
+  },
+  "author": "Kiran Mondal",
+  "license": "ISC"
 }
