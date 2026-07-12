@@ -1,88 +1,103 @@
-import express from 'express';
-import path from 'path';
-import cors from 'cors';
-import pkg from 'pg';
-import { fileURLToPath } from 'url';
+const express = require('express');
+const cors = require('cors');
+const rateLimit = require('express-rate-limit'); // 🔒 সিকিউরিটি রেট লিমিটার যোগ করা হলো
 
-// ⚠️ লোকাল ফাইলের নামের শেষে অবশ্যই .js এক্সটেনশন থাকতে হবে ES Module-এ
-import './routes.js'; 
-import './rules.js';
-
-const { Pool } = pkg;
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 📁 ES Module-এ __dirname তৈরি করার আধুনিক নিয়ম
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// 🛡️ ১. স্প্যামিং এবং DDOS প্রোটেকশন (Missing Rate Limiting ফিক্স)
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // ১৫ মিনিট সময়
+    max: 100, // এই সময়ের মধ্যে একটি আইপি থেকে সর্বোচ্চ ১০০টি রিকোয়েস্ট পাঠানো যাবে
+    message: { error: 'Too many requests from this IP, please try again after 15 minutes.' },
+    standardHeaders: true, 
+    legacyHeaders: false, 
+});
 
-// 🔐 Middleware Configuration
+// মিডলওয়্যার কনফিগারেশন
 app.use(cors());
 app.use(express.json());
 
-// 📁 Serve Static Files (গুগল ভেরিফিকেশন এবং অন্যান্য ফাইলের জন্য)
-app.use(express.static(__dirname));
+// 🛡️ ২. প্রাইভেট ফাইল এক্সপোজার রোধ করা (Exposure of Private Files ফিক্স)
+// এটি নিশ্চিত করে যে আপনার সার্ভারের ভেতরের কোনো সিক্রেট ফাইল ব্রাউজারে দেখা যাবে না, শুধুমাত্র 'public' ফোল্ডারটি এক্সেস করা যাবে।
+app.use(express.static('public')); 
 
-// 🏛️ PostgreSQL Database Connection Setup
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/chaturanga_db",
-    ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
-});
+// গ্লোবাল এপিআই রাউটে রেট লিমিটার অ্যাপ্লাই করা হলো
+app.use('/api/', apiLimiter);
 
-// 🔍 Database Initialization Query
-const initDb = async () => {
-    try {
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS strategy_logs (
-                id SERIAL PRIMARY KEY,
-                winning_move TEXT NOT NULL,
-                recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-        console.log("Database Matrix: Strategy tables synchronized successfully.");
-    } catch (err) {
-        console.error("Database Matrix Error:", err.message);
+// 📊 ইন-মেমোরি ট্রাফিক এবং ম্যাচ ডেটা স্টোরেজ
+let activeVisitors = new Map(); 
+let strategyTraps = [];
+
+// ⏱️ নিষ্ক্রিয় ইউজারদের ট্র্যাকার থেকে সরানোর মেকানিজম (cleanup)
+setInterval(() => {
+    const now = Date.now();
+    for (let [vid, lastSeen] of activeVisitors.entries()) {
+        if (now - lastSeen > 12000) { 
+            activeVisitors.delete(vid);
+        }
     }
-};
-initDb();
+}, 4000);
 
-// 🌐 ------------------ API ROUTES ------------------ 🌐
-
-// 📥 Save Dynamic Strategic Traps
-app.post('/api/save-strategy', async (req, res) => {
-    const { move } = req.body;
-    if (!move) return res.status(400).json({ error: "Invalid move structure provided." });
-
-    try {
-        await pool.query('INSERT INTO strategy_logs (winning_move) VALUES ($1)', [move]);
-        res.status(200).json({ success: true, message: "Strategy recorded in global memory." });
-    } catch (err) {
-        res.status(500).json({ error: "Internal Database Exception", details: err.message });
+// 📡 রুট ১: লাইভ কাউন্টার এপিআই
+app.get('/api/live-counters', (req, res) => {
+    const visitorId = req.query.visitorId;
+    if (visitorId) {
+        activeVisitors.set(visitorId, Date.now());
     }
-});
 
-// 📤 Fetch Prior Tactical Combat Patterns
-app.get('/api/get-strategies', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT winning_move FROM strategy_logs ORDER BY recorded_at DESC LIMIT 50');
-        const traps = result.rows.map(row => row.winning_move);
-        res.status(200).json({ traps });
-    } catch (err) {
-        res.status(500).json({ error: "Internal Database Exception", details: err.message });
+    let activeMatchesCount = 0;
+    const now = Date.now();
+    for (let [vid, statusObj] of activeMatches.entries()) {
+        if (now - statusObj.timestamp > 12000) {
+            activeMatches.delete(vid);
+        } else if (statusObj.status === "playing") {
+            activeMatchesCount++;
+        }
     }
+
+    res.json({
+        onlineNow: activeVisitors.size,
+        inBattles: activeMatchesCount
+    });
 });
 
-// 🚀 Special Route for Google Search Console Verification
-app.get('/google711bc6cd9e996d83.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'google711bc6cd9e996d83.html'));
+// 📡 রুট ২: রিয়েল-টাইম অ্যাক্টিভিটি রিপোর্টার
+let activeMatches = new Map();
+app.post('/api/report-activity', (req, res) => {
+    const { status, mode, visitorId, lastAction } = req.body;
+    if (visitorId) {
+        activeVisitors.set(visitorId, Date.now());
+        if (status === "ended") {
+            activeMatches.delete(visitorId);
+        } else {
+            activeMatches.set(visitorId, {
+                status: status,
+                mode: mode,
+                lastAction: lastAction || "",
+                timestamp: Date.now()
+            });
+        }
+    }
+    res.json({ success: true });
 });
 
-// 🎮 Serve Main Frontend Application (Fallback Rule)
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+// 📡 রুট ৩: স্ট্র্যাটেজি সেভ এপিআই
+app.post('/api/save-strategy', (req, res) => {
+    const { move, timestamp } = req.body;
+    if (move) {
+        strategyTraps.push({ move, timestamp: timestamp || new Date() });
+        if (strategyTraps.length > 50) strategyTraps.shift(); 
+    }
+    res.json({ success: true });
 });
 
-// ⚡ Activate Server Instance
+// 📡 রুট ৪: স্ট্র্যাটেজি গেট এপিআই
+app.get('/api/get-strategies', (req, res) => {
+    res.json({ traps: strategyTraps.map(t => t.move) });
+});
+
+// সার্ভার স্টার্ট
 app.listen(PORT, () => {
-    console.log(`Chaturanga Engine Active on Core Port: ${PORT}`);
+    console.log(`Chaturanga Ancient Engine active on port ${PORT}`);
 });
