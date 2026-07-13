@@ -8,9 +8,10 @@
     <meta name="description" content="Play the ancient Indian chess game Chaturanga online. Battle against a smart, adaptive computer engine or invite a friend for a pass-and-play match. No download required!">
     <meta name="keywords" content="Chaturanga, ancient chess, Ashtapada, Indian board game, play Chaturanga online, chess origins, historical board game">
     <meta name="author" content="Kiran Mondal">
-    
+
+    <!-- 🎯 আপনার গুগল ভেরিফিকেশন মেটা ট্যাগ -->
     <meta name="google-site-verification" content="D3pLIiUfXAJjGnOMpE_mGwmhJzo-5iuQGNJcT0nvmLk" />
-    
+
     <meta property="og:title" content="Chaturanga Online - Royal Sandalwood Ashtapada Game">
     <meta property="og:description" content="Challenge the classic balanced computer engine in a historical game of Chaturanga. Experience premium tactical board gaming.">
     <meta property="og:image" content="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1000&auto=format&fit=crop">
@@ -194,27 +195,16 @@
         </div>
     </div>
         <script>
-        const RENDER_API_URL = "https://chaturanga-6wdo.onrender.com/api"; 
-
         const pieceSigns = { 
             "Raja": "⚜️", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" 
         };
 
-        // 🆔 Standard UUID Generation with Legacy Fallback
-        if (!localStorage.getItem('chaturanga_visitor_uid')) {
-            const fallbackUid = Math.random().toString(36).substring(2) + Date.now().toString(36);
-            localStorage.setItem('chaturanga_visitor_uid', typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : fallbackUid);
-        }
-        const VISITOR_ID = localStorage.getItem('chaturanga_visitor_uid');
-
         let gameMetrics = {
             currentStage: 2,           
             userAggressionCount: 0,    
-            matchMoveHistory: [],
-            consecutiveUserLosses: 0   
+            matchMoveHistory: []
         };
 
-        let strategyDatabase = { userWinningTraps: [] };
         let currentMode = "Vs-Computer"; 
         let isGameOver = false; 
         let capturedWhite = [];
@@ -227,57 +217,6 @@
         let selectedSquare = null;
         let highlightedMoves = [];
         let isPlayer1Turn = true; 
-
-        // 🟢 Modern Real-Time Traffic Syncer
-        async function updateLiveTrafficAnalytics() {
-            try {
-                const response = await fetch(`${RENDER_API_URL}/live-counters?visitorId=${VISITOR_ID}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    document.getElementById('online-users').innerText = data.onlineNow || 1;
-                    document.getElementById('active-matches').innerText = data.inBattles || 0;
-                }
-            } catch (error) {
-                document.getElementById('online-users').innerText = "1";
-                document.getElementById('active-matches').innerText = (gameMetrics.matchMoveHistory.length > 0 && !isGameOver) ? "1" : "0";
-            }
-        }
-
-        // 📡 Global Real-Time Activity Dispatcher
-        async function reportMatchActivity(status, currentMoveLog = "") {
-            try {
-                await fetch(`${RENDER_API_URL}/report-activity`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        status: status, 
-                        mode: currentMode,
-                        visitorId: VISITOR_ID,
-                        lastAction: currentMoveLog
-                    })
-                });
-            } catch (e) {}
-        }
-
-        async function loadGlobalDatabase() {
-            try {
-                const response = await fetch(`${RENDER_API_URL}/get-strategies`);
-                if (response.ok) {
-                    const data = await response.json();
-                    strategyDatabase.userWinningTraps = data.traps || [];
-                }
-            } catch (error) {}
-        }
-
-        async function syncTrapToDatabase(winningMove) {
-            try {
-                await fetch(`${RENDER_API_URL}/save-strategy`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ move: winningMove, timestamp: new Date() })
-                });
-            } catch (error) {}
-        }
 
         function resetInitialSetup() {
             initialSetup = {
@@ -319,24 +258,22 @@
                 document.getElementById('loss-title-2').innerText = "💀 Player 2 Losses";
             }
             createBoard();
-            reportMatchActivity("ended", "Battle restarted"); 
         }
 
         function generateTeachingReport(userWon) {
             if (currentMode !== '2-Player' && userWon) {
                 gameMetrics.currentStage = 3; 
-                if(gameMetrics.matchMoveHistory.length > 0) syncTrapToDatabase(gameMetrics.matchMoveHistory.slice(-2).join("->"));
-                return "🎯 Exceptional Tactics! The Chaturanga Board Game Engine has analyzed your movement patterns and calibrated its calculations to Stage 3 for a supreme challenge.";
+                return "🎯 Exceptional Tactics! The Chaturanga Board Game Engine has calibrated its calculations to Stage 3 for a supreme challenge.";
             }
             return "🏛️ Ancient Strategic Analysis: Control the 4 central cells of the Ashtapada. Utilize your Padati rows to construct unified defensive walls.";
         }
-                    function showEndGameModal(title, description, icon, userWon) {
+
+        function showEndGameModal(title, description, icon, userWon) {
             const teachingReport = generateTeachingReport(userWon);
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalDesc').innerHTML = `<span class="block mb-3">${description}</span><div class="bg-stone-900/90 p-2.5 text-left text-amber-500 text-[11px] font-sans leading-relaxed whitespace-pre-line border border-amber-900/40">${teachingReport}</div>`;
             document.getElementById('modalIcon').innerText = icon;
             modalElement.classList.remove('hidden');
-            reportMatchActivity("ended", `Match finished - ${title}`); 
         }
 
         function checkLegalMove(piece, fromR, fromC, toR, toC) {
@@ -365,8 +302,7 @@
                 default: return false;
             }
         }
-
-        function calculatePossibleMoves(row, col, piece) {
+                    function calculatePossibleMoves(row, col, piece) {
             const validDestinations = [];
             for (let r = 0; r < 8; r++) {
                 for (let c = 0; c < 8; c++) { if (checkLegalMove(piece, row, col, r, c)) validDestinations.push(`${r}-${c}`); }
@@ -423,10 +359,6 @@
                     createBoard(); return;
                 }
 
-                let moveLogText = `White moved ${selectedSquare.piece.name} to [${row},${col}]`;
-                if (targetPiece) moveLogText = `White ${selectedSquare.piece.name} captured Black ${targetPiece.name}! 🔥`;
-                reportMatchActivity("playing", moveLogText);
-
                 gameMetrics.matchMoveHistory.push(`${fromKey}:${selectedSquare.piece.name}->${squareId}`);
                 if (targetPiece && !targetPiece.isWhite) {
                     gameMetrics.userAggressionCount++;
@@ -448,7 +380,7 @@
 
                 if (!isGameOver) {
                     isPlayer1Turn = !isPlayer1Turn; createBoard();
-                    if (currentMode === 'Vs-Computer' && !isPlayer1Turn) setTimeout(triggerComputerMoveLogic, 600);
+                    if (currentMode === 'Vs-Computer' && !isPlayer1Turn) setTimeout(triggerComputerMoveLogic, 300);
                 } else { createBoard(); }
             }
         }
@@ -482,10 +414,6 @@
             else { availableMoves.sort((a, b) => b.weight - a.weight); }
 
             const chosenMove = availableMoves[0], targetPiece = initialSetup[chosenMove.to];
-            
-            let botLogText = `Computer moved ${chosenMove.piece.name} to [${chosenMove.to}]`;
-            if (targetPiece) botLogText = `Computer captured your ${targetPiece.name}! ⚠️`;
-            reportMatchActivity("playing", botLogText);
 
             if (targetPiece) {
                 capturedWhite.push(targetPiece.name);
@@ -495,14 +423,7 @@
             isPlayer1Turn = true; createBoard();
         }
 
-        // 🚀 Performance Optimization Defer Method
         triggerReset();
-        
-        setTimeout(() => {
-            loadGlobalDatabase();
-            updateLiveTrafficAnalytics();
-            setInterval(updateLiveTrafficAnalytics, 3500); 
-        }, 1000);
     </script>
 </body>
 </html>
