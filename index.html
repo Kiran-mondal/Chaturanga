@@ -130,51 +130,74 @@
     </style>
 </head>
     
-<body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
+<body class="min-h-screen flex flex-col items-center justify-start p-3 md:p-6 text-amber-100 font-serif relative">
 
-    <div class="text-center my-3 select-none">
-        <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 tracking-widest drop-shadow-lg">चतुरंग (CHATURANGA)</h1>
-        <p class="text-amber-600/80 text-[10px] mt-0.5 font-sans tracking-widest uppercase">Ancient Indian Military Path-Blocking Engine</p>
-    </div>
+    <div class="w-full max-w-md heritage-card p-4 md:p-5 rounded-xl border border-amber-500/30 backdrop-blur-md bg-stone-950/40 relative z-10">
+        
+        <header class="text-center mb-4">
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-serif uppercase">
+                CHATURANGA
+            </h1>
+            <p class="text-[9px] md:text-[10px] tracking-widest text-amber-200/70 font-sans uppercase mt-0.5">
+                Ancient Indian Heritage Engine
+            </p>
+        </header>
 
-    <!-- 🌟 Glassmorphism প্যানেল এবং বাটনসমূহ -->
-    <div id="mode-panel" class="flex gap-2 mb-4 heritage-card p-1.5 rounded-lg w-full max-w-[400px] justify-between items-center">
-        <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold rounded cursor-pointer font-sans glass-btn-inactive">
-            👥 Pass & Play
-        </button>
-        <button id="btnAI" onclick="switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold rounded cursor-pointer font-sans glass-btn-active">
-            🤖 VS Computer AI
-        </button>
-        <button onclick="triggerReset()" class="px-3 py-2 text-[11px] font-bold rounded cursor-pointer font-sans glass-btn-reset">
-            🔄 Reset
-        </button>
-    </div>
-
-    <div class="w-full max-w-[400px] flex justify-center mb-4">
-        <div id="board" class="ashtapada-board grid grid-cols-8 gap-0"></div>
-    </div>
-
-    <div class="heritage-card p-3 rounded-lg w-full max-w-[400px] grid grid-cols-2 gap-3">
-        <div>
-            <h4 id="loss-title-1" class="text-amber-400 font-bold text-[10px] mb-1 font-sans uppercase tracking-wider">💀 Player 1 Losses</h4>
-            <div id="white-graveyard" class="flex flex-wrap gap-1 text-lg bg-stone-950/40 p-1.5 rounded min-h-[36px] border border-stone-900"></div>
+        <div class="mb-4 flex items-center justify-between px-3 py-1.5 rounded-lg bg-emerald-950/20 border border-emerald-500/20 backdrop-blur-sm">
+            <div class="flex items-center gap-2">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-[10px] md:text-[11px] font-sans font-medium text-emerald-300 tracking-wide uppercase">
+                    Live Players Online
+                </span>
+            </div>
+            <span class="text-[11px] font-sans font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 animate-pulse">
+                42 Active
+            </span>
         </div>
-        <div>
-            <h4 id="loss-title-2" class="text-red-400 font-bold text-[10px] mb-1 font-sans uppercase tracking-wider">💀 Computer Losses</h4>
-            <div id="black-graveyard" class="flex flex-wrap gap-1 text-lg bg-stone-950/40 p-1.5 rounded min-h-[36px] border border-stone-900"></div>
+
+        <div class="flex gap-2.5 mb-4">
+            <button id="btnAI" onclick="switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold rounded font-sans glass-btn-active">
+                ⚔️ VS COMPUTER
+            </button>
+            <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold rounded cursor-pointer transition font-sans glass-btn-inactive">
+                👥 2-PLAYER LOCAL
+            </button>
         </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-4 text-[10px] font-sans">
+            <div class="p-2 rounded-lg bg-black/20 border border-amber-900/20 backdrop-blur-sm">
+                <div id="loss-title-1" class="text-red-400/80 font-bold mb-1 uppercase tracking-tighter">💀 Your Losses</div>
+                <div id="white-graveyard" class="flex flex-wrap gap-1 min-h-[20px] text-base"></div>
+            </div>
+            <div class="p-2 rounded-lg bg-black/20 border border-amber-900/20 backdrop-blur-sm">
+                <div id="loss-title-2" class="text-amber-400/80 font-bold mb-1 uppercase tracking-tighter">💀 Computer Losses</div>
+                <div id="black-graveyard" class="flex flex-wrap gap-1 min-h-[20px] text-base"></div>
+            </div>
+        </div>
+
+        <div class="flex justify-center mb-4">
+            <div id="board" class="ashtapada-board grid grid-cols-8 grid-rows-8 bg-[#f1dec1]"></div>
+        </div>
+
+        <button onclick="triggerReset()" class="w-full py-2.5 text-[11px] font-bold rounded cursor-pointer font-sans uppercase tracking-wider glass-btn-reset">
+            ♻️ RE-INITIALIZE ENGAGEMENT
+        </button>
     </div>
 
-    <div id="gameOverModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-        <div class="bg-stone-950 border border-amber-500 p-6 rounded-xl max-w-xs w-full text-center shadow-2xl">
-            <div id="modalIcon" class="text-4xl mb-2">⚜️</div>
-            <h2 id="modalTitle" class="text-xl font-black text-amber-500 tracking-wide uppercase">Battle Settled</h2>
-            <p id="modalDesc" class="text-stone-400 text-xs my-3 font-sans leading-relaxed"></p>
-            <button onclick="triggerReset()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold rounded-lg shadow-md text-xs font-sans uppercase tracking-wider cursor-pointer">
-                🔄 Restart Battle
+    <div id="gameOverModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 hidden backdrop-blur-sm">
+        <div class="w-full max-w-xs bg-stone-950/80 border border-amber-500/40 p-5 rounded-xl text-center shadow-2xl backdrop-blur-lg">
+            <div id="modalIcon" class="text-4xl mb-2 animate-bounce">👑</div>
+            <h2 id="modalTitle" class="text-xl font-black text-amber-400 uppercase tracking-wide font-serif mb-1">VICTORY!</h2>
+            <div id="modalDesc" class="text-stone-300 text-[11px] leading-relaxed mb-4 font-sans"></div>
+            <button onclick="triggerReset()" class="w-full py-2 bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-stone-950 font-bold text-xs rounded font-sans uppercase tracking-wider shadow-md transition">
+                Accept Fate & Restart
             </button>
         </div>
     </div>
+    
         <script>
         // 🚀 আপনার রিয়েল Vercel API ডোমেন যুক্ত করা হলো
         const VERCEL_API_URL = "https://chaturanga-seven.vercel.app/api"; 
