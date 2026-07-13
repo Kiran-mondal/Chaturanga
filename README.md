@@ -1,4 +1,5 @@
 # 👑 Chaturanga Online - Ancient Indian Strategy Board Game Engine
+[![Netlify Status](https://api.netlify.com/api/v1/badges/18799394-c48d-41e0-ab99-22d6603a0183/deploy-status)](https://app.netlify.com/projects/chaturanga-online/deploys)
 
 Welcome to **Chaturanga**, a modern, lightweight, serverless revival of the ancient Indian strategy board game, which is globally recognized as the common ancestor of modern Chess. 
 
