@@ -14,9 +14,9 @@
     <meta property="og:image" content="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1000&auto=format&fit=crop">
     <meta property="og:type" content="website">
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" defer></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
+        /* 🌌 Ambient Background Animation */
         @keyframes ambientGlow {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -37,13 +37,12 @@
             -webkit-user-select: none;
         }
 
-        /* 👑 CLS Fix: বোর্ডের নির্দিষ্ট সাইজ আগে থেকেই লক করে দেওয়া হলো */
+        /* 👑 Main Ashtapada Board */
         .ashtapada-board {
             display: grid;
             grid-template-columns: repeat(8, minmax(0, 1fr));
             width: 100%;
             max-width: 400px;
-            height: 400px; /* Layout Shift পুরোপুরি বন্ধ করার জন্য ফিক্সড হাইট */
             aspect-ratio: 1 / 1;
             padding: 10px; 
             background: linear-gradient(135deg, rgba(43, 20, 8, 0.8) 0%, rgba(23, 10, 4, 0.85) 100%); 
@@ -100,6 +99,7 @@
             border: 2.5px dashed #aa2b2b !important;
         }
 
+        /* 🔮 Premium Glassmorphism Box */
         .heritage-card {
             background: linear-gradient(135deg, rgba(35, 15, 5, 0.4) 0%, rgba(15, 2, 0, 0.5) 100%);
             border: 1px solid rgba(212, 175, 55, 0.25);
@@ -108,6 +108,7 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
 
+        /* 🟢 Pulse Blink Animation */
         .pulse-dot {
             width: 7px;
             height: 7px;
@@ -163,7 +164,7 @@
             </button>
         </div>
 
-        <div class="w-full flex justify-center mb-4 min-h-[400px]">
+        <div class="w-full flex justify-center mb-4">
             <div id="board" class="ashtapada-board"></div>
         </div>
 
@@ -178,8 +179,8 @@
             </div>
         </div>
 
-    </main>
-
+    </main> 
+    
     <div id="gameOverModal" class="hidden fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-4">
         <div class="bg-stone-950/95 border border-amber-500 p-6 rounded-xl max-w-xs w-full text-center shadow-2xl backdrop-blur-md">
             <div id="modalIcon" class="text-4xl mb-2">⚜️</div>
@@ -197,8 +198,10 @@
             "Raja": "⚜️", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" 
         };
 
+        // 🆔 Standard UUID Generation with Legacy Fallback
         if (!localStorage.getItem('chaturanga_visitor_uid')) {
-            localStorage.setItem('chaturanga_visitor_uid', crypto.randomUUID());
+            const fallbackUid = Math.random().toString(36).substring(2) + Date.now().toString(36);
+            localStorage.setItem('chaturanga_visitor_uid', typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : fallbackUid);
         }
         const VISITOR_ID = localStorage.getItem('chaturanga_visitor_uid');
 
@@ -223,6 +226,7 @@
         let highlightedMoves = [];
         let isPlayer1Turn = true; 
 
+        // 🟢 Modern Real-Time Traffic Syncer
         async function updateLiveTrafficAnalytics() {
             try {
                 const response = await fetch(`${RENDER_API_URL}/live-counters?visitorId=${VISITOR_ID}`);
@@ -237,6 +241,7 @@
             }
         }
 
+        // 📡 Global Real-Time Activity Dispatcher
         async function reportMatchActivity(status, currentMoveLog = "") {
             try {
                 await fetch(`${RENDER_API_URL}/report-activity`, {
@@ -446,7 +451,6 @@
             }
         }
 
-        // 🧠 FIXED COMPUTER BRAIN: লুপের সকল টাইপো একদম ১০০% রিমুভ করে সচল করা হলো
         function triggerComputerMoveLogic() {
             if (isGameOver) return;
             let availableMoves = [];
@@ -489,6 +493,7 @@
             isPlayer1Turn = true; createBoard();
         }
 
+        // 🚀 Performance Optimization Defer Method
         triggerReset();
         
         setTimeout(() => {
