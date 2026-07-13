@@ -19,51 +19,43 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
      <style>
-        /* 🌌 ছবিটাকে ডানে-বামে (সাইডে) আলতো করে সরানোর প্রিমিয়াম অ্যানিমেশন */
-@keyframes ambientGlow {
-    0% {
-        transform: scale(1.15) translate(0%, 0%) translateZ(0);
-    }
-    50% {
-        transform: scale(1.15) translate(-4%, 0%) translateZ(0); /* শুধু বাম দিকে (সাইডে) ৪% সরবে, ওপরে উঠবে না */
-    }
-    100% {
-        transform: scale(1.15) translate(0%, 0%) translateZ(0);
-    }
-}
+             /* 🌌 চিত্রকলাকে কোনো জুম ছাড়া সাইডে আলতো করে সরানোর প্রিমিয়াম অ্যানিমেশন */
+        @keyframes ambientGlow {
+            0% { transform: translate(0%, 0%) translateZ(0); }
+            50% { transform: translate(-3%, 0%) translateZ(0); } /* ওপরে-নিচে ফিক্সড, শুধু সাইডে সামান্য মুভমেন্ট */
+            100% { transform: translate(0%, 0%) translateZ(0); }
+        }
 
-body {
-    background: #120903;
-    overflow-x: hidden;
-    user-select: none;
-    -webkit-user-select: none;
-    margin: 0;
-    padding: 0;
-}
+        body {
+            background: #0d0602; /* 🖤 চিত্রের বাইরের ফাঁকা অংশকে রাজকীয় ডার্ক/কালো রাখার জন্য */
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
 
-/* 🚀 ব্যাকগ্রাউন্ডের ছবিকে মাঝ বরাবর সেট করে জিপিইউ মোডে অ্যানিমেশন চালানো */
-body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background-image: 
-        linear-gradient(rgba(18, 9, 3, 0.48), rgba(8, 2, 0, 0.68)),
-        url('https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1000&auto=format&fit=crop');
-    background-size: cover;
-    background-position: center center; /* ফুল ও চিত্রকর্মটি একদম মাঝখানে ফিক্সড থাকবে */
-    background-repeat: no-repeat;
-    will-change: transform;
-    transform: translateZ(0); /* Hardware Acceleration ⚡ */
-    animation: ambientGlow 28s ease-in-out infinite; /* ২৮ সেকেন্ড পর পর ডানে-বামে স্মুথলি দুলবে */
-}
-         
-         
-
-        /* 👑 Main Ashtapada Board */
+        /* 🚀 কোনো জুম বা কাটা অংশ ছাড়া পুরো চিত্রকর্মটি নিখুঁতভাবে ফুটিয়ে তোলা */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: -4%; /* অ্যানিমেশনের স্মুথ সাইড মুভমেন্টের জন্য সামান্য বাড়তি জায়গা */
+            width: 108%;
+            height: 100%;
+            z-index: -1;
+            background-image: 
+                linear-gradient(rgba(13, 6, 2, 0.42), rgba(8, 2, 0, 0.62)), /* গেমের ফ্রন্টএন্ড স্পষ্ট রাখার জন্য ওভারলে */
+                url('https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1000&auto=format&fit=crop'); 
+            background-size: contain;       /* 🎯 ছবি একটুও জুম হবে না বা কাটবে vanished হবে না, পুরো ফুল ও চিত্রকলা ভেতরে থাকবে */
+            background-position: center center; /* চিত্রকর্মটি একদম স্ক্রিনের মাঝখানে থাকবে */
+            background-repeat: no-repeat;
+            will-change: transform;
+            transform: translateZ(0);        /* জিপিইউ মোড অ্যাক্সিলারেশন ⚡ */
+            animation: ambientGlow 32s ease-in-out infinite; /* শান্ত ও ধীরগতিতে পাশে পাশে সরবে */
+        }
+          
+         /* 👑 Main Ashtapada Board */
         .ashtapada-board {
             display: grid;
             grid-template-columns: repeat(8, minmax(0, 1fr));
