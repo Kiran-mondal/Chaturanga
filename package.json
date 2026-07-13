@@ -12,6 +12,7 @@
     "express": "^4.19.2",
     "express-rate-limit": "^7.1.5",
     "pg": "^8.11.3"
+    "hono": "^4.0.0"
   },
   "author": "Kiran Mondal",
   "license": "ISC"
