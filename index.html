@@ -491,10 +491,14 @@
             isPlayer1Turn = true; createBoard();
         }
 
-        loadGlobalDatabase();
-        updateLiveTrafficAnalytics();
-        setInterval(updateLiveTrafficAnalytics, 3500); 
+                // 🚀 Performance Fix: ইনিশিয়াল পেজ লোড ফাস্ট করতে এপিআই কলগুলোকে ১ সেকেন্ড ডিফার করা হলো
         triggerReset();
+        
+        setTimeout(() => {
+            loadGlobalDatabase();
+            updateLiveTrafficAnalytics();
+            setInterval(updateLiveTrafficAnalytics, 3500); 
+        }, 1000);
     </script>
 </body>
 </html>
