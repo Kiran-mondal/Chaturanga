@@ -4,6 +4,27 @@ import { isValidMove } from './rules.js';
 
 const router = express.Router();
 
+// 📊 [নতুন যুক্ত করা হলো] লাইভ ট্রাফিক এবং একটিভ ম্যাচের কাউন্টার API
+router.get('/live-counters', async (req, res) => {
+  try {
+    // গত ৫ মিনিটের একটিভ ইউজার সংখ্যা আনা
+    const onlineResult = await query(
+      "SELECT COUNT(DISTINCT piece_name) as online_count FROM ai_learning_memory WHERE created_at > NOW() - INTERVAL '5 minutes'"
+    );
+    // রানিং বা অনগোয়িং ম্যাচের সংখ্যা আনা
+    const matchResult = await query(
+      "SELECT COUNT(*) as match_count FROM game_sessions WHERE status = 'ongoing' AND updated_at > NOW() - INTERVAL '30 minutes'"
+    );
+    
+    res.json({
+      onlineNow: onlineResult.rows[0]?.online_count || 1, // ডাটাবেজ ফাঁকা থাকলে ডিফল্ট ১ দেখাবে
+      inBattles: matchResult.rows[0]?.match_count || 0
+    });
+  } catch (error) {
+    res.json({ onlineNow: 1, inBattles: 0, error: error.message });
+  }
+});
+
 // ১. নতুন ম্যাচ সেশন শুরু করা এবং ডাটাবেজে টেবিল তৈরি নিশ্চিত করা
 router.post('/match/start', async (req, res) => {
   try {
