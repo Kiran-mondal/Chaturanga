@@ -6,15 +6,15 @@
     <title>Chaturanga - Ancient Indian Heritage Engine</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* 🌌 চিত্রকলাকে কোনো জুম ছাড়া সাইডে আলতো করে সরানোর প্রিমিয়াম অ্যানিমেশন */
+        /* 🌌 ব্যাকগ্রাউন্ড আর্টটিকে হালকা ও মসৃণভাবে অ্যানিমেট করার জন্য */
         @keyframes ambientGlow {
-            0% { transform: translate(0%, 0%) translateZ(0); }
-            50% { transform: translate(-3%, 0%) translateZ(0); }
-            100% { transform: translate(0%, 0%) translateZ(0); }
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         body {
-            background: #0d0602; /* 🖤 চিত্রের বাইরের ফাঁকা অংশকে ডার্ক কালো রাখার জন্য */
+            background: #2a1408; /* ব্যাকগ্রাউন্ড কালো না রেখে একটি রাজকীয় ব্রাউন টোন দেওয়া হলো */
             overflow-x: hidden;
             user-select: none;
             -webkit-user-select: none;
@@ -22,24 +22,23 @@
             padding: 0;
         }
 
-        /* 🚀 কোনো জুম বা কাটা অংশ ছাড়া পুরো নতুন চিত্রকর্মটি নিখুঁতভাবে ফুটিয়ে তোলা */
+        /* 🚀 পুরো স্ক্রিন জুড়ে নতুন রাজকীয় ব্যাকগ্রাউন্ড আর্ট সেট করা (কালো ভাব দূর করতে) */
         body::before {
             content: "";
             position: fixed;
             top: 0;
-            left: -4%;
-            width: 108%;
+            left: 0;
+            width: 100%;
             height: 100%;
             z-index: -1;
             background-image: 
-                linear-gradient(rgba(13, 6, 2, 0.42), rgba(8, 2, 0, 0.62)),
-                url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop'); /* 🎯 এখানে আপনার পছন্দমতো নতুন ছবির লিংক বসানো হয়েছে */
-            background-size: contain;       /* 🎯 ছবি একটুও জুম বা নষ্ট হবে না */
-            background-position: center center;
-            background-repeat: no-repeat;
-            will-change: transform;
-            transform: translateZ(0);
-            animation: ambientGlow 32s ease-in-out infinite;
+                linear-gradient(rgba(30, 15, 5, 0.45), rgba(15, 5, 2, 0.65)),
+                url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop'); 
+            background-size: cover;             /* ছবি পুরো স্ক্রিন জুড়ে ছড়িয়ে থাকবে */
+            background-position: center;
+            background-attachment: fixed;
+            will-change: background-position;
+            animation: ambientGlow 25s ease infinite;
         }
 
         .ashtapada-board {
@@ -130,6 +129,7 @@
         }
     </style>
 </head>
+    
 <body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
 
     <div class="text-center my-3 select-none">
