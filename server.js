@@ -1,10 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// ১. স্ট্যাটিক ফাইল ও লোগো ডিরেক্টরি সার্ভ করার জন্য মিডলওয়্যার (লোগো ফিক্স)
+app.use(express.static(__dirname)); 
 
 // Initialize database connection
 const pool = new Pool({
@@ -37,6 +41,17 @@ app.get('/api/get-strategies', async (req, res) => {
     } catch (err) {
         res.json({ traps: [] });
     }
+});
+
+// ২. হোম রুট হিসেবে index.html ফাইলটি সরাসরি সার্ভ করার ব্যবস্থা করা হলো
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// ৩. লোকাল এনভায়রনমেন্ট টেস্ট বা ভার্সেলের ব্যাকআপের জন্য পোর্ট লিসেনার
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
 
 module.exports = app;
