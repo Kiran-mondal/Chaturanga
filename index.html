@@ -141,7 +141,7 @@
         </div>
 
         <div id="mode-panel" class="flex gap-2 heritage-card p-1.5 rounded-lg justify-between items-center">
-            <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/60 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-600/30 hover:bg-stone-800/70 hover:border-amber-500/60">
+            <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/60 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-600/30">
                 👥 Pass & Play
             </button>
             <button id="btnAI" onclick="switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition font-sans shadow-md shadow-amber-600/50">
@@ -173,7 +173,7 @@
             <div id="modalIcon" class="text-4xl mb-2">👑</div>
             <h2 id="modalTitle" class="text-xl font-black text-amber-500 tracking-wide uppercase">Battle Settled</h2>
             <p id="modalDesc" class="text-stone-300 text-xs my-3 font-sans leading-relaxed"></p>
-            <button onclick="triggerReset()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold rounded-lg shadow-md text-xs font-sans uppercase tracking-wider hover:shadow-lg hover:shadow-amber-600/50 transition">
+            <button onclick="triggerReset()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold rounded-lg shadow-md text-xs font-sans uppercase tracking-wider">
                 🔄 Restart Battle
             </button>
         </div>
@@ -183,7 +183,12 @@
         const VERCEL_API_URL = "https://chaturanga-ruddy.vercel.app/api";
 
         const pieceSigns = {
-            "Raja": "👑", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🏹", "Padati": "⚔️"
+            "Raja": "👑",    // রাজা (রাজমুকুট)
+            "Mantri": "📜",  // মন্ত্রী (রাজকীয় স্ক্রোল/দলিল)
+            "Gaja": "🐘",    // গজ (হাতি)
+            "Ashva": "🐎",   // অশ্ব (ঘোড়া)
+            "Ratha": "🛕",   // রথ (প্রাচীন ভারতীয় মন্দির)
+            "Padati": "⚔️"   // পদাতিক (তলোয়ার)
         };
 
         let gameMetrics = {
@@ -278,8 +283,8 @@
             resetInitialSetup();
             modalElement.classList.add('hidden');
 
-            document.getElementById('btn2P').className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded font-sans shadow-md shadow-amber-600/50' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 text-amber-400 rounded border border-amber-600/30 hover:bg-stone-800/70';
-            document.getElementById('btnAI').className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded font-sans shadow-md shadow-amber-600/50' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 text-amber-400 rounded border border-amber-600/30 hover:bg-stone-800/70';
+            document.getElementById('btn2P').className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded font-sans shadow-md shadow-amber-600/50' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-600/30';
+            document.getElementById('btnAI').className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded font-sans shadow-md shadow-amber-600/50' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-600/30';
 
             if (currentMode === 'Vs-AI') {
                 document.getElementById('loss-title-1').innerText = "💀 Your Losses";
