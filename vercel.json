@@ -4,14 +4,6 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "logo.svg",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -20,11 +12,7 @@
       "dest": "/logo.svg"
     },
     {
-      "src": "/get-strategies",
-      "dest": "server.js"
-    },
-    {
-      "src": "/save-strategy",
+      "src": "/api/(.*)",
       "dest": "server.js"
     },
     {
