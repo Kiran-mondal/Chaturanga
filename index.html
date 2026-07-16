@@ -37,6 +37,13 @@
             justify-content: flex-start;
         }
 
+        .status-card {
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(180, 83, 9, 0.25);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
         .heritage-card {
             background: linear-gradient(135deg, rgba(20, 10, 5, 0.6) 0%, rgba(10, 3, 0, 0.75) 100%);
             border: 1px solid rgba(180, 83, 9, 0.4);
@@ -111,19 +118,36 @@
 
     <div class="w-full max-w-[400px] flex flex-col gap-3 pt-16 mb-0">
         
+        <div class="status-card p-3 rounded-lg flex justify-between items-center select-none">
+            <div class="flex items-center gap-2">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-[10px] font-sans text-stone-300 font-bold tracking-wider uppercase">LIVE WEBSITE STATUS</span>
+            </div>
+            
+            <div class="flex gap-4 text-right font-sans items-center">
+                <div class="bg-emerald-950/40 px-2 py-1 rounded border border-emerald-500/20 flex items-center justify-center">
+                    <script type="text/javascript" src="https://freecounterstat.com/online/counter.php?id=chaturanga_live&style=0001"></script>
+                    <span class="text-emerald-400 font-bold text-xs ml-1 uppercase tracking-tighter">ONLINE</span>
+                </div>
+            </div>
+        </div>
+
         <div class="text-center py-2 select-none">
             <h1 class="text-3xl font-serif text-amber-500 tracking-widest font-bold mb-0.5">চতুরঙ্গ</h1>
             <h2 class="text-lg font-sans text-stone-300 font-extrabold tracking-widest uppercase">CHATURANGA</h2>
         </div>
 
         <div id="mode-panel" class="flex gap-2 heritage-card p-1.5 rounded-lg justify-between items-center">
-            <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded cursor-pointer transition">
+            <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/60 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-600/30 hover:bg-stone-800/70 hover:border-amber-500/60">
                 👥 Pass & Play
             </button>
-            <button id="btnAI" onclick="switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition">
+            <button id="btnAI" onclick="switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition font-sans shadow-md shadow-amber-600/50">
                 💻 VS Computer
             </button>
-            <button id="btnReset" onclick="triggerReset()" class="px-4 py-2 text-[11px] font-bold bg-stone-950/80 rounded cursor-pointer transition">
+            <button id="btnReset" onclick="triggerReset()" class="px-4 py-2 text-[11px] font-bold bg-stone-950/80 text-red-400 rounded border border-red-900/40 cursor-pointer transition font-sans">
                 🔄 Reset
             </button>
         </div>
@@ -145,11 +169,11 @@
     </div>
 
     <div id="gameOverModal" class="hidden fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-stone-950/95 border border-amber-500/50 p-6 rounded-xl max-w-xs w-full text-center shadow-2xl">
+        <div class="bg-stone-950/95 border border-amber-500/50 p-6 rounded-xl max-w-xs w-full text-center shadow-2xl backdrop-blur-md">
             <div id="modalIcon" class="text-4xl mb-2">👑</div>
             <h2 id="modalTitle" class="text-xl font-black text-amber-500 tracking-wide uppercase">Battle Settled</h2>
             <p id="modalDesc" class="text-stone-300 text-xs my-3 font-sans leading-relaxed"></p>
-            <button onclick="triggerReset()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold rounded-lg shadow-lg hover:from-amber-600 hover:to-amber-700 transition">
+            <button onclick="triggerReset()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold rounded-lg shadow-md text-xs font-sans uppercase tracking-wider hover:shadow-lg hover:shadow-amber-600/50 transition">
                 🔄 Restart Battle
             </button>
         </div>
@@ -254,12 +278,12 @@
             resetInitialSetup();
             modalElement.classList.add('hidden');
 
-            document.getElementById('btn2P').className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded cursor-pointer transition';
-            document.getElementById('btnAI').className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded cursor-pointer transition';
+            document.getElementById('btn2P').className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded font-sans shadow-md shadow-amber-600/50' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 text-amber-400 rounded border border-amber-600/30 hover:bg-stone-800/70';
+            document.getElementById('btnAI').className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded font-sans shadow-md shadow-amber-600/50' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 text-amber-400 rounded border border-amber-600/30 hover:bg-stone-800/70';
 
             if (currentMode === 'Vs-AI') {
                 document.getElementById('loss-title-1').innerText = "💀 Your Losses";
-                document.getElementById('loss-title-2').innerText = "🤖 Computer Losses";
+                document.getElementById('loss-title-2').innerText = "💀 Computer Losses";
             } else {
                 document.getElementById('loss-title-1').innerText = "💀 Player 1 Losses";
                 document.getElementById('loss-title-2').innerText = "💀 Player 2 Losses";
