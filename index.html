@@ -4,29 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="google-site-verification" content="5GtTZlOTeLNQ70u775QHue-jroUvKrMAuYfzX1BdbUA" />
-    <title>Chaturanga - Royal Sandalwood Ashtapada Engine</title>
+    <title>Chaturanga - चतुरङ्ग</title>
     
-    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/Kiran-mondal/Chaturanga/main/logo.svg">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Kiran-mondal/Chaturanga/main/logo.svg">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <link rel="apple-touch-icon" href="logo.svg">
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @keyframes ambientGlow {
-            0% { opacity: 0.7; }
-            50% { opacity: 0.85; }
-            100% { opacity: 0.7; }
-        }
-        
         body {
-            background: #0a0502;
+            background-color: #0c0603;
+            /* Using the stunning dark heritage floral oil painting from your screenshot */
             background-image: 
-                linear-gradient(rgba(10, 5, 2, 0.3), rgba(5, 2, 0, 0.5)),
-                url('https://images.unsplash.com/photo-1579783928614-a3fb3927b6a5?q=80&w=1000&auto=format&fit=crop');
+                linear-gradient(to bottom, rgba(12, 6, 3, 0.75) 0%, rgba(12, 6, 3, 0.92) 100%),
+                url("https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=1000&auto=format&fit=crop");
             background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background-position: center top;
             background-repeat: no-repeat;
-            animation: ambientGlow 25s ease-in-out infinite;
+            background-attachment: fixed;
             overflow-y: auto;
             overflow-x: hidden;
             user-select: none;
@@ -37,64 +31,64 @@
             justify-content: flex-start;
         }
 
-        .status-card {
-            background: rgba(0, 0, 0, 0.45);
-            border: 1px solid rgba(180, 83, 9, 0.25);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-        }
-
         .heritage-card {
-            background: linear-gradient(135deg, rgba(20, 10, 5, 0.6) 0%, rgba(10, 3, 0, 0.75) 100%);
-            border: 1px solid rgba(180, 83, 9, 0.4);
+            background: rgba(26, 15, 8, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(180, 83, 9, 0.35);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
         }
 
         .ashtapada-board {
             width: 100%;
             max-width: 400px;
             aspect-ratio: 1 / 1;
-            border: 4px solid #b45309;
-            box-shadow: 0 0 30px rgba(234, 179, 8, 0.15), 0 15px 40px rgba(0, 0, 0, 0.9);
-            border-radius: 6px;
+            border: 5px solid #d97706;
+            box-shadow: 0 0 30px rgba(234, 179, 8, 0.25), 0 20px 50px rgba(0, 0, 0, 0.95);
+            border-radius: 8px;
+            background-color: #5c2c16;
         }
 
+        /* Classic Ashtapada wooden style squares */
         .ashtapada-square {
-            background-color: #f1dec1;
+            background-color: #ebd1af;
             border: 1px solid #7c2d12;
             transition: background-color 0.15s ease;
         }
 
+        .ashtapada-square:nth-child(2n) {
+            background-color: #d1ab7e;
+        }
+
+        /* Ashtapada traditional cross markers */
         .marked-square::after {
-            content: "X";
+            content: "✕";
             position: absolute;
             color: #7c2d12;
-            opacity: 0.15;
-            font-size: 1.6rem;
+            opacity: 0.25;
+            font-size: 1.8rem;
             font-weight: 300;
         }
 
         .selected {
             background-color: #eab308 !important;
-            box-shadow: inset 0 0 10px #7c2d12;
+            box-shadow: inset 0 0 12px #7c2d12;
         }
 
         .possible-move-marker::before {
             content: "";
             position: absolute;
-            width: 11px;
-            height: 11px;
+            width: 13px;
+            height: 13px;
             background-color: #10b981;
             border-radius: 50%;
-            box-shadow: 0 0 8px #10b981;
+            box-shadow: 0 0 10px #10b981;
             z-index: 10;
         }
 
         .possible-capture-marker {
             background-color: #fca5a5 !important;
-            box-shadow: inset 0 0 8px #dc2626 !important;
+            box-shadow: inset 0 0 10px #dc2626 !important;
         }
 
         .losses-container {
@@ -116,79 +110,83 @@
 </head>
 <body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
 
-    <div class="w-full max-w-[400px] flex flex-col gap-3 pt-16 mb-0">
+    <div class="w-full max-w-[400px] flex flex-col gap-3 pt-6 mb-0">
         
-        <div class="status-card p-3 rounded-lg flex justify-between items-center select-none">
+        <!-- Royal Branding and Header -->
+        <div class="text-center py-2 select-none flex flex-col items-center gap-1">
+            <img src="logo.svg" alt="Chaturanga Logo" class="w-16 h-16 drop-shadow-[0_0_12px_rgba(234,179,8,0.6)] mb-1" onerror="this.src='https://img.icons8.com/color/96/crown.png';">
+            <h1 class="text-3xl font-serif text-amber-500 tracking-widest font-bold mb-0.5">চতুরঙ্গ</h1>
+            <h2 class="text-3xl font-serif text-amber-500 tracking-widest font-extrabold uppercase mb-0.5">(CHATURANGA)</h2>
+            <h3 class="text-[10px] font-sans text-amber-600/90 font-bold tracking-widest uppercase">ROYAL SANDALWOOD ASHTAPADA ENGINE</h3>
+        </div>
+
+        <!-- Live Website Status Bar -->
+        <div class="heritage-card rounded-lg px-4 py-2.5 flex justify-between items-center text-xs border border-amber-600/20">
             <div class="flex items-center gap-2">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <span class="text-[10px] font-sans text-stone-300 font-bold tracking-wider uppercase">LIVE WEBSITE STATUS</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="font-sans font-extrabold tracking-wider text-stone-200">LIVE WEBSITE STATUS</span>
             </div>
-            
-            <div class="flex gap-4 text-right font-sans items-center">
-                <div class="bg-emerald-950/40 px-2 py-1 rounded border border-emerald-500/20 flex items-center justify-center">
-                    <script type="text/javascript" src="https://freecounterstat.com/online/counter.php?id=chaturanga_live&style=0001"></script>
-                    <span class="text-emerald-400 font-bold text-xs ml-1 uppercase tracking-tighter">ONLINE</span>
+            <div class="flex gap-4 font-sans text-right">
+                <div>
+                    <div class="text-amber-500 font-bold text-xs">1</div>
+                    <div class="text-[8px] text-stone-400 font-bold tracking-tighter uppercase">ONLINE NOW</div>
+                </div>
+                <div>
+                    <div class="text-amber-500 font-bold text-xs">0</div>
+                    <div class="text-[8px] text-stone-400 font-bold tracking-tighter uppercase">IN BATTLES</div>
                 </div>
             </div>
         </div>
 
-        <div class="text-center py-2 select-none">
-            <h1 class="text-3xl font-serif text-amber-500 tracking-widest font-bold mb-0.5">চতুরঙ্গ</h1>
-            <h2 class="text-lg font-sans text-stone-300 font-extrabold tracking-widest uppercase">CHATURANGA</h2>
-        </div>
-
+        <!-- Mode Buttons -->
         <div id="mode-panel" class="flex gap-2 heritage-card p-1.5 rounded-lg justify-between items-center">
-            <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/60 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-600/30">
+            <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded cursor-pointer transition uppercase tracking-wider flex items-center justify-center gap-1">
                 👥 Pass & Play
             </button>
-            <button id="btnAI" onclick="switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition font-sans shadow-md shadow-amber-600/50">
+            <button id="btnAI" onclick="switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider flex items-center justify-center gap-1">
                 💻 VS Computer
             </button>
-            <button id="btnReset" onclick="triggerReset()" class="px-4 py-2 text-[11px] font-bold bg-stone-950/80 text-red-400 rounded border border-red-900/40 cursor-pointer transition font-sans">
+            <button id="btnReset" onclick="triggerReset()" class="px-4 py-2 text-[11px] font-bold bg-stone-950/80 rounded cursor-pointer transition uppercase tracking-wider flex items-center justify-center gap-1">
                 🔄 Reset
             </button>
         </div>
 
+        <!-- Game Board Container -->
         <div class="flex justify-center w-full">
             <div id="board" class="ashtapada-board grid grid-cols-8 gap-0"></div>
         </div>
 
+        <!-- Graveyard Panel -->
         <div class="heritage-card p-3 rounded-lg grid grid-cols-2 gap-3 mb-2">
             <div>
-                <h4 id="loss-title-1" class="text-amber-500/90 font-bold text-[10px] mb-1 font-sans uppercase tracking-wider">💀 Your Losses</h4>
+                <h4 id="loss-title-1" class="text-amber-500/90 font-bold text-[10px] mb-1 font-sans uppercase tracking-wider">💀 WHITE LOSSES</h4>
                 <div id="white-graveyard" class="losses-container flex flex-wrap gap-1 text-base bg-black/30 p-1.5 rounded min-h-[40px]"></div>
             </div>
             <div>
-                <h4 id="loss-title-2" class="text-red-500/90 font-bold text-[10px] mb-1 font-sans uppercase tracking-wider">💀 Computer Losses</h4>
+                <h4 id="loss-title-2" class="text-red-500/90 font-bold text-[10px] mb-1 font-sans uppercase tracking-wider">💀 BLACK LOSSES</h4>
                 <div id="black-graveyard" class="losses-container flex flex-wrap gap-1 text-base bg-black/30 p-1.5 rounded min-h-[40px]"></div>
             </div>
         </div>
     </div>
 
+    <!-- Game Over Modal -->
     <div id="gameOverModal" class="hidden fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-stone-950/95 border border-amber-500/50 p-6 rounded-xl max-w-xs w-full text-center shadow-2xl backdrop-blur-md">
+        <div class="bg-stone-950/95 border border-amber-500/50 p-6 rounded-xl max-w-xs w-full text-center shadow-2xl">
             <div id="modalIcon" class="text-4xl mb-2">👑</div>
             <h2 id="modalTitle" class="text-xl font-black text-amber-500 tracking-wide uppercase">Battle Settled</h2>
             <p id="modalDesc" class="text-stone-300 text-xs my-3 font-sans leading-relaxed"></p>
-            <button onclick="triggerReset()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold rounded-lg shadow-md text-xs font-sans uppercase tracking-wider">
+            <button onclick="triggerReset()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold rounded-lg shadow-lg hover:from-amber-600 hover:to-amber-700 transition cursor-pointer uppercase tracking-wider">
                 🔄 Restart Battle
             </button>
         </div>
     </div>
         <script>
-        // Vercel API Configuration
+        // Custom domain routing setup
         const VERCEL_API_URL = "https://chaturanga.quarry.dpdns.org/api";
 
+        // Royal designs representing classic ancient Indian pieces
         const pieceSigns = {
-            "Raja": "👑",    // রাজা (রাজমুকুট)
-            "Mantri": "📜",  // মন্ত্রী (রাজকীয় স্ক্রোল/দলিল)
-            "Gaja": "🐘",    // গজ (হাতি)
-            "Ashva": "🐎",   // অশ্ব (ঘোড়া)
-            "Ratha": "🛕",   // রথ (প্রাচীন ভারতীয় মন্দির)
-            "Padati": "⚔️"   // পদাতিক (তলোয়ার)
+            "Raja": "⚜️", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️"
         };
 
         let gameMetrics = {
@@ -223,10 +221,9 @@
                 if (response.ok) {
                     const data = await response.json();
                     aiDatabase.userWinningTraps = data.traps || [];
-                    console.log("Computer database sync completed.");
                 }
             } catch (error) {
-                console.error("Offline mode is active.", error);
+                console.log("Offline fallback active.");
             }
         }
 
@@ -237,9 +234,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ move: winningMove })
                 });
-                console.log("User's new strategy successfully recorded by computer.");
             } catch (error) {
-                console.error("Cloud sync bypassed.", error);
+                console.log("Local database bypass.");
             }
         }
 
@@ -283,21 +279,20 @@
             resetInitialSetup();
             modalElement.classList.add('hidden');
 
-            document.getElementById('btn2P').className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded font-sans shadow-md shadow-amber-600/50' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-600/30';
-            document.getElementById('btnAI').className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded font-sans shadow-md shadow-amber-600/50' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 text-amber-400 rounded cursor-pointer transition font-sans border border-amber-600/30';
+            document.getElementById('btn2P').className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded cursor-pointer transition uppercase tracking-wider';
+            document.getElementById('btnAI').className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded cursor-pointer transition uppercase tracking-wider';
 
             if (currentMode === 'Vs-AI') {
-                document.getElementById('loss-title-1').innerText = "💀 Your Losses";
-                document.getElementById('loss-title-2').innerText = "💀 Computer Losses";
+                document.getElementById('loss-title-1').innerText = "💀 YOUR LOSSES";
+                document.getElementById('loss-title-2').innerText = "🤖 COMPUTER LOSSES";
             } else {
-                document.getElementById('loss-title-1').innerText = "💀 Player 1 Losses";
-                document.getElementById('loss-title-2').innerText = "💀 Player 2 Losses";
+                document.getElementById('loss-title-1').innerText = "💀 PLAYER 1 LOSSES";
+                document.getElementById('loss-title-2').innerText = "💀 PLAYER 2 LOSSES";
             }
             createBoard();
         }
-
-        function generateAITeachingReport(userWon) {
-            if (currentMode !== 'Vs-AI') return "Local match completed.";
+                    function generateAITeachingReport(userWon) {
+            if (currentMode !== 'Vs-AI') return "Match finished locally.";
             if (userWon) {
                 gameMetrics.consecutiveUserLosses = 0;
                 gameMetrics.currentStage = Math.min(gameMetrics.currentStage + 1, 3);
@@ -308,24 +303,24 @@
                     aiDatabase.userWinningTraps.push(lastWinningMove);
                     syncTrapToVercelDatabase(lastWinningMove.to);
                 }
-                return "🎉 Congratulations! You defeated the computer. The computer has learned your strategy and will adapt next time.";
+                return "🎉 Victory! The system has analyzed your tactics and will adapt for the next encounter.";
             }
 
             gameMetrics.consecutiveUserLosses++;
-            let advise = "📋 [Computer Battle Report]:\n";
+            let advise = "📋 [Engine Evaluation]:\n";
             if (gameMetrics.consecutiveUserLosses >= 2) {
                 gameMetrics.currentStage = Math.max(gameMetrics.currentStage - 1, 1);
                 gameMetrics.adaptiveDifficultyScore = Math.max(gameMetrics.adaptiveDifficultyScore - 20, 50);
                 gameMetrics.consecutiveUserLosses = 0;
-                advise += "🛡️ The computer has adjusted the game level to be more balanced for your benefit. Keep practicing!\n";
+                advise += "🛡️ Engine difficulty dynamically scaled down for balance.\n";
             } else {
-                advise += "⚡ The computer is now playing at expert level. Your aggressive piece movements were noted. ";
+                advise += "⚡ Engine playing at tactical level. ";
                 if (gameMetrics.userAggressionCount < 3) {
-                    advise += "Your Padati and Ashva pieces remained lazy at the start.";
+                    advise += "Develop Padati and Ashva pieces in the early phase.";
                 } else if (gameMetrics.userMistakes.includes("Raja_exposed")) {
-                    advise += "Major mistake! You left your Raja completely unprotected.";
+                    advise += "Tactical Error: Raja was left vulnerable with open lines of attack.";
                 } else {
-                    advise += "You should have used Ratha and Gaja pieces more effectively.";
+                    advise += "Coordinate your Ratha and Gaja forces to establish board dominance.";
                 }
             }
             return advise;
@@ -391,8 +386,8 @@
         }
 
         function updateGraveyardUI() {
-            document.getElementById('black-graveyard').innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-900 rounded border border-amber-500/10">${pieceSigns[p]}</span>`).join('');
-            document.getElementById('white-graveyard').innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-900 rounded border border-amber-500/10">${pieceSigns[p]}</span>`).join('');
+            document.getElementById('black-graveyard').innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10">${pieceSigns[p]}</span>`).join('');
+            document.getElementById('white-graveyard').innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10">${pieceSigns[p]}</span>`).join('');
         }
 
         function createBoard() {
@@ -402,6 +397,7 @@
                     const squareId = `${row}-${col}`;
                     const square = document.createElement('div');
                     square.className = 'ashtapada-square flex flex-col items-center justify-center cursor-pointer select-none relative aspect-square';
+                    
                     if (markedSquares.includes(squareId)) square.classList.add('marked-square');
                     if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col) square.classList.add('selected');
                     if (!isGameOver && selectedSquare && highlightedMoves.includes(squareId)) {
@@ -410,10 +406,10 @@
 
                     const piece = initialSetup[squareId];
                     if (piece) {
-                        const labelColor = piece.isWhite ? 'text-amber-500' : 'text-red-500';
+                        const labelColor = piece.isWhite ? 'text-amber-700' : 'text-red-700';
                         square.innerHTML = `
-                            <span class="text-xl md:text-2xl filter drop-shadow-sm">${pieceSigns[piece.name]}</span>
-                            <span class="text-[7px] ${labelColor} font-bold z-10 uppercase font-sans tracking-tighter absolute bottom-0.5">${piece.name}</span>
+                            <span class="text-2xl md:text-3xl filter drop-shadow-sm">${pieceSigns[piece.name]}</span>
+                            <span class="text-[7px] ${labelColor} font-sans font-extrabold z-10 uppercase tracking-tighter absolute bottom-0.5">${piece.name}</span>
                         `;
                     }
                     square.addEventListener('click', () => handleSquareClick(row, col));
@@ -457,7 +453,7 @@
                         if (targetPiece.name === 'Raja') {
                             isGameOver = true;
                             createBoard();
-                            showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false);
+                            showEndGameModal("DEFEAT", "The opponent has captured your Raja!", "💀", false);
                             return;
                         }
                     } else {
@@ -465,7 +461,7 @@
                         if (targetPiece.name === 'Raja') {
                             isGameOver = true;
                             createBoard();
-                            showEndGameModal("VICTORY!", "You have conquered the computer's throne!", "👑", true);
+                            showEndGameModal("VICTORY!", "You have conquered the opposing throne!", "👑", true);
                             return;
                         }
                     }
