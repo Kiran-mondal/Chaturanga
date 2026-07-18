@@ -1,71 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-  <defs>
-    <radialGradient id="darkBg" cx="50%" cy="50%" r="70%">
-      <stop offset="0%" stop-color="#190e05" />
-      <stop offset="60%" stop-color="#0a0502" />
-      <stop offset="100%" stop-color="#020100" />
-    </radialGradient>
-
-    <linearGradient id="goldFront" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fef08a" /> <stop offset="50%" stop-color="#f59e0b" /> <stop offset="100%" stop-color="#b45309" /> </linearGradient>
-
-    <linearGradient id="goldDepth" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#7c2d12" /> <stop offset="50%" stop-color="#92400e" /> <stop offset="100%" stop-color="#d97706" /> </linearGradient>
-
-    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="14" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
-  </defs>
-
-  <rect width="512" height="512" rx="140" fill="url(#darkBg)" stroke="#7c2d12" stroke-width="2" />
-
-  <circle cx="256" cy="256" r="210" fill="none" stroke="#d97706" stroke-width="1.5" stroke-dasharray="8 6" opacity="0.25" />
-  <circle cx="256" cy="256" r="195" fill="none" stroke="#f59e0b" stroke-width="3" opacity="0.4" />
-
-  <g filter="url(#neonGlow)" transform="translate(16, 10)">
-    
-    <path d="M 150 170 
-             L 310 170 
-             L 310 215 
-             L 270 215 
-             L 270 250 
-             L 310 250 
-             L 310 295 
-             L 150 295 
-             C 110 295, 110 170, 150 170 Z" 
-          fill="url(#goldDepth)" />
-          
-    <path d="M 150 170 
-             C 110 170, 110 295, 150 295 
-             L 150 310 
-             C 90 310, 90 155, 150 155 Z" 
-          fill="url(#goldDepth)" />
-
-    <path d="M 155 160 
-             L 315 160 
-             L 315 205 
-             L 275 205 
-             L 275 240 
-             L 315 240 
-             L 315 285 
-             L 155 285 
-             C 120 285, 120 160, 155 160 Z" 
-          fill="url(#goldFront)" />
-
-    <path d="M 185 200 
-             L 245 200 
-             L 245 245 
-             L 185 245 Z" 
-          fill="#190e05" stroke="url(#goldDepth)" stroke-width="3" />
-
-    <polygon points="170,160 185,120 205,160" fill="url(#goldFront)" />
-    <polygon points="220,160 235,105 250,160" fill="url(#goldFront)" />
-    <path d="M 235 90 L 240 95 L 235 100 L 230 95 Z" fill="#ffffff" filter="url(#neonGlow)" />
-    <polygon points="265,160 280,120 295,160" fill="url(#goldFront)" />
-
-  </g>
-
-  <circle cx="251" cy="235" r="30" fill="#ffffff" opacity="0.1" filter="url(#neonGlow)" />
-  <circle cx="251" cy="235" r="4" fill="#ffffff" />
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- ব্যাকগ্রাউন্ড সার্কেল -->
+  <circle cx="50" cy="50" r="48" fill="#d97706" stroke="#ffffff" stroke-width="2"/>
+  <!-- Chaturanga Piece (Stylized) -->
+  <path d="M50 20 L75 55 L50 80 L25 55 Z" fill="#ffffff" />
+  <circle cx="50" cy="50" r="10" fill="#d97706" />
 </svg>
