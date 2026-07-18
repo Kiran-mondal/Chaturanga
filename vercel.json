@@ -8,6 +8,18 @@
     {
       "src": "index.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "sitemap.xml",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "logo.svg",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "robots.txt",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
