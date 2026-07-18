@@ -16,6 +16,14 @@
       "dest": "/sitemap.xml"
     },
     {
+      "src": "/logo.svg",
+      "dest": "/logo.svg"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/robots.txt"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "server.js"
     },
