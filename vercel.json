@@ -12,6 +12,10 @@
   ],
   "routes": [
     {
+      "src": "/sitemap.xml",
+      "dest": "/sitemap.xml"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "server.js"
     },
