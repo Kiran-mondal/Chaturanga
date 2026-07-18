@@ -60,12 +60,6 @@
             50% { box-shadow: 0 0 12px #10b981; }
         }
 
-        .piece-icon { animation: pieceIdle 2s ease-in-out infinite; }
-        @keyframes pieceIdle {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
-        }
-
         .mode-button { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .mode-button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3); }
 
@@ -79,6 +73,12 @@
         @keyframes modalContentBounce {
             0% { transform: translateY(-20px); opacity: 0; }
             100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-icon { animation: pieceIdle 2s ease-in-out infinite; }
+        @keyframes pieceIdle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
         }
 
         * { scroll-behavior: smooth; }
@@ -133,10 +133,10 @@
     <!-- Modal -->
     <div id="gameOverModal" class="hidden fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
         <div class="bg-stone-950/95 border border-amber-500/50 p-6 rounded-xl max-w-xs w-full text-center modal-content">
-            <div id="modalIcon" class="text-4xl mb-2 piece-icon">👑</div>
+            <div id="modalIcon" class="text-4xl mb-2 modal-icon">👑</div>
             <h2 id="modalTitle" class="text-xl font-black text-amber-500 uppercase">Battle Settled</h2>
             <p id="modalDesc" class="text-sm text-amber-200 my-3"></p>
-            <button onclick="triggerReset(); document.getElementById('gameOverModal').classList.add('hidden')" class="w-full py-2 bg-amber-600 rounded font-bold text-stone-950 hover:bg-amber-500">Restart</button>
+            <button onclick="triggerReset(); document.getElementById('gameOverModal').classList.add('hidden')" class="w-full py-2 bg-amber-600 rounded font-bold text-stone-950 hover:bg-amber-500">Restart Battle</button>
         </div>
     </div>
 
@@ -260,8 +260,8 @@
             resetInitialSetup();
             modalElement.classList.add('hidden');
 
-            document.getElementById('btn2P').className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider mode-button' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded cursor-pointer transition uppercase tracking-wider mode-button';
-            document.getElementById('btnAI').className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider mode-button' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded cursor-pointer transition uppercase tracking-wider mode-button';
+            document.getElementById('btn2P').className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
+            document.getElementById('btnAI').className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
 
             if (currentMode === 'Vs-AI') {
                 document.getElementById('loss-title-1').innerText = "💀 YOUR LOSSES";
@@ -390,7 +390,7 @@
                     if (piece) {
                         const labelColor = piece.isWhite ? 'text-amber-700' : 'text-red-700';
                         square.innerHTML = `
-                            <span class="text-2xl md:text-3xl filter drop-shadow-sm piece-icon">${pieceSigns[piece.name]}</span>
+                            <span class="text-2xl md:text-3xl filter drop-shadow-sm">${pieceSigns[piece.name]}</span>
                             <span class="text-[7px] ${labelColor} font-sans font-extrabold z-10 uppercase tracking-tighter absolute bottom-0.5">${piece.name}</span>
                         `;
                     }
