@@ -484,4 +484,189 @@ function triggerAiEngineLogic() {
         if (bestMove.targetPiece.name === 'Raja') {
             isGameOver = true;
             createBoard();
-      
+      }
+    } else {
+        const fromKey = `${selectedSquare.row}-${selectedSquare.col}`;
+        const isLegal = checkLegalMove(selectedSquare.piece, selectedSquare.row, selectedSquare.col, row, col);
+        if (!isLegal) {
+            selectedSquare = null;
+            highlightedMoves = [];
+            createBoard();
+            return;
+        }
+
+        if (targetPiece) gameMetrics.userAggressionCount++;
+        if (selectedSquare.piece.name === 'Raja' && row < 6) gameMetrics.userMistakes.push("Raja_exposed");
+
+        gameMetrics.matchMoveHistory.push({ from: fromKey, to: squareId, piece: selectedSquare.piece.name });
+
+        if (targetPiece) {
+            if (targetPiece.isWhite) {
+                capturedWhite.push(targetPiece.name);
+                if (targetPiece.name === 'Raja') {
+                    isGameOver = true;
+                    createBoard();
+                    showEndGameModal("DEFEAT", "The opponent has captured your Raja!", "💀", false);
+                    return;
+                }
+            } else {
+                capturedBlack.push(targetPiece.name);
+                if (targetPiece.name === 'Raja') {
+                    isGameOver = true;
+                    createBoard();
+                    showEndGameModal("VICTORY!", "You have conquered the opposing throne!", "👑", true);
+                    return;
+                }
+            }
+        }
+
+        let pieceNameToDeploy = selectedSquare.piece.name;
+        if (pieceNameToDeploy === 'Padati' && (row === 0 || row === 7)) pieceNameToDeploy = 'Mantri';
+
+        delete initialSetup[fromKey];
+        initialSetup[squareId] = { name: pieceNameToDeploy, isWhite: selectedSquare.piece.isWhite };
+        selectedSquare = null;
+        highlightedMoves = [];
+        createBoard();
+
+        if (isGameOver) return;
+        if (currentMode === 'Vs-AI') {
+            setTimeout(triggerAiEngineLogic, 300); 
+        } else {
+            isPlayer1Turn = !isPlayer1Turn;
+        }
+    }
+}
+
+function evaluateBoardState() {
+    const scores = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 };
+    let totalVal = 0;
+    for (const key in initialSetup) {
+        const piece = initialSetup[key];
+        const [r, c] = key.split('-').map(Number);
+        let weight = scores[piece.name];
+        if (piece.name === 'Padati') weight += piece.isWhite ? (7 - r) : r;
+        if (piece.isWhite) totalVal -= weight; else totalVal += weight;
+    }
+    return totalVal;
+}
+
+function minimax(depth, isAiMaximizing) {
+    if (depth === 0 || isGameOver) return evaluateBoardState();
+    const aiMoves = [];
+    for (const key in initialSetup) {
+        const isWhitePiece = initialSetup[key].isWhite;
+        if ((isAiMaximizing && !isWhitePiece) || (!isAiMaximizing && isWhitePiece)) {
+            const [fromR, fromC] = key.split('-').map(Number);
+            const piece = initialSetup[key];
+            for (let toR = 0; toR < 8; toR++) {
+                for (let toC = 0; toC < 8; toC++) {
+                    if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
+                        aiMoves.push({ from: key, to: `${toR}-${toC}`, piece: piece });
+                    }
+                }
+            }
+        }
+    }
+    if (aiMoves.length === 0) return evaluateBoardState();
+
+    if (isAiMaximizing) {
+        let maxEval = -Infinity;
+        for (const move of aiMoves) {
+            const backup = initialSetup[move.to];
+            initialSetup[move.to] = initialSetup[move.from];
+            delete initialSetup[move.from];
+            let evaluation = minimax(depth - 1, false);
+            maxEval = Math.max(maxEval, evaluation);
+            initialSetup[move.from] = initialSetup[move.to];
+            if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
+        }
+        return maxEval;
+    } else {
+        let minEval = Infinity;
+        for (const move of aiMoves) {
+            const backup = initialSetup[move.to];
+            initialSetup[move.to] = initialSetup[move.from];
+            delete initialSetup[move.from];
+            let evaluation = minimax(depth - 1, true);
+            minEval = Math.min(minEval, evaluation);
+            initialSetup[move.from] = initialSetup[move.to];
+            if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
+        }
+        return minEval;
+    }
+}
+
+function triggerAiEngineLogic() {
+    if (isGameOver) return;
+    const allLegalAiMoves = [];
+    for (const key in initialSetup) {
+        if (!initialSetup[key].isWhite) {
+            const [fromR, fromC] = key.split('-').map(Number);
+            const piece = initialSetup[key];
+            for (let toR = 0; toR < 8; toR++) { 
+                for (let toC = 0; toC < 8; toC++) {
+                    if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
+                        const target = initialSetup[`${toR}-${toC}`];
+                        allLegalAiMoves.push({ fromKey: key, toKey: `${toR}-${toC}`, piece: piece, targetPiece: target });
+                    }
+                }
+            }
+        }
+    }
+
+    if (allLegalAiMoves.length === 0) {
+        isGameOver = true;
+        showEndGameModal("STALEMATE", "The battle ended in a draw.", "🏳️", false);
+        return;
+    }
+
+    if (gameMetrics.currentStage === 1) {
+        allLegalAiMoves.sort((a, b) => Math.random() - 0.5);
+    } else if (gameMetrics.currentStage === 2) {
+        for (const move of allLegalAiMoves) {
+            const backup = initialSetup[move.toKey];
+            initialSetup[move.toKey] = initialSetup[move.fromKey];
+            delete initialSetup[move.fromKey];
+            move.minimaxWeight = evaluateBoardState(); 
+            initialSetup[move.fromKey] = initialSetup[move.toKey];
+            if (backup) initialSetup[move.toKey] = backup; else delete initialSetup[move.toKey];
+        }
+        allLegalAiMoves.sort((a, b) => b.minimaxWeight - a.minimaxWeight);
+    } else {
+        for (const move of allLegalAiMoves) {
+            const backup = initialSetup[move.toKey];
+            initialSetup[move.toKey] = initialSetup[move.fromKey];
+            delete initialSetup[move.fromKey];
+            move.minimaxWeight = minimax(2, false); 
+            
+            aiDatabase.userWinningTraps.forEach(trap => {
+                if (trap.to === move.toKey) move.minimaxWeight += 250;
+            });
+            
+            initialSetup[move.fromKey] = initialSetup[move.toKey];
+            if (backup) initialSetup[move.toKey] = backup; else delete initialSetup[move.toKey];
+        }
+        allLegalAiMoves.sort((a, b) => b.minimaxWeight - a.minimaxWeight);
+    }
+    
+    const bestMove = allLegalAiMoves[0]; 
+    if (bestMove.targetPiece) {
+        capturedWhite.push(bestMove.targetPiece.name);
+        if (bestMove.targetPiece.name === 'Raja') {
+            isGameOver = true;
+            createBoard();
+            showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false);
+            return;
+        }
+    }
+
+    delete initialSetup[bestMove.fromKey];
+    initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false };
+    createBoard();
+}
+
+// Initialize on page load
+loadGlobalAIDatabase();
+incrementVisitorCount();
+triggerReset();
