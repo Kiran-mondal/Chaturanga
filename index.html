@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sa">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,18 +43,6 @@
             <h3 class="text-[10px] text-amber-600/90 font-bold tracking-widest uppercase">ROYAL SANDALWOOD ASHTAPADA ENGINE</h3>
         </div>
 
-        <!-- Live Status & Visitor Counter -->
-        <div class="heritage-card rounded-lg px-4 py-2.5 flex justify-between items-center text-xs border border-amber-600/20">
-            <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 status-indicator"></span>
-                <span class="font-sans font-extrabold tracking-wider text-stone-200">LIVE WEBSITE STATUS</span>
-            </div>
-            <div class="flex gap-4 font-sans text-right">
-                <div><div class="text-amber-500 font-bold">1</div><div class="text-[8px] text-stone-400 font-bold uppercase">ONLINE</div></div>
-                <div><div id="visitorCount" class="text-amber-500 font-bold counter-value">-</div><div class="text-[8px] text-stone-400 font-bold uppercase">VISITORS</div></div>
-            </div>
-        </div>
-
         <!-- Mode Buttons -->
         <div class="flex gap-2 heritage-card p-1.5 rounded-lg justify-between">
             <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button">👥 Pass & Play</button>
@@ -70,11 +58,19 @@
         <div class="heritage-card rounded-lg p-3 space-y-2">
             <div>
                 <h4 id="loss-title-1" class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">💀 YOUR LOSSES</h4>
-                <div id="black-graveyard" class="flex flex-wrap gap-1"></div>
+                <div id="black-graveyard" class="flex flex-wrap gap-1 min-h-[30px]"></div>
             </div>
             <div>
                 <h4 id="loss-title-2" class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">🤖 COMPUTER LOSSES</h4>
-                <div id="white-graveyard" class="flex flex-wrap gap-1"></div>
+                <div id="white-graveyard" class="flex flex-wrap gap-1 min-h-[30px]"></div>
+            </div>
+        </div>
+
+        <!-- Live Move History Panel -->
+        <div class="heritage-card rounded-lg p-3 mt-1 h-40 flex flex-col">
+            <h4 class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-2 border-b border-amber-600/30 pb-1">📜 Battle Chronicles</h4>
+            <div id="move-history-feed" class="overflow-y-auto flex-1 space-y-2 text-[11px] font-sans text-stone-300 pr-1">
+                <div class="text-stone-500 italic text-center mt-6">The battlefield awaits the first strike...</div>
             </div>
         </div>
     </div>
