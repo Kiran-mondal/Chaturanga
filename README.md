@@ -1,4 +1,8 @@
-# 👑 Chaturanga Online - Ancient Indian Strategy Board Game Engine
+<div align="center">
+  <img src="https://chaturanga.quarry.dpdns.org/logo.svg" alt="Chaturanga Logo" width="250" height="250">
+</div>
+
+# Chaturanga - Ancient Indian Strategy Board Game 
 
 Welcome to **Chaturanga**, a modern, lightweight, serverless revival of the ancient Indian strategy board game, which is globally recognized as the common ancestor of modern Chess. 
 
