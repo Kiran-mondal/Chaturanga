@@ -1,17 +1,16 @@
 // ==========================================
-// 1. MENU & PAGE ROUTING LOGIC
+// 1. GLOBAL VARIABLES & UI ROUTING
 // ==========================================
-function toggleMobileMenu() {
-    const menu = document.getElementById('mobile-menu');
-    if (!menu) return;
-    if (menu.classList.contains('hidden')) {
-        menu.classList.remove('hidden'); menu.classList.add('flex');
-    } else {
-        menu.classList.add('hidden'); menu.classList.remove('flex');
-    }
-}
+let currentMode = "Vs-AI", isGameOver = false, capturedWhite = [], capturedBlack = [], initialSetup = {};
+let selectedSquare = null, highlightedMoves = [], isPlayer1Turn = true;
+let gameMetrics = { currentStage: 1, userAggressionCount: 0, userMistakes: [], matchMoveHistory: [], consecutiveUserLosses: 0, adaptiveDifficultyScore: 50 };
+let aiDatabase = { userWinningTraps: [] };
 
-function showPage(targetPage) {
+const pieceSigns = { "Raja": "⚜️", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" };
+const markedSquares = ["0-0", "0-3", "0-4", "0-7", "3-0", "3-3", "3-4", "3-7", "4-0", "4-3", "4-4", "4-7", "7-0", "7-3", "7-4", "7-7"];
+const VERCEL_API_URL = "https://chaturanga.quarry.dpdns.org/api";
+
+window.showPage = function(targetPage) {
     const pages = ['home', 'game', 'rules', 'heritage', 'projects'];
     pages.forEach(page => {
         const container = document.getElementById(`${page}-container`);
@@ -24,15 +23,39 @@ function showPage(targetPage) {
             btns.forEach(btn => { btn.classList.add('text-stone-400', 'border-transparent'); btn.classList.remove('text-amber-200', 'border-amber-500'); });
         }
     });
+};
+
+window.toggleMobileMenu = function() {
+    const menu = document.getElementById('mobile-menu');
+    if (menu) menu.classList.toggle('hidden');
+    if (menu) menu.classList.toggle('flex');
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.showPage('home');
+    window.triggerReset();
+});
+
+// ==========================================
+// 2. AUDIO & HAPTIC ENGINE (Lazy Load)
+// ==========================================
+let audioCtx;
+function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
 }
 
-// ==========================================
-// 2. AUDIO & HAPTIC ENGINE
-// ==========================================
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
 function playMoveSound() {
-    triggerVibration(40); playSynthSound(200, 'sine', 0.1);
+    triggerVibration(40); 
+    initAudio();
+    try {
+        const osc = audioCtx.createOscillator(), gainNode = audioCtx.createGain();
+        osc.type = 'sine'; osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    } catch(e) {}
 }
 
 function playCaptureSound(capturedPieceName) {
@@ -47,36 +70,11 @@ function playCaptureSound(capturedPieceName) {
     new Audio(audioSrc).play().catch(e => console.log("Audio Error:", e));
 }
 
-function playSynthSound(freq, type, duration) {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator(), gainNode = audioCtx.createGain();
-    osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-    osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + duration);
-}
-
 function triggerVibration(pattern) { if (navigator.vibrate) navigator.vibrate(pattern); }
 
 // ==========================================
 // 3. CORE GAME ENGINE & AI LOGIC
 // ==========================================
-const VERCEL_API_URL = "https://chaturanga.quarry.dpdns.org/api";
-const pieceSigns = { "Raja": "⚜️", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" };
-let gameMetrics = { currentStage: 1, userAggressionCount: 0, userMistakes: [], matchMoveHistory: [], consecutiveUserLosses: 0, adaptiveDifficultyScore: 50 };
-let aiDatabase = { userWinningTraps: [] };
-let currentMode = "Vs-AI", isGameOver = false, capturedWhite = [], capturedBlack = [], initialSetup = {};
-const markedSquares = ["0-0", "0-3", "0-4", "0-7", "3-0", "3-3", "3-4", "3-7", "4-0", "4-3", "4-4", "4-7", "7-0", "7-3", "7-4", "7-7"];
-let selectedSquare = null, highlightedMoves = [], isPlayer1Turn = true;
-
-async function loadGlobalAIDatabase() {
-    try { const response = await fetch(`${VERCEL_API_URL}/get-strategies`); if (response.ok) { const data = await response.json(); aiDatabase.userWinningTraps = data.traps || []; } } catch (e) {}
-}
-async function syncTrapToVercelDatabase(winningMove) {
-    try { await fetch(`${VERCEL_API_URL}/save-strategy`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ move: winningMove }) }); } catch (e) {}
-}
-
 function resetInitialSetup() {
     initialSetup = {
         "0-0": { name: "Ratha", isWhite: false }, "0-1": { name: "Ashva", isWhite: false }, "0-2": { name: "Gaja", isWhite: false },  "0-3": { name: "Mantri", isWhite: false }, "0-4": { name: "Raja", isWhite: false },  "0-5": { name: "Gaja", isWhite: false }, "0-6": { name: "Ashva", isWhite: false }, "0-7": { name: "Ratha", isWhite: false },
@@ -86,29 +84,38 @@ function resetInitialSetup() {
     };
 }
 
-function switchMode(mode) {
+window.switchMode = function(mode) {
     currentMode = mode;
     if (mode === "Vs-AI") { gameMetrics.currentStage = 1; gameMetrics.consecutiveUserLosses = 0; gameMetrics.adaptiveDifficultyScore = 50; }
-    triggerReset();
+    window.triggerReset();
 }
 
-function triggerReset() {
+window.triggerReset = function() {
     selectedSquare = null; highlightedMoves = []; isPlayer1Turn = true; isGameOver = false; capturedWhite = []; capturedBlack = []; gameMetrics.matchMoveHistory = [];
-    resetInitialSetup(); document.getElementById('gameOverModal').classList.add('hidden');
+    resetInitialSetup(); 
+    
+    const modal = document.getElementById('gameOverModal');
+    if (modal) modal.classList.add('hidden');
     
     const historyFeed = document.getElementById('move-history-feed');
     if (historyFeed) historyFeed.innerHTML = '<div class="text-stone-500 italic text-center mt-6">The battlefield awaits the first strike...</div>';
 
-    document.getElementById('btn2P').className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
-    document.getElementById('btnAI').className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
+    const btn2P = document.getElementById('btn2P');
+    const btnAI = document.getElementById('btnAI');
+    if (btn2P) btn2P.className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
+    if (btnAI) btnAI.className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
     
-    document.getElementById('loss-title-1').innerText = currentMode === 'Vs-AI' ? "💀 YOUR LOSSES" : "💀 PLAYER 1 LOSSES";
-    document.getElementById('loss-title-2').innerText = currentMode === 'Vs-AI' ? "🤖 COMPUTER LOSSES" : "💀 PLAYER 2 LOSSES";
+    const lossTitle1 = document.getElementById('loss-title-1');
+    const lossTitle2 = document.getElementById('loss-title-2');
+    if (lossTitle1) lossTitle1.innerText = currentMode === 'Vs-AI' ? "💀 YOUR LOSSES" : "💀 PLAYER 1 LOSSES";
+    if (lossTitle2) lossTitle2.innerText = currentMode === 'Vs-AI' ? "🤖 COMPUTER LOSSES" : "💀 PLAYER 2 LOSSES";
+    
     createBoard();
 }
 
 function logMoveToHistory(pieceName, toSquare, isCapture, isWhite) {
     const historyFeed = document.getElementById('move-history-feed');
+    if (!historyFeed) return;
     if (historyFeed.innerText.includes('awaits')) historyFeed.innerHTML = ''; 
     const colorLabel = isWhite ? '<span class="text-amber-500 font-bold">Player</span>' : '<span class="text-red-500 font-bold">Computer</span>';
     const actionText = isCapture ? `<span class="text-red-400 font-bold">captured on</span>` : `moved to`;
@@ -122,10 +129,6 @@ function generateAITeachingReport(userWon) {
     if (currentMode !== 'Vs-AI') return "Match finished locally.";
     if (userWon) {
         gameMetrics.consecutiveUserLosses = 0; gameMetrics.currentStage = Math.min(gameMetrics.currentStage + 1, 3);
-        if (gameMetrics.matchMoveHistory.length > 0) {
-            const lastWinningMove = gameMetrics.matchMoveHistory[gameMetrics.matchMoveHistory.length - 1];
-            aiDatabase.userWinningTraps.push(lastWinningMove); syncTrapToVercelDatabase(lastWinningMove.to);
-        }
         return "🎉 Victory! The system has analyzed your tactics and will adapt for the next encounter.";
     }
     gameMetrics.consecutiveUserLosses++; let advise = "📋 [Engine Evaluation]:\n";
@@ -173,12 +176,15 @@ function calculatePossibleMoves(row, col, piece) {
 }
 
 function updateGraveyardUI() {
-    document.getElementById('black-graveyard').innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 graveyard-piece">${pieceSigns[p]}</span>`).join('');
-    document.getElementById('white-graveyard').innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 graveyard-piece">${pieceSigns[p]}</span>`).join('');
+    const bYard = document.getElementById('black-graveyard');
+    const wYard = document.getElementById('white-graveyard');
+    if (bYard) bYard.innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 graveyard-piece">${pieceSigns[p]}</span>`).join('');
+    if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 graveyard-piece">${pieceSigns[p]}</span>`).join('');
 }
 
 function createBoard() {
     const boardElement = document.getElementById('board');
+    if (!boardElement) return;
     boardElement.innerHTML = '';
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
@@ -200,9 +206,8 @@ function createBoard() {
     updateGraveyardUI();
 }
 
-async function handleSquareClick(row, col) {
+window.handleSquareClick = async function(row, col) {
     if (isGameOver) return;
-    if (audioCtx.state === 'suspended') audioCtx.resume();
     
     const squareId = `${row}-${col}`, targetPiece = initialSetup[squareId];
 
@@ -300,9 +305,5 @@ function triggerAiEngineLogic() {
 
     if (bestMove.targetPiece) { capturedWhite.push(bestMove.targetPiece.name); if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
-}
-
-// গেম শুরু করার কল
-loadGlobalAIDatabase();
-triggerReset();
-                       
+                                                                                                                                                                                                                                   }
+        
