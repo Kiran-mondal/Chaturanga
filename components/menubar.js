@@ -1,20 +1,19 @@
-// ১. মেনুবারটি HTML ফাইলে অটোমেটিক লোড করার ফাংশন
-async function loadMenuBar() {
-    try {
-        const response = await fetch('components/menubar.html');
-        const menuHtml = await response.text();
-        document.getElementById('menubar-placeholder').innerHTML = menuHtml;
-    } catch (error) {
-        console.error('Error loading the menubar:', error);
-    }
-}
+// ১. index.html লোড হওয়ার সাথে সাথে মেনুবার ইনজেক্ট করার ফাংশন
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('components/menubar.html')
+        .then(response => response.text())
+        .then(html => { 
+            document.getElementById('menubar-placeholder').innerHTML = html; 
+            // বাই ডিফল্ট 'home' পেজটি ওপেন করবে
+            showPage('home');
+        })
+        .catch(err => console.error("Error loading menubar: ", err));
+});
 
-// পেজ লোড হলেই মেনুবার লোড হবে
-document.addEventListener('DOMContentLoaded', loadMenuBar);
-
-// ২. মোবাইলে হ্যামবার্গার মেনু ওপেন/ক্লোজ করার ফাংশন
+// ২. মোবাইলের মেনু ওপেন/ক্লোজ করার লজিক
 window.toggleMobileMenu = function() {
     const menu = document.getElementById('mobile-menu');
+    if (!menu) return;
     if (menu.classList.contains('hidden')) {
         menu.classList.remove('hidden');
         menu.classList.add('flex');
@@ -24,9 +23,9 @@ window.toggleMobileMenu = function() {
     }
 };
 
-// ৩. ট্যাবে ক্লিক করলে নির্দিষ্ট পেজ ওপেন করার ফাংশন
+// ৩. ট্যাব ক্লিক করলে নির্দিষ্ট পেজ দেখানো এবং বাকিগুলো লুকানোর লজিক
 window.showPage = function(targetPage) {
-    const pages = ['game', 'rules', 'heritage', 'projects'];
+    const pages = ['home', 'game', 'rules', 'heritage', 'projects'];
     
     pages.forEach(page => {
         const container = document.getElementById(`${page}-container`);
