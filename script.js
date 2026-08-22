@@ -154,4 +154,4 @@ async function handleSquareClick(row, col) {
 // Initialize on page load
 loadGlobalAIDatabase();
 triggerReset();
-        
+    
