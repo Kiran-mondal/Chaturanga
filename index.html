@@ -2,68 +2,272 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chaturanga - Ancient Indian Strategy Board Game</title>
-    <link rel="icon" href="/logo.svg?v=2" type="image/svg+xml">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
-
-    <!-- আলাদা ফোল্ডার থেকে মেনুবার ও পেজগুলো এখানে লোড হবে -->
-    <div id="menubar-placeholder" class="w-full flex flex-col items-center z-50"></div>
-
-    <script>
-        fetch('components/menubar.html')
-            .then(res => res.text())
-            .then(html => { 
-                document.getElementById('menubar-placeholder').innerHTML = html; 
-            });
-    </script>
-
-    <!-- MAIN GAME CONTAINER (মূল গেম পেজ যা শুধু Game ট্যাবে ক্লিক করলে আসবে) -->
-    <div class="w-full max-w-[400px] relative">
-        <div id="game-container" class="hidden flex-col gap-3 pt-2 mb-8 animate-fade-in">
-            <div class="flex gap-2 heritage-card p-1.5 rounded-lg justify-between mt-2">
-                <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button">👥 Pass & Play</button>
-                <button id="btnAI" onclick="switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded mode-button">💻 VS Computer</button>
-            </div>
-
-            <div class="flex justify-center w-full">
-                <div id="board" class="ashtapada-board grid grid-cols-8 gap-0"></div>
-            </div>
-
-            <div class="heritage-card rounded-lg p-3 space-y-2">
-                <div>
-                    <h4 id="loss-title-1" class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">💀 YOUR LOSSES</h4>
-                    <div id="black-graveyard" class="flex flex-wrap gap-1 min-h-[30px]"></div>
-                </div>
-                <div>
-                    <h4 id="loss-title-2" class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">🤖 COMPUTER LOSSES</h4>
-                    <div id="white-graveyard" class="flex flex-wrap gap-1 min-h-[30px]"></div>
-                </div>
-            </div>
-
-            <div class="heritage-card rounded-lg p-3 mt-1 h-40 flex flex-col">
-                <h4 class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-2 border-b border-amber-600/30 pb-1">📜 Battle Chronicles</h4>
-                <div id="move-history-feed" class="overflow-y-auto flex-1 space-y-2 text-[11px] font-sans text-stone-300 pr-1">
-                    <div class="text-stone-500 italic text-center mt-6">The battlefield awaits the first strike...</div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kiran Mondal - Mini Portfolio</title>
     
-    <!-- Modal -->
-    <div id="gameOverModal" class="hidden fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-stone-950/95 border border-amber-500/50 p-6 rounded-xl max-w-xs w-full text-center modal-content">
-            <div id="modalIcon" class="text-4xl mb-2 modal-icon">👑</div>
-            <h2 id="modalTitle" class="text-xl font-black text-amber-500 uppercase">Battle Settled</h2>
-            <p id="modalDesc" class="text-sm text-amber-200 my-3"></p>
-            <button onclick="triggerReset(); document.getElementById('gameOverModal').classList.add('hidden')" class="w-full py-2 bg-amber-600 rounded font-bold text-stone-950 hover:bg-amber-500">Restart Battle</button>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-cream: #f4ead5; 
+            --gold: #dcb360; 
+            --royal-red: #7a1f1f;
+            --dark-wood: #1e1008;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000000;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .overlay-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('../bg.jpg') center/cover no-repeat fixed;
+            filter: brightness(0.4);
+            z-index: 1;
+        }
+
+        .container {
+            background: var(--bg-cream);
+            border: 4px solid var(--gold);
+            border-radius: 12px;
+            width: 92%;
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 35px 25px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+
+        .github-profile {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .github-profile img {
+            width: 110px; height: 110px;
+            border-radius: 50%;
+            border: 3px solid var(--gold);
+            box-shadow: 0 4px 15px rgba(220,179,96,0.5);
+            margin-bottom: 12px;
+            object-fit: cover;
+        }
+        .github-profile h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: var(--royal-red);
+            margin: 0 0 5px 0;
+        }
+        .github-profile p {
+            font-size: 0.9rem;
+            color: var(--dark-wood);
+            font-weight: bold;
+            margin: 0 0 15px 0;
+        }
+        .btn-github-main {
+            display: inline-block;
+            background: var(--royal-red);
+            color: var(--gold);
+            padding: 10px 22px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border: 2px solid var(--gold);
+        }
+
+        .section-header {
+            text-align: center;
+            margin: 30px 0 20px 0;
+        }
+        .section-header h3 {
+            font-size: 1.35rem;
+            color: var(--royal-red);
+            font-family: 'Cinzel', serif;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .bottom-line {
+            width: 180px;
+            height: 2px;
+            background: var(--gold);
+            margin: 0 auto;
+        }
+
+        .repo-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .repo-card {
+            background: #ffffff;
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .card-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--royal-red);
+            font-family: 'Cinzel', serif;
+        }
+        .card-header svg {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .repo-card p {
+            font-size: 0.9rem;
+            color: var(--dark-wood);
+            margin: 0 0 15px 0;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .card-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .live-btn {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background: var(--gold);
+            color: var(--dark-wood);
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            border: 1px solid var(--dark-wood);
+        }
+        .code-btn {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background: #ffffff;
+            border: 1px solid var(--royal-red);
+            color: var(--royal-red);
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 25px 12px; width: 95%; margin: 15px auto; }
+            .card-header h3 { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="overlay-bg"></div>
+
+    <div class="container">
+        <!-- মেনুবারের ক্লোজ বাটনটি এখানে সফলভাবে রিমুভ করা হয়েছে -->
+        
+        <div class="github-profile">
+            <img src="https://github.com/Kiran-mondal.png" alt="Kiran Mondal">
+            <h2>Kiran Mondal</h2>
+            <p>Full-Stack Developer & Cyber Security Enthusiast</p>
+            <a href="https://github.com/Kiran-mondal" target="_blank" class="btn-github-main">
+                <i class="fa-brands fa-github"></i> View Full GitHub Profile
+            </a>
+        </div>
+
+        <div class="section-header">
+            <h3><i class="fa-solid fa-globe" style="color: #007bff;"></i> My Live Web Projects</h3>
+            <div class="bottom-line"></div>
+        </div>
+        
+        <div class="repo-grid">
+            <div class="repo-card">
+                <div class="card-header">
+                    <svg width="34" height="34" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="512" height="512" rx="120" fill="#0D4FF0"/>
+                        <path d="M256 80L120 140V240C120 330 176 407 256 432C336 407 392 330 392 240V140L256 80Z" fill="white"/>
+                        <circle cx="256" cy="255" r="70" fill="#0D4FF0"/>
+                        <rect x="235" y="240" width="42" height="75" rx="8" fill="white"/>
+                    </svg>
+                    <h3>Password Guard</h3>
+                </div>
+                <p>Advanced AI-powered password protection & vault management tool with 3D Cyber UI[span_0](start_span)[span_0](end_span).</p>
+                <div class="card-buttons">
+                    <a href="https://passwordguard.quarry.dpdns.org" target="_blank" class="live-btn">Live App</a>
+                    <a href="https://github.com/Kiran-mondal/Password-Guard" target="_blank" class="code-btn">Source Code</a>
+                </div>
+            </div>
+            
+            <div class="repo-card">
+                <div class="card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="34" height="34">
+                        <path d="M 120 390 C 120 270, 392 350, 392 210 C 392 130, 310 90, 256 90" fill="none" stroke="#58a6ff" stroke-width="45" stroke-linecap="round" />
+                        <circle cx="256" cy="90" r="45" fill="#58a6ff" />
+                    </svg>
+                    <h3>ZenDrift</h3>
+                </div>
+                <p>Dynamic performance tracking system built for an engaging and smooth web experience[span_1](start_span)[span_1](end_span).</p>
+                <div class="card-buttons">
+                    <a href="https://zendrift.quarry.dpdns.org" target="_blank" class="live-btn">Live App</a>
+                    <a href="https://github.com/Kiran-mondal" target="_blank" class="code-btn">Source Code</a>
+                </div>
+            </div>
+            
+            <div class="repo-card">
+                <div class="card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="34" height="34">
+                        <path d="M 280 250 C 420 250, 420 380, 350 400 C 450 420, 450 580, 280 580" stroke="#00f2fe" stroke-width="45" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="450" cy="120" r="30" fill="#00f2fe" />
+                    </svg>
+                    <h3>Omlang</h3>
+                </div>
+                <p>A modern language and communication-focused platform with an intuitive user interface[span_2](start_span)[span_2](end_span).</p>
+                <div class="card-buttons">
+                    <a href="https://omlang.quarry.dpdns.org" target="_blank" class="live-btn">Live App</a>
+                    <a href="https://github.com/Kiran-mondal" target="_blank" class="code-btn">Source Code</a>
+                </div>
+            </div>
+            
+            <div class="repo-card">
+                <div class="card-header">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="34" height="34">
+                        <circle cx="50" cy="50" r="48" fill="#d97706" stroke="#ffffff" stroke-width="2"/>
+                        <path d="M50 20 L75 55 L50 80 L25 55 Z" fill="#ffffff" />
+                    </svg>
+                    <h3>Chaturanga</h3>
+                </div>
+                <p>Interactive web-based application focused on deep logic, planning, and strategy[span_3](start_span)[span_3](end_span).</p>
+                <div class="card-buttons">
+                    <a href="https://chaturanga.quarry.dpdns.org" target="_blank" class="live-btn">Live App</a>
+                    <a href="https://github.com/Kiran-mondal" target="_blank" class="code-btn">Source Code</a>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- External JavaScript -->
-    <script src="script.js"></script>
 </body>
-</html>
+    </html>
+                        
