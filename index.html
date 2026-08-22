@@ -46,19 +46,20 @@
     <!-- ==================== ALL PAGES CONTAINER ==================== -->
     <div class="w-full max-w-[400px] relative mt-2">
         
-        <!-- 1. HOME PAGE (Default Active) -->
-        <div id="home-container" class="flex flex-col gap-5 pt-6 mb-8 text-center animate-fade-in">
-            <div class="py-4 select-none flex flex-col items-center gap-1">
-                <h1 class="text-4xl text-amber-500 tracking-widest font-bold">चतुरङ्ग</h1>
-                <h2 class="text-2xl text-amber-500 tracking-widest font-extrabold uppercase">(CHATURANGA)</h2>
-                <h3 class="text-[10px] text-amber-600/90 font-bold tracking-widest uppercase mt-2">ROYAL SANDALWOOD ASHTAPADA ENGINE</h3>
-            </div>
-            <div class="heritage-card p-6 rounded-xl space-y-4 text-sm leading-relaxed text-stone-300">
-                <p>Welcome to the ancient Indian battlefield. Experience the common ancestor of modern chess on an 8x8 Ashtapada board.</p>
-                <button onclick="showPage('game')" class="w-full py-3 bg-amber-600 rounded-lg font-bold text-stone-950 hover:bg-amber-500 uppercase tracking-widest transition shadow-lg mt-2">Play Game Now</button>
-            </div>
-        </div>
-
+        <!-- 1. HOME PAGE -->
+<div id="home-container" class="hidden flex-col gap-5 pt-6 mb-8 text-center animate-fade-in">
+    <div class="py-4 select-none flex flex-col items-center gap-1">
+        <h1 class="text-4xl text-amber-500 tracking-widest font-bold">चतुरङ्ग</h1>
+        <h2 class="text-2xl text-amber-500 tracking-widest font-extrabold uppercase">(CHATURANGA)</h2>
+        <h3 class="text-[10px] text-amber-600/90 font-bold tracking-widest uppercase mt-2">ROYAL SANDALWOOD ASHTAPADA ENGINE</h3>
+    </div>
+    <div class="heritage-card p-6 rounded-xl space-y-4 text-sm leading-relaxed text-stone-300">
+        <p>Welcome to the ancient Indian battlefield. Experience the common ancestor of modern chess on an 8x8 Ashtapada board.</p>
+        <!-- বাটনটি আপডেট করা হয়েছে -->
+        <button onclick="window.showPage('game')" class="w-full py-3 bg-amber-600 rounded-lg font-bold text-stone-950 hover:bg-amber-500 uppercase tracking-widest transition shadow-lg mt-2">Play Game Now</button>
+    </div>
+</div>
+        
         <!-- 2. GAME PAGE (Hidden by default) -->
         <div id="game-container" class="hidden flex-col gap-3 pt-2 mb-8 animate-fade-in">
             <div class="flex gap-2 heritage-card p-1.5 rounded-lg justify-between">
