@@ -14,7 +14,7 @@
       "use": "@vercel/static"
     },
     {
-      "src": "script.js",
+      "src": "*.js",
       "use": "@vercel/static"
     },
     {
@@ -48,8 +48,8 @@
       "dest": "/style.css"
     },
     {
-      "src": "/script.js",
-      "dest": "/script.js"
+      "src": "/(.*\\.js)",
+      "dest": "/$1"
     },
     {
       "src": "/components/(.*)",
