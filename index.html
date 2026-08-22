@@ -11,13 +11,43 @@
 </head>
 <body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
 
-    <!-- JS থেকে মেনুবারটি স্বয়ংক্রিয়ভাবে এখানে এসে বসবে -->
-    <div id="menubar-placeholder" class="w-full flex justify-center z-50"></div>
+    <!-- ==================== RESPONSIVE MENU BAR ==================== -->
+    <nav class="w-full max-w-[400px] md:max-w-[600px] heritage-card rounded-lg p-3 mt-4 mb-2 z-50 relative transition-all">
+        <div class="flex justify-between items-center relative z-20">
+            <div class="text-amber-500 font-extrabold tracking-widest text-sm uppercase">चतुरङ्ग</div>
+            
+            <!-- Desktop Menu -->
+            <div class="hidden sm:flex gap-4">
+                <button onclick="showPage('home')" class="nav-btn-home text-[11px] text-amber-200 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-amber-500 pb-1 transition-all">Home</button>
+                <button onclick="showPage('game')" class="nav-btn-game text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Play</button>
+                <button onclick="showPage('rules')" class="nav-btn-rules text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Rules</button>
+                <button onclick="showPage('heritage')" class="nav-btn-heritage text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Heritage</button>
+                <button onclick="showPage('projects')" class="nav-btn-projects text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Projects</button>
+            </div>
 
+            <!-- Mobile Hamburger Button -->
+            <button onclick="toggleMobileMenu()" class="sm:hidden text-amber-500 hover:text-amber-300 focus:outline-none transition">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Full-Width Dropdown Menu -->
+        <div id="mobile-menu" class="hidden sm:hidden flex-col items-center gap-5 pt-6 pb-6 w-full bg-[#160d07]/95 backdrop-blur-md absolute left-0 top-full rounded-b-xl border-x border-b border-amber-600/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-10 transition-all">
+            <button onclick="showPage('home'); toggleMobileMenu()" class="nav-btn-home text-[14px] text-amber-200 font-extrabold uppercase tracking-[0.2em] transition-all">Home</button>
+            <button onclick="showPage('game'); toggleMobileMenu()" class="nav-btn-game text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">Play</button>
+            <button onclick="showPage('rules'); toggleMobileMenu()" class="nav-btn-rules text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">Rules</button>
+            <button onclick="showPage('heritage'); toggleMobileMenu()" class="nav-btn-heritage text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">Heritage</button>
+            <button onclick="showPage('projects'); toggleMobileMenu()" class="nav-btn-projects text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">Projects</button>
+        </div>
+    </nav>
+
+    <!-- ==================== ALL PAGES CONTAINER ==================== -->
     <div class="w-full max-w-[400px] relative mt-2">
         
-        <!-- 1. HOME PAGE -->
-        <div id="home-container" class="hidden flex-col gap-5 pt-6 mb-8 text-center animate-fade-in">
+        <!-- 1. HOME PAGE (Default Active) -->
+        <div id="home-container" class="flex flex-col gap-5 pt-6 mb-8 text-center animate-fade-in">
             <div class="py-4 select-none flex flex-col items-center gap-1">
                 <h1 class="text-4xl text-amber-500 tracking-widest font-bold">चतुरङ्ग</h1>
                 <h2 class="text-2xl text-amber-500 tracking-widest font-extrabold uppercase">(CHATURANGA)</h2>
@@ -29,7 +59,7 @@
             </div>
         </div>
 
-        <!-- 2. GAME PAGE -->
+        <!-- 2. GAME PAGE (Hidden by default) -->
         <div id="game-container" class="hidden flex-col gap-3 pt-2 mb-8 animate-fade-in">
             <div class="flex gap-2 heritage-card p-1.5 rounded-lg justify-between">
                 <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button">👥 Pass & Play</button>
@@ -59,7 +89,7 @@
             </div>
         </div>
 
-        <!-- 3. RULES PAGE -->
+        <!-- 3. RULES PAGE (Hidden by default) -->
         <div id="rules-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in text-stone-300">
             <h2 class="text-xl font-bold text-amber-500 uppercase tracking-widest text-center border-b border-amber-600/30 pb-2 mb-2">Rules of War</h2>
             <div class="heritage-card p-5 rounded-lg space-y-4 text-sm leading-relaxed">
@@ -73,7 +103,7 @@
             <button onclick="showPage('game')" class="w-full py-3 bg-amber-600 rounded font-bold text-stone-950 hover:bg-amber-500 uppercase tracking-widest mt-2">Start Battle</button>
         </div>
 
-        <!-- 4. HERITAGE PAGE -->
+        <!-- 4. HERITAGE PAGE (Hidden by default) -->
         <div id="heritage-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in text-stone-300 text-center">
             <h2 class="text-xl font-bold text-amber-500 uppercase tracking-widest border-b border-amber-600/30 pb-2 mb-2">The Heritage</h2>
             <div class="heritage-card p-6 rounded-lg space-y-5 text-sm leading-relaxed">
@@ -82,7 +112,7 @@
             </div>
         </div>
 
-        <!-- 5. MY PROJECTS PAGE -->
+        <!-- 5. MY PROJECTS PAGE (Hidden by default) -->
         <div id="projects-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in font-sans">
             <div class="text-center mb-2">
                 <img src="https://github.com/Kiran-mondal.png" alt="Kiran Mondal" class="w-16 h-16 rounded-full mx-auto border-2 border-amber-500 mb-2">
@@ -124,8 +154,7 @@
     </div>
 
     <!-- Script Files -->
-    <script src="components/menubar.js"></script>
     <script src="script.js"></script>
 </body>
-    </html>
-                        
+                    </html>
+    
