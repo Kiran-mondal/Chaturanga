@@ -122,5 +122,5 @@ function triggerAiEngineLogic() {
     delete initialSetup[bestMove.fromKey];
     initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false };
     createBoard();
-                      }
-      
+                                              }
+                        
