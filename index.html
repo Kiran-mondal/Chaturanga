@@ -3,170 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Page Title -->
     <title>Chaturanga - Ancient Indian Strategy Board Game</title>
-    <meta name="description" content="Chaturanga is a modern, serverless revival of the ancient Indian strategy board game.">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Chaturanga is a modern, serverless revival of the ancient Indian strategy board game, the ancestor of modern chess. Play online on an 8x8 Ashtapada board.">
+    <meta name="keywords" content="Chaturanga, Ancient Indian Board Game, Strategy Game, Ashtapada, Chess Ancestor, Play Chess Online, Board Game Engine, Strategic Board Game">
+    <meta name="author" content="Chaturanga Team">
+
+    <!-- Open Graph (For Social Media Sharing) -->
+    <meta property="og:title" content="Chaturanga - Ancient Indian Strategy Board Game">
+    <meta property="og:description" content="Experience the strategic depth of the ancient Ashtapada board. Play the common ancestor of modern chess online.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://chaturanga.quarry.dpdns.org/">
+    <meta property="og:image" content="https://chaturanga.quarry.dpdns.org/logo.svg">
+
+    <!-- Google Site Verification -->
+    <meta name="google-site-verification" content="google711bc6cd9e996d83" />
+
+    <!-- Favicon Logo -->
     <link rel="icon" href="/logo.svg?v=2" type="image/svg+xml">
+    <link rel="shortcut icon" href="/logo.svg?v=2" type="image/svg+xml">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- External CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
 
-    <!-- Responsive Navigation Menu Bar -->
-    <nav class="w-full max-w-[400px] md:max-w-[600px] heritage-card rounded-lg p-3 mt-4 mb-2 z-50 relative transition-all">
-        <div class="flex justify-between items-center relative z-20">
-            <div class="text-amber-500 font-extrabold tracking-widest text-sm uppercase">चतुरङ्ग</div>
-            
-            <!-- Desktop Menu (Hidden on mobile) -->
-            <div class="hidden sm:flex gap-4">
-                <button onclick="showPage('game')" class="nav-btn-game text-[11px] text-amber-200 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-amber-500 pb-1 transition-all">Play</button>
-                <button onclick="showPage('rules')" class="nav-btn-rules text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Rules</button>
-                <button onclick="showPage('heritage')" class="nav-btn-heritage text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Heritage</button>
-                <button onclick="showPage('projects')" class="nav-btn-projects text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">My Projects</button>
-            </div>
+    <!-- আলাদা করে রাখা মেনুবারটি এখানে এসে বসবে -->
+    <div id="menubar-placeholder" class="w-full max-w-[400px] md:max-w-[600px] mx-auto z-50"></div>
 
-            <!-- Mobile Hamburger Button -->
-            <button onclick="toggleMobileMenu()" class="sm:hidden text-amber-500 hover:text-amber-300 focus:outline-none transition">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
-        </div>
-
-        <!-- Mobile Full-Width Dropdown Menu -->
-        <div id="mobile-menu" class="hidden sm:hidden flex-col items-center gap-5 pt-6 pb-6 w-full bg-[#160d07]/95 backdrop-blur-md absolute left-0 top-full rounded-b-xl border-x border-b border-amber-600/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-10 transition-all">
-            <button onclick="showPage('game'); toggleMobileMenu()" class="nav-btn-game text-[14px] text-amber-200 font-extrabold uppercase tracking-[0.2em] transition-all">Home / Play</button>
-            <button onclick="showPage('rules'); toggleMobileMenu()" class="nav-btn-rules text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">Rules</button>
-            <button onclick="showPage('heritage'); toggleMobileMenu()" class="nav-btn-heritage text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">Heritage</button>
-            <button onclick="showPage('projects'); toggleMobileMenu()" class="nav-btn-projects text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">My Projects</button>
-        </div>
-    </nav>
-
-    <!-- MAIN WRAPPER -->
-    <div class="w-full max-w-[400px] relative">
+    <!-- শুধুমাত্র গেমের প্রয়োজনীয় অংশ -->
+    <div id="game-container" class="w-full max-w-[400px] flex flex-col gap-3 pt-2 mb-8 animate-fade-in">
         
-        <!-- ==================== 1. GAME PAGE (Default) ==================== -->
-        <div id="game-container" class="flex flex-col gap-3 pt-2 mb-8 animate-fade-in">
-            <!-- Branding -->
-            <div class="text-center py-2 select-none flex flex-col items-center gap-1">
-                <h1 class="text-4xl text-amber-500 tracking-widest font-bold">चतुरङ्ग</h1>
-                <h2 class="text-3xl text-amber-500 tracking-widest font-extrabold uppercase">(CHATURANGA)</h2>
-                <h3 class="text-[10px] text-amber-600/90 font-bold tracking-widest uppercase">ROYAL SANDALWOOD ASHTAPADA ENGINE</h3>
-            </div>
+        <!-- Branding -->
+        <div class="text-center py-4 select-none flex flex-col items-center gap-1">
+            <h1 class="text-4xl text-amber-500 tracking-widest font-bold">चतुरङ्ग</h1>
+            <h2 class="text-3xl text-amber-500 tracking-widest font-extrabold uppercase">(CHATURANGA)</h2>
+            <h3 class="text-[10px] text-amber-600/90 font-bold tracking-widest uppercase mt-1">ROYAL SANDALWOOD ASHTAPADA ENGINE</h3>
+        </div>
 
-            <!-- Mode Buttons -->
-            <div class="flex gap-2 heritage-card p-1.5 rounded-lg justify-between">
-                <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button">👥 Pass & Play</button>
-                <button id="btnAI" onclick="switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded mode-button">💻 VS Computer</button>
-            </div>
+        <!-- Mode Buttons -->
+        <div class="flex gap-2 heritage-card p-1.5 rounded-lg justify-between">
+            <button id="btn2P" onclick="switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button">👥 Pass & Play</button>
+            <button id="btnAI" onclick="switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded mode-button">💻 VS Computer</button>
+        </div>
 
-            <!-- Board -->
-            <div class="flex justify-center w-full">
-                <div id="board" class="ashtapada-board grid grid-cols-8 gap-0"></div>
-            </div>
+        <!-- Board -->
+        <div class="flex justify-center w-full">
+            <div id="board" class="ashtapada-board grid grid-cols-8 gap-0"></div>
+        </div>
 
-            <!-- Graveyard Display -->
-            <div class="heritage-card rounded-lg p-3 space-y-2">
-                <div>
-                    <h4 id="loss-title-1" class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">💀 YOUR LOSSES</h4>
-                    <div id="black-graveyard" class="flex flex-wrap gap-1 min-h-[30px]"></div>
-                </div>
-                <div>
-                    <h4 id="loss-title-2" class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">🤖 COMPUTER LOSSES</h4>
-                    <div id="white-graveyard" class="flex flex-wrap gap-1 min-h-[30px]"></div>
-                </div>
+        <!-- Graveyard Display -->
+        <div class="heritage-card rounded-lg p-3 space-y-2">
+            <div>
+                <h4 id="loss-title-1" class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">💀 YOUR LOSSES</h4>
+                <div id="black-graveyard" class="flex flex-wrap gap-1 min-h-[30px]"></div>
             </div>
-
-            <!-- Live Move History Panel -->
-            <div class="heritage-card rounded-lg p-3 mt-1 h-40 flex flex-col">
-                <h4 class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-2 border-b border-amber-600/30 pb-1">📜 Battle Chronicles</h4>
-                <div id="move-history-feed" class="overflow-y-auto flex-1 space-y-2 text-[11px] font-sans text-stone-300 pr-1">
-                    <div class="text-stone-500 italic text-center mt-6">The battlefield awaits the first strike...</div>
-                </div>
+            <div>
+                <h4 id="loss-title-2" class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">🤖 COMPUTER LOSSES</h4>
+                <div id="white-graveyard" class="flex flex-wrap gap-1 min-h-[30px]"></div>
             </div>
         </div>
 
-        <!-- ==================== 2. RULES PAGE ==================== -->
-        <div id="rules-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in text-stone-300">
-            <h2 class="text-xl font-bold text-amber-500 uppercase tracking-widest text-center border-b border-amber-600/30 pb-2 mb-2">Rules of War</h2>
-            <div class="heritage-card p-5 rounded-lg space-y-4 text-sm leading-relaxed">
-                <p><span class="text-lg">⚜️</span> <strong>Raja (King):</strong> Moves exactly 1 square in any direction. Capture the enemy Raja to win.</p>
-                <p><span class="text-lg">📜</span> <strong>Mantri (Minister):</strong> Moves exactly 1 square diagonally only.</p>
-                <p><span class="text-lg">🐘</span> <strong>Gaja (Elephant):</strong> Moves exactly 2 squares diagonally. Can jump over other pieces.</p>
-                <p><span class="text-lg">🐎</span> <strong>Ashva (Horse):</strong> Moves in a standard L-shape. Can jump over other pieces.</p>
-                <p><span class="text-lg">🛕</span> <strong>Ratha (Chariot):</strong> Moves any number of empty squares straight horizontally or vertically.</p>
-                <p><span class="text-lg">⚔️</span> <strong>Padati (Foot-soldier):</strong> Moves 1 square straight forward only. Captures 1 square diagonally.</p>
-            </div>
-            <button onclick="showPage('game')" class="w-full py-3 bg-amber-600 rounded font-bold text-stone-950 hover:bg-amber-500 uppercase tracking-widest mt-2">Start Battle</button>
-        </div>
-
-        <!-- ==================== 3. HERITAGE PAGE ==================== -->
-        <div id="heritage-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in text-stone-300 text-center">
-            <h2 class="text-xl font-bold text-amber-500 uppercase tracking-widest border-b border-amber-600/30 pb-2 mb-2">The Heritage</h2>
-            <div class="heritage-card p-6 rounded-lg space-y-5 text-sm leading-relaxed">
-                <p><strong>Chaturanga</strong> is an ancient Indian strategy game developed during the Gupta Empire (6th century CE).</p>
-                <p>The term <i>Chaturanga</i> translates to the "four divisions of the military": Infantry, Cavalry, Elephantry, and Chariotry.</p>
-                <p>Played on an uncheckered 8x8 <i>Ashtapada</i> board, this epic battle of minds is widely recognized as the direct ancestor of modern games like Chess, Shogi, and Makruk.</p>
-            </div>
-        </div>
-
-        <!-- ==================== 4. MY PROJECTS PAGE ==================== -->
-        <div id="projects-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in font-sans">
-            <div class="text-center mb-2">
-                <img src="https://github.com/Kiran-mondal.png" alt="Kiran Mondal" class="w-16 h-16 rounded-full mx-auto border-2 border-amber-500 mb-2">
-                <h2 class="text-lg font-bold text-amber-500">Kiran Mondal</h2>
-                <p class="text-[10px] text-amber-200 uppercase tracking-widest">Full-Stack Developer & Cyber Security</p>
-            </div>
-            <div class="text-center border-b border-amber-600/30 pb-2 mb-2">
-                <h3 class="text-sm font-bold text-amber-500 uppercase tracking-wider">My Other Live Projects</h3>
-            </div>
-
-            <!-- Password Guard -->
-            <div class="heritage-card rounded-lg p-4 flex flex-col gap-2">
-                <div class="flex items-center gap-3 border-b border-amber-600/20 pb-2">
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
-                        <circle cx="50" cy="50" r="48" fill="#00e5ff" stroke="#ffffff" stroke-width="2"/>
-                        <path d="M50 20 L75 55 L50 80 L25 55 Z" fill="#0a1128" />
-                        <circle cx="50" cy="50" r="10" fill="#00e5ff" />
-                    </svg>
-                    <h3 class="font-bold text-amber-400 text-lg">Password Guard</h3>
-                </div>
-                <p class="text-xs text-stone-300 leading-relaxed">Advanced AI-powered password protection & vault management tool with 3D Cyber UI.</p>
-                <div class="flex gap-2 mt-2">
-                    <a href="https://passwordguard.quarry.dpdns.org" target="_blank" class="flex-1 text-center py-1.5 text-[10px] font-bold bg-amber-600 text-stone-950 rounded uppercase">Live App</a>
-                    <a href="https://github.com/Kiran-mondal/Password-Guard" target="_blank" class="flex-1 text-center py-1.5 text-[10px] font-bold bg-stone-900 border border-amber-600/50 text-amber-500 rounded uppercase">Source Code</a>
-                </div>
-            </div>
-
-            <!-- ZenDrift -->
-            <div class="heritage-card rounded-lg p-4 flex flex-col gap-2">
-                <div class="flex items-center gap-3 border-b border-amber-600/20 pb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="30" height="30">
-                        <path d="M 120 390 C 120 270, 392 350, 392 210 C 392 130, 310 90, 256 90" fill="none" stroke="#58a6ff" stroke-width="45" stroke-linecap="round" />
-                        <circle cx="256" cy="90" r="45" fill="#58a6ff" />
-                    </svg>
-                    <h3 class="font-bold text-amber-400 text-lg">ZenDrift</h3>
-                </div>
-                <p class="text-xs text-stone-300 leading-relaxed">Dynamic performance tracking system built for an engaging and smooth web experience.</p>
-                <div class="flex gap-2 mt-2">
-                    <a href="https://zendrift.quarry.dpdns.org" target="_blank" class="flex-1 text-center py-1.5 text-[10px] font-bold bg-amber-600 text-stone-950 rounded uppercase">Live App</a>
-                    <a href="https://github.com/Kiran-mondal" target="_blank" class="flex-1 text-center py-1.5 text-[10px] font-bold bg-stone-900 border border-amber-600/50 text-amber-500 rounded uppercase">Source Code</a>
-                </div>
-            </div>
-
-            <!-- Omlang -->
-            <div class="heritage-card rounded-lg p-4 flex flex-col gap-2">
-                <div class="flex items-center gap-3 border-b border-amber-600/20 pb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="30" height="30">
-                        <path d="M 280 250 C 420 250, 420 380, 350 400 C 450 420, 450 580, 280 580" stroke="#00f2fe" stroke-width="45" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="450" cy="120" r="30" fill="#00f2fe" />
-                    </svg>
-                    <h3 class="font-bold text-amber-400 text-lg">Omlang</h3>
-                </div>
-                <p class="text-xs text-stone-300 leading-relaxed">A modern language and communication-focused platform with an intuitive user interface.</p>
-                <div class="flex gap-2 mt-2">
-                    <a href="https://omlang.quarry.dpdns.org" target="_blank" class="flex-1 text-center py-1.5 text-[10px] font-bold bg-amber-600 text-stone-950 rounded uppercase">Live App</a>
-                    <a href="https://github.com/Kiran-mondal" target="_blank" class="flex-1 text-center py-1.5 text-[10px] font-bold bg-stone-900 border border-amber-600/50 text-amber-500 rounded uppercase">Source Code</a>
-                </div>
+        <!-- Live Move History Panel -->
+        <div class="heritage-card rounded-lg p-3 mt-1 h-40 flex flex-col">
+            <h4 class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-2 border-b border-amber-600/30 pb-1">📜 Battle Chronicles</h4>
+            <div id="move-history-feed" class="overflow-y-auto flex-1 space-y-2 text-[11px] font-sans text-stone-300 pr-1">
+                <div class="text-stone-500 italic text-center mt-6">The battlefield awaits the first strike...</div>
             </div>
         </div>
     </div>
@@ -182,7 +90,10 @@
     </div>
 
     <!-- External JavaScript -->
+    <!-- মেনুবার কন্ট্রোল করার জন্য আলাদা করা JS ফাইলটি এখানে কল করা হলো -->
+    <script src="components/menubar.js"></script>
+    
+    <!-- গেমের অরিজিনাল JS ফাইল -->
     <script src="script.js"></script>
 </body>
-                </html>
-    
+</html>
