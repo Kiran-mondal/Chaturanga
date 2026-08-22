@@ -18,14 +18,6 @@
       "use": "@vercel/static"
     },
     {
-      "src": "components/menubar.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "components/menubar.js",
-      "use": "@vercel/static"
-    },
-    {
       "src": "*.mp3",
       "use": "@vercel/static"
     },
@@ -50,10 +42,6 @@
     {
       "src": "/(.*\\.js)",
       "dest": "/$1"
-    },
-    {
-      "src": "/components/(.*)",
-      "dest": "/components/$1"
     },
     {
       "src": "/(.*\\.mp3)",
