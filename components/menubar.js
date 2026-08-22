@@ -4,6 +4,7 @@ const menubarHTML = `
     <div class="flex justify-between items-center relative z-20">
         <div class="text-amber-500 font-extrabold tracking-widest text-sm uppercase">चतुरङ्ग</div>
         
+        <!-- Desktop Menu -->
         <div class="hidden sm:flex gap-4">
             <button onclick="showPage('home')" class="nav-btn-home text-[11px] text-amber-200 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-amber-500 pb-1 transition-all">Home</button>
             <button onclick="showPage('game')" class="nav-btn-game text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Play</button>
@@ -12,6 +13,7 @@ const menubarHTML = `
             <button onclick="showPage('projects')" class="nav-btn-projects text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Projects</button>
         </div>
 
+        <!-- Mobile Hamburger Button -->
         <button onclick="toggleMobileMenu()" class="sm:hidden text-amber-500 hover:text-amber-300 focus:outline-none transition">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -19,6 +21,7 @@ const menubarHTML = `
         </button>
     </div>
 
+    <!-- Mobile Full-Width Dropdown Menu -->
     <div id="mobile-menu" class="hidden sm:hidden flex-col items-center gap-5 pt-6 pb-6 w-full bg-[#160d07]/95 backdrop-blur-md absolute left-0 top-full rounded-b-xl border-x border-b border-amber-600/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-10 transition-all">
         <button onclick="showPage('home'); toggleMobileMenu()" class="nav-btn-home text-[14px] text-amber-200 font-extrabold uppercase tracking-[0.2em] transition-all">Home</button>
         <button onclick="showPage('game'); toggleMobileMenu()" class="nav-btn-game text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">Play</button>
