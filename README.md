@@ -1,12 +1,12 @@
 <div align="center">
-  <img src="https://chaturanga.quarry.dpdns.org/logo.svg" alt="Chaturanga Logo" width="250" height="250">
+  <img src="https://raw.githubusercontent.com/Kiran-mondal/Chaturanga/main/logo.svg" alt="Chaturanga Logo" width="250" height="250">
 </div>
 
 # Chaturanga - Ancient Indian Strategy Board Game 
 
 Welcome to **Chaturanga**, a modern, lightweight, serverless revival of the ancient Indian strategy board game, which is globally recognized as the common ancestor of modern Chess. 
 
-This project brings the 8x8 uncheckered **Ashtapada** board to life with dynamic client-side mechanics, a smart, adaptive AI engine, and zero-latency performance—optimized to run perfectly on all desktop and mobile browsers.
+This project brings the 8x8 uncheckered **Ashtapada** board to life with dynamic client-side mechanics, a smart, adaptive AI engine, and zero-latency performance—optimized to run perfectly on all devices.
 
 ---
 
@@ -49,7 +49,7 @@ The game maps the four traditional divisions of the ancient Indian military usin
 This project leverages modern production tools optimized for ultra-fast, cloud-native automation and zero server lag:
 
 * **Frontend & Architecture:** Monolithic HTML5 DOM setup powered by standard Javascript local-state execution.
-* **UI & Hardware Acceleration:** Responsive layout styled with **Tailwind CSS**. Implements CSS GPU layering (`transform: translateZ(0)`) and `will-change` properties to eliminate mobile scrolling lags.
+* **UI & Hardware Acceleration:** Responsive layout styled with **Tailwind CSS**. Implements CSS GPU layering (`transform: translateZ(0)`) and `will-change` properties to eliminate mobile scrolling lag.
 * **SEO & Integration:** Native Google Search Console HTML verification tag injection for high-priority indexation.
 * **Hosting Platform:** High-performance deployment powered by **Vercel's Global Edge Network**.
 
@@ -61,4 +61,5 @@ This project leverages modern production tools optimized for ultra-fast, cloud-n
 3. **Serverless Architecture:** Operates with 100% static client-side optimization, meaning zero database friction, zero runtime server bottlenecks, and 100% smooth movement responses.
 
 ---
+
 *Developed with ⚜️ by Kiran Mondal.*
