@@ -18,6 +18,18 @@
       "use": "@vercel/static"
     },
     {
+      "src": "components/menubar.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "components/menubar.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.mp3",
+      "use": "@vercel/static"
+    },
+    {
       "src": "sitemap.xml",
       "use": "@vercel/static"
     },
@@ -38,6 +50,14 @@
     {
       "src": "/script.js",
       "dest": "/script.js"
+    },
+    {
+      "src": "/components/(.*)",
+      "dest": "/components/$1"
+    },
+    {
+      "src": "/(.*\\.mp3)",
+      "dest": "/$1"
     },
     {
       "src": "/sitemap.xml",
