@@ -5,8 +5,9 @@
         
         <!-- Desktop Menu -->
         <div class="hidden sm:flex gap-4">
-            <button onclick="showPage('game')" class="nav-btn-game text-[11px] text-amber-200 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-amber-500 pb-1 transition-all">Play</button>
-            <button onclick="showPage('rules')" class="nav-btn-rules text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Rules</button>
+            <button onclick="showPage('home')" class="nav-btn-home text-[11px] text-amber-200 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-amber-500 pb-1 transition-all">Home</button>
+            <button onclick="showPage('game')" class="nav-btn-game text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Play Game</button>
+            <button onclick="showPage('rules')" class="nav-btn-rules text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Rules & About</button>
             <button onclick="showPage('heritage')" class="nav-btn-heritage text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Heritage</button>
             <button onclick="showPage('projects')" class="nav-btn-projects text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">My Projects</button>
         </div>
@@ -20,10 +21,78 @@
     </div>
 
     <!-- Mobile Full-Width Dropdown Menu -->
-    <div id="mobile-menu" class="hidden sm:hidden flex-col items-center gap-5 pt-6 pb-6 w-full bg-[#160d07]/95 backdrop-blur-md absolute left-0 top-full rounded-b-xl border-x border-b border-amber-600/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-10 transition-all">
-        <button onclick="showPage('game'); toggleMobileMenu()" class="nav-btn-game text-[14px] text-amber-200 font-extrabold uppercase tracking-[0.2em] transition-all">Home / Play</button>
-        <button onclick="showPage('rules'); toggleMobileMenu()" class="nav-btn-rules text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">Rules</button>
-        <button onclick="showPage('heritage'); toggleMobileMenu()" class="nav-btn-heritage text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">Heritage</button>
-        <button onclick="showPage('projects'); toggleMobileMenu()" class="nav-btn-projects text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">My Projects</button>
+    <div id="mobile-menu" class="hidden sm:hidden flex-col items-center gap-4 pt-5 pb-5 w-full bg-[#160d07]/95 backdrop-blur-md absolute left-0 top-full rounded-b-xl border-x border-b border-amber-600/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-10 transition-all">
+        <button onclick="showPage('home'); toggleMobileMenu()" class="nav-btn-home text-[13px] text-amber-200 font-extrabold uppercase tracking-[0.2em]">Home</button>
+        <button onclick="showPage('game'); toggleMobileMenu()" class="nav-btn-game text-[13px] text-stone-400 font-extrabold uppercase tracking-[0.2em]">Play Game</button>
+        <button onclick="showPage('rules'); toggleMobileMenu()" class="nav-btn-rules text-[13px] text-stone-400 font-extrabold uppercase tracking-[0.2em]">Rules & About</button>
+        <button onclick="showPage('heritage'); toggleMobileMenu()" class="nav-btn-heritage text-[13px] text-stone-400 font-extrabold uppercase tracking-[0.2em]">Heritage</button>
+        <button onclick="showPage('projects'); toggleMobileMenu()" class="nav-btn-projects text-[13px] text-stone-400 font-extrabold uppercase tracking-[0.2em]">My Projects</button>
     </div>
 </nav>
+
+<!-- ==================== ALL TABS / PAGES CONTENT ==================== -->
+<div class="w-full max-w-[400px] relative mx-auto">
+    
+    <!-- 1. HOME PAGE -->
+    <div id="home-container" class="hidden flex-col gap-5 pt-8 mb-8 text-center animate-fade-in">
+        <div class="py-4 select-none flex flex-col items-center gap-1">
+            <h1 class="text-4xl text-amber-500 tracking-widest font-bold">चतुरङ्ग</h1>
+            <h2 class="text-2xl text-amber-500 tracking-widest font-extrabold uppercase">(CHATURANGA)</h2>
+            <h3 class="text-[10px] text-amber-600/90 font-bold tracking-widest uppercase mt-2">ROYAL SANDALWOOD ASHTAPADA ENGINE</h3>
+        </div>
+        <div class="heritage-card p-6 rounded-xl space-y-4 text-sm leading-relaxed text-stone-300">
+            <p>Welcome to the ancient Indian battlefield. Experience the common ancestor of modern chess on an 8x8 Ashtapada board.</p>
+            <button onclick="showPage('game')" class="w-full py-3 bg-amber-600 rounded-lg font-bold text-stone-950 hover:bg-amber-500 uppercase tracking-widest transition shadow-lg">Play Game Now</button>
+        </div>
+    </div>
+
+    <!-- 2. RULES & ABOUT PAGE -->
+    <div id="rules-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in text-stone-300">
+        <h2 class="text-xl font-bold text-amber-500 uppercase tracking-widest text-center border-b border-amber-600/30 pb-2 mb-2">Rules of War</h2>
+        <div class="heritage-card p-5 rounded-lg space-y-3 text-xs leading-relaxed">
+            <p><span class="text-sm">⚜️</span> <strong>Raja (King):</strong> Moves 1 square in any direction.</p>
+            <p><span class="text-sm">📜</span> <strong>Mantri (Minister):</strong> Moves 1 square diagonally.</p>
+            <p><span class="text-sm">🐘</span> <strong>Gaja (Elephant):</strong> Moves 2 squares diagonally (can jump).</p>
+            <p><span class="text-sm">🐎</span> <strong>Ashva (Horse):</strong> Moves in an L-shape (Knight equivalent).</p>
+            <p><span class="text-sm">🛕</span> <strong>Ratha (Chariot):</strong> Moves straight horizontally or vertically.</p>
+            <p><span class="text-sm">⚔️</span> <strong>Padati (Pawn):</strong> Moves 1 step forward, captures diagonally.</p>
+        </div>
+    </div>
+
+    <!-- 3. HERITAGE PAGE -->
+    <div id="heritage-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in text-stone-300 text-center">
+        <h2 class="text-xl font-bold text-amber-500 uppercase tracking-widest border-b border-amber-600/30 pb-2 mb-2">The Heritage</h2>
+        <div class="heritage-card p-6 rounded-lg space-y-4 text-sm leading-relaxed">
+            <p>Developed during the Gupta Empire, Chaturanga represents the four arms of the ancient Indian military: infantry, cavalry, elephantry, and chariotry.</p>
+            <p>It spread along the Silk Road, evolving into international games like Chess, Shogi, and Xiangqi.</p>
+        </div>
+    </div>
+
+    <!-- 4. MY PROJECTS PAGE -->
+    <div id="projects-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in font-sans">
+        <div class="text-center mb-2">
+            <img src="https://github.com/Kiran-mondal.png" alt="Kiran Mondal" class="w-16 h-16 rounded-full mx-auto border-2 border-amber-500 mb-2">
+            <h2 class="text-lg font-bold text-amber-500">Kiran Mondal</h2>
+            <p class="text-[10px] text-amber-200 uppercase tracking-widest">Full-Stack Developer & Cyber Security</p>
+        </div>
+        <div class="text-center border-b border-amber-600/30 pb-2 mb-2">
+            <h3 class="text-sm font-bold text-amber-500 uppercase tracking-wider">My Other Live Projects</h3>
+        </div>
+
+        <div class="heritage-card rounded-lg p-4 flex flex-col gap-2">
+            <div class="flex items-center gap-3 border-b border-amber-600/20 pb-2">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
+                    <circle cx="50" cy="50" r="48" fill="#00e5ff" stroke="#ffffff" stroke-width="2"/>
+                    <path d="M50 20 L75 55 L50 80 L25 55 Z" fill="#0a1128" />
+                    <circle cx="50" cy="50" r="10" fill="#00e5ff" />
+                </svg>
+                <h3 class="font-bold text-amber-400 text-lg">Password Guard</h3>
+            </div>
+            <p class="text-xs text-stone-300 leading-relaxed">Advanced AI-powered password protection & vault management tool.</p>
+            <div class="flex gap-2 mt-2">
+                <a href="https://passwordguard.quarry.dpdns.org" target="_blank" class="flex-1 text-center py-1.5 text-[10px] font-bold bg-amber-600 text-stone-950 rounded uppercase">Live App</a>
+                <a href="https://github.com/Kiran-mondal/Password-Guard" target="_blank" class="flex-1 text-center py-1.5 text-[10px] font-bold bg-stone-900 border border-amber-600/50 text-amber-500 rounded uppercase">Source Code</a>
+            </div>
+        </div>
+    </div>
+</div>
