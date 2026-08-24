@@ -253,7 +253,16 @@ window.handleSquareClick = async function(row, col) {
 
 function evaluateBoardState() {
     const scores = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 }; let totalVal = 0;
-    for (const key in initialSetup) { const piece = initialSetup[key]; const [r] = key.split('-').map(Number); let weight = scores[piece.name]; if (piece.name === 'Padati') weight += piece.isWhite ? (7 - r) : r; if (piece.isWhite) totalVal -= weight; else totalVal += weight; } return totalVal;
+    for (const key in initialSetup) {
+        const piece = initialSetup[key];
+        // ⚡ Bolt Optimization: Replace slow key.split('-').map(Number) with fast charCodeAt math.
+        // Board size is fixed 8x8 (single digits), so this is safe and avoids array allocations.
+        const r = key.charCodeAt(0) - 48;
+        let weight = scores[piece.name];
+        if (piece.name === 'Padati') weight += piece.isWhite ? (7 - r) : r;
+        if (piece.isWhite) totalVal -= weight; else totalVal += weight;
+    }
+    return totalVal;
 }
 
 function minimax(depth, isAiMaximizing) {
@@ -261,7 +270,8 @@ function minimax(depth, isAiMaximizing) {
     const aiMoves = [];
     for (const key in initialSetup) {
         if ((isAiMaximizing && !initialSetup[key].isWhite) || (!isAiMaximizing && initialSetup[key].isWhite)) {
-            const [fromR, fromC] = key.split('-').map(Number), piece = initialSetup[key];
+            // ⚡ Bolt Optimization: Use fast charCodeAt instead of split
+            const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48, piece = initialSetup[key];
             for (let toR = 0; toR < 8; toR++) { for (let toC = 0; toC < 8; toC++) { if (checkLegalMove(piece, fromR, fromC, toR, toC)) aiMoves.push({ from: key, to: `${toR}-${toC}`, piece: piece }); } }
         }
     }
@@ -282,7 +292,8 @@ function triggerAiEngineLogic() {
     const allLegalAiMoves = [];
     for (const key in initialSetup) {
         if (!initialSetup[key].isWhite) {
-            const [fromR, fromC] = key.split('-').map(Number), piece = initialSetup[key];
+            // ⚡ Bolt Optimization: Use fast charCodeAt instead of split
+            const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48, piece = initialSetup[key];
             for (let toR = 0; toR < 8; toR++) { for (let toC = 0; toC < 8; toC++) { if (checkLegalMove(piece, fromR, fromC, toR, toC)) allLegalAiMoves.push({ fromKey: key, toKey: `${toR}-${toC}`, piece: piece, targetPiece: initialSetup[`${toR}-${toC}`] }); } }
         }
     }
