@@ -27,8 +27,15 @@ window.showPage = function(targetPage) {
 
 window.toggleMobileMenu = function() {
     const menu = document.getElementById('mobile-menu');
-    if (menu) menu.classList.toggle('hidden');
-    if (menu) menu.classList.toggle('flex');
+    const btn = document.getElementById('mobile-menu-btn');
+    if (menu) {
+        menu.classList.toggle('hidden');
+        menu.classList.toggle('flex');
+    }
+    if (btn) {
+        const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', !isExpanded);
+    }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
