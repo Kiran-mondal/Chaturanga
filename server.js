@@ -25,11 +25,12 @@ pool.query(`CREATE TABLE IF NOT EXISTS strategy_traps (id SERIAL PRIMARY KEY, mo
 app.post('/api/save-strategy', async (req, res) => {
     try {
         const { move } = req.body;
-        if (!move) return res.status(400).json({ success: false, message: "No move provided" });
+        if (!move || typeof move !== 'string' || move.length > 500) return res.status(400).json({ success: false, message: "Invalid move provided" });
         await pool.query('INSERT INTO strategy_traps (move) VALUES ($1)', [move]);
         res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error("Database error in /api/save-strategy:", err);
+        res.status(500).json({ success: false, error: "Internal server error" });
     }
 });
 

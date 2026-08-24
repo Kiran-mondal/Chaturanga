@@ -21,7 +21,8 @@ router.get('/live-counters', async (req, res) => {
       inBattles: matchResult.rows[0]?.match_count || 0
     });
   } catch (error) {
-    res.json({ onlineNow: 1, inBattles: 0, error: error.message });
+    console.error("Database error in /live-counters:", error);
+    res.json({ onlineNow: 1, inBattles: 0, error: "Internal server error" });
   }
 });
 
@@ -58,13 +59,15 @@ router.post('/match/start', async (req, res) => {
     );
     res.json({ success: true, matchId: result.rows[0].id });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
 // ২. প্লেয়ারের নতুন নতুন চাল ও কৌশল ডাটাবেজে সেভ করার API Endpoint
 router.post('/ai/learn', async (req, res) => {
   const { piece, coordinate } = req.body;
+  if (!piece || typeof piece !== 'string' || piece.length > 50 || !coordinate || typeof coordinate !== 'string' || coordinate.length > 10) return res.status(400).json({ error: "Invalid input" });
   try {
     await query(
       'INSERT INTO ai_learning_memory (piece_name, target_coordinate) VALUES ($1, $2)',
@@ -74,7 +77,8 @@ router.post('/ai/learn', async (req, res) => {
     const memoryCount = await query('SELECT COUNT(*) FROM ai_learning_memory');
     res.json({ success: true, totalLearnedMoves: memoryCount.rows[0].count });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -84,7 +88,8 @@ router.get('/ai/memory', async (req, res) => {
     const memoryRes = await query('SELECT piece_name, target_coordinate FROM ai_learning_memory ORDER BY id DESC LIMIT 50');
     res.json({ success: true, tactics: memoryRes.rows });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
