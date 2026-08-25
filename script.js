@@ -192,25 +192,58 @@ function updateGraveyardUI() {
 function createBoard() {
     const boardElement = document.getElementById('board');
     if (!boardElement) return;
+
+    const activeElementId = document.activeElement ? document.activeElement.id : null;
+
     boardElement.innerHTML = '';
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
             const squareId = `${row}-${col}`, square = document.createElement('div');
+            square.id = `square-${squareId}`;
+            square.setAttribute('role', 'button');
+            square.setAttribute('tabindex', '0');
             square.className = 'ashtapada-square flex flex-col items-center justify-center cursor-pointer select-none relative aspect-square';
-            if (markedSquares.includes(squareId)) square.classList.add('marked-square');
-            if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col) square.classList.add('selected');
-            if (!isGameOver && selectedSquare && highlightedMoves.includes(squareId)) square.classList.add(initialSetup[squareId] ? 'possible-capture-marker' : 'possible-move-marker');
 
             const piece = initialSetup[squareId];
+            let ariaLabel = piece ? `${piece.isWhite ? 'White' : 'Black'} ${piece.name} at row ${row}, column ${col}` : `Empty square at row ${row}, column ${col}`;
+
+            if (markedSquares.includes(squareId)) square.classList.add('marked-square');
+            if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col) {
+                square.classList.add('selected');
+                ariaLabel += ' (Selected)';
+            }
+            if (!isGameOver && selectedSquare && highlightedMoves.includes(squareId)) {
+                if (piece) {
+                    square.classList.add('possible-capture-marker');
+                    ariaLabel += ' (Possible Capture)';
+                } else {
+                    square.classList.add('possible-move-marker');
+                    ariaLabel += ' (Possible Move)';
+                }
+            }
+
+            square.setAttribute('aria-label', ariaLabel);
+
             if (piece) {
                 const labelColor = piece.isWhite ? 'text-amber-700' : 'text-red-700';
                 square.innerHTML = `<span class="text-2xl md:text-3xl filter drop-shadow-sm">${pieceSigns[piece.name]}</span><span class="text-[7px] ${labelColor} font-sans font-extrabold z-10 uppercase tracking-tighter absolute bottom-0.5">${piece.name}</span>`;
             }
             square.addEventListener('click', () => handleSquareClick(row, col));
+            square.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleSquareClick(row, col);
+                }
+            });
             boardElement.appendChild(square);
         }
     }
     updateGraveyardUI();
+
+    if (activeElementId) {
+        const toFocus = document.getElementById(activeElementId);
+        if (toFocus) toFocus.focus();
+    }
 }
 
 window.handleSquareClick = async function(row, col) {

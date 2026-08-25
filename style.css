@@ -65,6 +65,11 @@ body {
 }
 
 .ashtapada-square:nth-child(2n) { background-color: #d1ab7e; }
+.ashtapada-square:focus-visible {
+    outline: 3px solid #f59e0b;
+    outline-offset: -3px;
+    z-index: 20;
+}
 .selected { background-color: #eab308 !important; }
 .marked-square { background-color: rgba(217, 119, 6, 0.3) !important; }
 .possible-move-marker { background-color: rgba(34, 197, 94, 0.4) !important; }
