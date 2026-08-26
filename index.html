@@ -75,9 +75,9 @@
 
         <!-- 2. GAME PAGE -->
         <div id="game-container" class="hidden flex-col gap-3 pt-2 mb-8 animate-fade-in">
-            <div class="flex gap-2 heritage-card p-1.5 rounded-lg justify-between">
-                <button id="btn2P" onclick="window.switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button">👥 Pass & Play</button>
-                <button id="btnAI" onclick="window.switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded mode-button">💻 VS Computer</button>
+            <div class="flex gap-2 heritage-card p-1.5 rounded-lg justify-between" role="group" aria-label="Game Mode">
+                <button id="btn2P" onclick="window.switchMode('2-Player')" class="flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button" aria-pressed="false">👥 Pass & Play</button>
+                <button id="btnAI" onclick="window.switchMode('Vs-AI')" class="flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded mode-button" aria-pressed="true">💻 VS Computer</button>
             </div>
             <div class="flex justify-center w-full">
                 <div id="board" class="ashtapada-board grid grid-cols-8 gap-0"></div>
@@ -94,7 +94,7 @@
             </div>
             <div class="heritage-card rounded-lg p-3 mt-1 h-40 flex flex-col">
                 <h4 class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-2 border-b border-amber-600/30 pb-1">📜 Battle Chronicles</h4>
-                <div id="move-history-feed" class="overflow-y-auto flex-1 space-y-2 text-[11px] font-sans text-stone-300 pr-1">
+                <div id="move-history-feed" class="overflow-y-auto flex-1 space-y-2 text-[11px] font-sans text-stone-300 pr-1" role="log" aria-live="polite" aria-atomic="false">
                     <div class="text-stone-500 italic text-center mt-6">The battlefield awaits the first strike...</div>
                 </div>
             </div>

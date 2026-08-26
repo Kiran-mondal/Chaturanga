@@ -109,8 +109,14 @@ window.triggerReset = function() {
 
     const btn2P = document.getElementById('btn2P');
     const btnAI = document.getElementById('btnAI');
-    if (btn2P) btn2P.className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
-    if (btnAI) btnAI.className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
+    if (btn2P) {
+        btn2P.className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
+        btn2P.setAttribute('aria-pressed', currentMode === '2-Player' ? 'true' : 'false');
+    }
+    if (btnAI) {
+        btnAI.className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
+        btnAI.setAttribute('aria-pressed', currentMode === 'Vs-AI' ? 'true' : 'false');
+    }
     
     const lossTitle1 = document.getElementById('loss-title-1');
     const lossTitle2 = document.getElementById('loss-title-2');
