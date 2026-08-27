@@ -9,3 +9,6 @@
 ## 2024-05-24 - ARIA roles for dynamic mode toggle and auto-reading game logs
 **Learning:** For game state changes and mode toggles, dynamically setting `aria-pressed` on the buttons combined with `role="group"` clarifies to screen reader users which mode is active. Furthermore, auto-announcing move histories with `aria-live="polite"`, `role="log"` and `aria-atomic="false"` dramatically improves the accessibility of turn-based web games without manual re-reading.
 **Action:** When implementing custom toggle groups or history feeds, ensure ARIA attributes like `aria-pressed`, `role="group"`, and `role="log"` with `aria-live="polite"` are applied to provide continuous context for screen readers.
+## 2024-08-27 - Dynamic ARIA States in SPAs
+**Learning:** In vanilla JS Single Page Applications (SPAs), native accessibility features like `aria-current="page"` are often overlooked because the page does not reload during navigation. Without explicit DOM manipulation, screen readers fail to correctly identify the active view, causing confusion for users navigating via keyboard/assistive technologies.
+**Action:** Always dynamically toggle stateful ARIA attributes (e.g., `aria-current`, `aria-pressed`, `aria-expanded`) alongside visual CSS class changes when updating the UI in vanilla JS.

@@ -269,10 +269,18 @@
                 const btns = document.querySelectorAll(`.nav-btn-${page}`);
                 if (page === targetPage) {
                     if(container) { container.style.display = 'flex'; container.classList.remove('hidden'); }
-                    btns.forEach(btn => { btn.classList.add('text-amber-200', 'border-amber-500'); btn.classList.remove('text-stone-400', 'border-transparent'); });
+                    btns.forEach(btn => {
+                        btn.classList.add('text-amber-200', 'border-amber-500');
+                        btn.classList.remove('text-stone-400', 'border-transparent');
+                        btn.setAttribute('aria-current', 'page');
+                    });
                 } else {
                     if(container) { container.style.display = 'none'; container.classList.add('hidden'); }
-                    btns.forEach(btn => { btn.classList.add('text-stone-400', 'border-transparent'); btn.classList.remove('text-amber-200', 'border-amber-500'); });
+                    btns.forEach(btn => {
+                        btn.classList.add('text-stone-400', 'border-transparent');
+                        btn.classList.remove('text-amber-200', 'border-amber-500');
+                        btn.removeAttribute('aria-current');
+                    });
                 }
             });
         };
