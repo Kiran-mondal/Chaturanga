@@ -8,6 +8,10 @@
     <link rel="icon" href="logo.svg?v=2" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
+    <!-- Three.js Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- Socket.IO Client -->
+<script src="/socket.io/socket.io.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- প্রজেক্ট পেজের জন্য কাস্টম স্টাইল -->
     <style>
@@ -82,6 +86,7 @@
             <div class="flex justify-center w-full">
                 <div id="board" class="ashtapada-board grid grid-cols-8 gap-0"></div>
             </div>
+            <div id="three-game-container" style="width: 100%; height: 60vh; position: relative;"></div>
             <div class="heritage-card rounded-lg p-3 space-y-2">
                 <div>
                     <h4 id="loss-title-1" class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">💀 YOUR LOSSES</h4>
