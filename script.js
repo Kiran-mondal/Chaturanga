@@ -11,27 +11,35 @@ const markedSquares = ["0-0", "0-3", "0-4", "0-7", "3-0", "3-3", "3-4", "3-7", "
 const VERCEL_API_URL = "https://chaturanga.quarry.dpdns.org/api";
 
 // ==========================================
-// SOCKET.IO CONNECTION
+// SOCKET.IO CONNECTION (Safe Initialization)
 // ==========================================
-const socket = io(); 
+let socket = null;
 
-socket.on('updateBoard', (moveData) => {
-    if(currentMode === '2-Player' && initialSetup[moveData.from]) {
-        console.log("Opponent moved:", moveData);
-        const piece = initialSetup[moveData.from];
-        const isCapture = !!initialSetup[moveData.to];
-        
-        initialSetup[moveData.to] = piece;
-        delete initialSetup[moveData.from];
-        
-        // Log history and sounds
-        if (isCapture) playCaptureSound(piece.name); else playMoveSound();
-        logMoveToHistory(piece.name, moveData.to, isCapture, piece.isWhite);
-        
-        isPlayer1Turn = moveData.nextTurn;
-        createBoard(); 
-    }
-});
+// Check if the 'io' library loaded successfully from the HTML before connecting
+if (typeof io !== 'undefined') {
+    socket = io(); 
+    
+    socket.on('updateBoard', (moveData) => {
+        if(currentMode === '2-Player' && initialSetup[moveData.from]) {
+            console.log("Opponent moved:", moveData);
+            const piece = initialSetup[moveData.from];
+            const isCapture = !!initialSetup[moveData.to];
+            
+            initialSetup[moveData.to] = piece;
+            delete initialSetup[moveData.from];
+            
+            // Log history and sounds
+            if (isCapture) playCaptureSound(piece.name); else playMoveSound();
+            logMoveToHistory(piece.name, moveData.to, isCapture, piece.isWhite);
+            
+            isPlayer1Turn = moveData.nextTurn;
+            createBoard(); 
+        }
+    });
+} else {
+    console.warn("Socket.IO not found. Multiplayer features disabled, running local only.");
+}
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
