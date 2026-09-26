@@ -2,26 +2,35 @@ const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
+const http = require('http'); // HTTP মডিউল যোগ করা হলো
+const { Server } = require("socket.io"); // Socket.IO যোগ করা হলো
 
 const app = express();
+const server = http.createServer(app); // Socket.IO এর জন্য সার্ভার তৈরি
+const io = new Server(server, {
+  cors: {
+    origin: "*", // সমস্ত অরিজিন থেকে কানেকশন নেওয়ার জন্য (প্রয়োজনে এটি পরিবর্তন করতে পারেন)
+    methods: ["GET", "POST"]
+  }
+});
+
 app.use(cors());
 app.use(express.json());
 
-// ১. স্ট্যাটিক ফাইল ও লোগো ডিরেক্টরি সার্ভ করার জন্য মিডলওয়্যার (লোগো ফিক্স)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Initialize database connection
+// Database connection
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
 
-// Sync database tables on startup
+// Sync database tables
 pool.query(`CREATE TABLE IF NOT EXISTS strategy_traps (id SERIAL PRIMARY KEY, move TEXT NOT NULL);`)
     .then(() => console.log("Database tables synchronized successfully"))
     .catch(err => console.error("Database sync error:", err));
 
-// API: Save new strategy
+// APIs
 app.post('/api/save-strategy', async (req, res) => {
     try {
         const { move } = req.body;
@@ -34,7 +43,6 @@ app.post('/api/save-strategy', async (req, res) => {
     }
 });
 
-// API: Retrieve strategies
 app.get('/api/get-strategies', async (req, res) => {
     try {
         const result = await pool.query('SELECT move FROM strategy_traps ORDER BY id DESC LIMIT 50');
@@ -44,15 +52,30 @@ app.get('/api/get-strategies', async (req, res) => {
     }
 });
 
-// ২. হোম রুট হিসেবে index.html ফাইলটি সরাসরি সার্ভ করার ব্যবস্থা করা হলো
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// ৩. লোকাল এনভায়রনমেন্ট টেস্ট বা ভার্সেলের ব্যাকআপের জন্য পোর্ট লিসেনার
+// Socket.IO লজিক
+io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id);
+
+    // যখন কোনো প্লেয়ার মুভ করবে
+    socket.on('playerMove', (moveData) => {
+        // মুভমেন্টের ডাটা অন্য প্লেয়ারদের কাছে পাঠিয়ে দেওয়া হবে
+        socket.broadcast.emit('updateBoard', moveData); 
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected:', socket.id);
+    });
+});
+
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+// app.listen এর পরিবর্তে server.listen ব্যবহার করা হলো
+server.listen(PORT, () => {
+    console.log(`Server with Socket.IO is running on port ${PORT}`);
 });
 
 module.exports = app;
