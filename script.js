@@ -32,10 +32,9 @@ if (typeof io !== 'undefined') {
 }
 
 // ==========================================
-// 3. UI TAB SWITCH FIX & INITIALIZATION
+// 3. UI TAB SWITCH FIX
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // 0x0 Size Bug Fix: Force 3D board to resize when Game tab is opened
     const originalShowPage = window.showPage;
     window.showPage = function(targetPage) {
         if(originalShowPage) originalShowPage(targetPage);
@@ -57,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 100);
         }
     };
-
     window.showPage('home');
     window.triggerReset();
 });
@@ -70,7 +68,6 @@ function initAudio() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') audioCtx.resume();
 }
-
 function playMoveSound() {
     triggerVibration(40); 
     initAudio();
@@ -83,7 +80,6 @@ function playMoveSound() {
         osc.start(); osc.stop(audioCtx.currentTime + 0.1);
     } catch(e) {}
 }
-
 function playCaptureSound(capturedPieceName) {
     triggerVibration([100, 50, 100]); 
     let audioSrc = "sword.mp3"; 
@@ -108,13 +104,11 @@ function resetInitialSetup() {
         "7-0": { name: "Ratha", isWhite: true }, "7-1": { name: "Ashva", isWhite: true }, "7-2": { name: "Gaja", isWhite: true },  "7-3": { name: "Mantri", isWhite: true }, "7-4": { name: "Raja", isWhite: true },  "7-5": { name: "Gaja", isWhite: true }, "7-6": { name: "Ashva", isWhite: true }, "7-7": { name: "Ratha", isWhite: true }
     };
 }
-
 window.switchMode = function(mode) {
     currentMode = mode;
     if (mode === "Vs-AI") { gameMetrics.currentStage = 1; gameMetrics.consecutiveUserLosses = 0; }
     window.triggerReset();
 }
-
 window.triggerReset = function() {
     selectedSquare = null; highlightedMoves = []; isPlayer1Turn = true; isGameOver = false; capturedWhite = []; capturedBlack = []; gameMetrics.matchMoveHistory = [];
     resetInitialSetup(); 
@@ -123,16 +117,15 @@ window.triggerReset = function() {
     if (modal) modal.classList.add('hidden');
     
     const historyFeed = document.getElementById('move-history-feed');
-    if (historyFeed) historyFeed.innerHTML = '<div class="text-stone-500 italic text-center mt-6">The battlefield awaits the first strike...</div>';
+    if (historyFeed) historyFeed.innerHTML = '<div class="text-stone-500 italic text-center mt-6">The battlefield awaits...</div>';
 
     const btn2P = document.getElementById('btn2P');
     const btnAI = document.getElementById('btnAI');
-    if (btn2P) btn2P.className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
-    if (btnAI) btnAI.className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
+    if (btn2P) btn2P.className = currentMode === '2-Player' ? 'flex-1 py-1.5 text-[11px] font-bold bg-amber-600 text-stone-950 rounded uppercase tracking-wider' : 'flex-1 py-1.5 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
+    if (btnAI) btnAI.className = currentMode === 'Vs-AI' ? 'flex-1 py-1.5 text-[11px] font-bold bg-amber-600 text-stone-950 rounded uppercase tracking-wider' : 'flex-1 py-1.5 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
     
     createBoard();
 }
-
 function logMoveToHistory(pieceName, toSquare, isCapture, isWhite) {
     const historyFeed = document.getElementById('move-history-feed');
     if (!historyFeed) return;
@@ -144,7 +137,6 @@ function logMoveToHistory(pieceName, toSquare, isCapture, isWhite) {
     entry.innerHTML = `> ${colorLabel}'s ${pieceName} ${actionText} [${toSquare}]`;
     historyFeed.appendChild(entry); historyFeed.scrollTop = historyFeed.scrollHeight; 
 }
-
 function showEndGameModal(title, description, icon, userWon) {
     document.getElementById('modalTitle').innerText = title;
     document.getElementById('modalDesc').innerHTML = `<span class="block mb-3">${description}</span>`;
@@ -167,13 +159,11 @@ function checkLegalMove(piece, fromR, fromC, toR, toC) {
         default: return false;
     }
 }
-
 function calculatePossibleMoves(row, col, piece) {
     const validDestinations = [];
     for (let r = 0; r < 8; r++) { for (let c = 0; c < 8; c++) { if (checkLegalMove(piece, row, col, r, c)) validDestinations.push(`${r}-${c}`); } }
     return validDestinations;
 }
-
 function updateGraveyardUI() {
     const bYard = document.getElementById('black-graveyard');
     const wYard = document.getElementById('white-graveyard');
@@ -182,19 +172,69 @@ function updateGraveyardUI() {
 }
 
 // ==========================================
-// 6. THREE.JS PREMIUM RENDERING
+// 6. THREE.JS RENDERING (TRANSPARENT + UNIQUE PIECES)
 // ==========================================
 let scene, camera, renderer, boardGroup, piecesGroup;
 let isThreeInitialized = false;
 
-const pieceGeometries = {
-    "Raja": new THREE.CylinderGeometry(0.35, 0.4, 0.25, 32),
-    "Mantri": new THREE.CylinderGeometry(0.3, 0.35, 0.2, 32),
-    "Gaja": new THREE.CylinderGeometry(0.35, 0.35, 0.15, 32),
-    "Ashva": new THREE.CylinderGeometry(0.3, 0.3, 0.15, 32),
-    "Ratha": new THREE.CylinderGeometry(0.3, 0.3, 0.15, 32),
-    "Padati": new THREE.CylinderGeometry(0.25, 0.25, 0.1, 32)
-};
+// Generate Distinct 3D Shapes for Each Piece
+function create3DPiece(name, isWhite) {
+    const group = new THREE.Group();
+    const pieceColor = isWhite ? 0xffd700 : 0x1c1917; // Gold for Player, Obsidian for AI
+    const mat = new THREE.MeshStandardMaterial({ color: pieceColor, roughness: isWhite ? 0.3 : 0.5, metalness: isWhite ? 0.8 : 0.2 });
+
+    // Common Base
+    const baseGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.1, 32);
+    const base = new THREE.Mesh(baseGeo, mat);
+    base.position.y = 0.05;
+    base.castShadow = true; base.receiveShadow = true;
+    group.add(base);
+
+    if (name === 'Padati') { // Pawn - Small
+        let topGeo = new THREE.SphereGeometry(0.15, 16, 16);
+        let top = new THREE.Mesh(topGeo, mat);
+        top.position.y = 0.25; top.castShadow = true;
+        group.add(top);
+    } else if (name === 'Ratha') { // Rook - Boxy
+        let bodyGeo = new THREE.BoxGeometry(0.3, 0.3, 0.3);
+        let body = new THREE.Mesh(bodyGeo, mat);
+        body.position.y = 0.25; body.castShadow = true;
+        group.add(body);
+    } else if (name === 'Ashva') { // Knight - Tilted
+        let bodyGeo = new THREE.CylinderGeometry(0.15, 0.25, 0.35, 16);
+        let body = new THREE.Mesh(bodyGeo, mat);
+        body.position.y = 0.25; body.rotation.z = Math.PI / 6; body.castShadow = true;
+        group.add(body);
+    } else if (name === 'Gaja') { // Bishop - Pointy Dome
+        let bodyGeo = new THREE.CylinderGeometry(0.05, 0.25, 0.35, 16);
+        let body = new THREE.Mesh(bodyGeo, mat);
+        body.position.y = 0.25; body.castShadow = true;
+        let topGeo = new THREE.SphereGeometry(0.1, 16, 16);
+        let top = new THREE.Mesh(topGeo, mat);
+        top.position.y = 0.45;
+        group.add(body, top);
+    } else if (name === 'Mantri') { // Queen - Tall and round
+        let bodyGeo = new THREE.CylinderGeometry(0.15, 0.3, 0.45, 16);
+        let body = new THREE.Mesh(bodyGeo, mat);
+        body.position.y = 0.3; body.castShadow = true;
+        let topGeo = new THREE.SphereGeometry(0.12, 16, 16);
+        let top = new THREE.Mesh(topGeo, mat);
+        top.position.y = 0.55;
+        group.add(body, top);
+    } else if (name === 'Raja') { // King - Tallest with a cross
+        let bodyGeo = new THREE.CylinderGeometry(0.15, 0.3, 0.5, 16);
+        let body = new THREE.Mesh(bodyGeo, mat);
+        body.position.y = 0.35; body.castShadow = true;
+        let crossGeo = new THREE.BoxGeometry(0.2, 0.05, 0.05);
+        let cross = new THREE.Mesh(crossGeo, mat);
+        cross.position.y = 0.65;
+        let crossV = new THREE.BoxGeometry(0.05, 0.2, 0.05);
+        let cross2 = new THREE.Mesh(crossV, mat);
+        cross2.position.y = 0.65;
+        group.add(body, cross, cross2);
+    }
+    return group;
+}
 
 function initThreeJS() {
     if(isThreeInitialized) return;
@@ -207,26 +247,26 @@ function initThreeJS() {
     let h = container.clientHeight || w;
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x120c08); 
+    scene.background = null; // TRANSPARENT BACKGROUND
 
-    camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
-    camera.position.set(0, 9, 7);
-    camera.lookAt(0, -1, 0);
+    camera = new THREE.PerspectiveCamera(32, w / h, 0.1, 1000);
+    camera.position.set(0, 8, 8.5); 
+    camera.lookAt(0, 0, 0); 
 
+    // Set alpha: true and clear color for transparency
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setClearColor( 0x000000, 0 );
     renderer.setSize(w, h);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
-    const ambientLight = new THREE.AmbientLight(0xffe4ce, 0.6); 
+    const ambientLight = new THREE.AmbientLight(0xffe4ce, 0.7); 
     scene.add(ambientLight);
     
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    directionalLight.position.set(5, 12, 8);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    directionalLight.position.set(5, 10, 5);
     directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 1024;
-    directionalLight.shadow.mapSize.height = 1024;
     scene.add(directionalLight);
 
     boardGroup = new THREE.Group();
@@ -271,6 +311,20 @@ function initThreeJS() {
     isThreeInitialized = true;
 }
 
+function updateEvalBar() {
+    const evalFill = document.getElementById('eval-fill');
+    if (!evalFill) return;
+    const score = evaluateBoardState();
+    
+    // Negative score = Player (White) advantage, Positive = AI (Black) advantage
+    // 50% is balanced. 100% means White dominates, 0% means Black dominates.
+    let percentage = 50 - (score / 40); 
+    percentage = Math.max(5, Math.min(95, percentage)); // Clamp between 5% and 95%
+    
+    evalFill.style.height = percentage + '%';
+    evalFill.style.backgroundColor = percentage > 50 ? '#f59e0b' : '#dc2626'; // Yellow/Amber for player, Red for AI
+}
+
 function createBoard() {
     if(typeof THREE !== 'undefined') initThreeJS();
     if(!isThreeInitialized) return;
@@ -307,34 +361,17 @@ function createBoard() {
 
             const pieceData = initialSetup[squareId];
             if (pieceData) {
-                const geom = pieceGeometries[pieceData.name] || new THREE.CylinderGeometry(0.3, 0.3, 0.2, 32);
-                const pieceColor = pieceData.isWhite ? 0xffd700 : 0x1c1917;
-                const mat = new THREE.MeshStandardMaterial({ color: pieceColor, roughness: pieceData.isWhite ? 0.3 : 0.5, metalness: pieceData.isWhite ? 0.8 : 0.2 });
-                
-                const pieceMesh = new THREE.Mesh(geom, mat);
-                pieceMesh.castShadow = true;
-                pieceMesh.receiveShadow = true;
-                pieceMesh.position.set(xPos, 0.1 + (geom.parameters.height / 2), zPos);
-                
-                const ringGeom = new THREE.TorusGeometry(0.12, 0.03, 16, 32);
-                const ringMat = new THREE.MeshStandardMaterial({ color: pieceData.isWhite ? 0xffffff : 0x8b0000 });
-                const ring = new THREE.Mesh(ringGeom, ringMat);
-                ring.position.set(0, geom.parameters.height / 2, 0);
-                ring.rotation.x = Math.PI / 2;
-                pieceMesh.add(ring);
-
+                // Use the new distinct 3D shape generation
+                const pieceMesh = create3DPiece(pieceData.name, pieceData.isWhite);
+                pieceMesh.position.set(xPos, 0.1, zPos);
                 piecesGroup.add(pieceMesh);
             }
         }
     }
     
-    // Hide old 2D board if it exists
-    const oldBoardElement = document.getElementById('board');
-    if (oldBoardElement) oldBoardElement.style.display = 'none';
-
     updateGraveyardUI();
+    updateEvalBar(); // Update Win Percentage Graph
 }
-
 window.handleSquareClick = async function(row, col) {
     if (isGameOver) return;
     const squareId = `${row}-${col}`, targetPiece = initialSetup[squareId];
@@ -378,6 +415,7 @@ window.handleSquareClick = async function(row, col) {
         if (currentMode === 'Vs-AI') { setTimeout(triggerAiEngineLogic, 300); } 
     }
 }
+
 // ==========================================
 // 7. AI ENGINE LOGIC
 // ==========================================
