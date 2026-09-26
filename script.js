@@ -8,27 +8,21 @@ let aiDatabase = { userWinningTraps: [] };
 
 const pieceSigns = { "Raja": "👑", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" };
 const markedSquares = ["0-0", "0-3", "0-4", "0-7", "3-0", "3-3", "3-4", "3-7", "4-0", "4-3", "4-4", "4-7", "7-0", "7-3", "7-4", "7-7"];
-const VERCEL_API_URL = "https://chaturanga.quarry.dpdns.org/api";
 
 // ==========================================
-// SOCKET.IO CONNECTION (Safe Initialization)
+// 2. SOCKET.IO CONNECTION (Safe Initialization)
 // ==========================================
 let socket = null;
-
-// Check if the 'io' library loaded successfully from the HTML before connecting
 if (typeof io !== 'undefined') {
     socket = io(); 
-    
     socket.on('updateBoard', (moveData) => {
         if(currentMode === '2-Player' && initialSetup[moveData.from]) {
-            console.log("Opponent moved:", moveData);
             const piece = initialSetup[moveData.from];
             const isCapture = !!initialSetup[moveData.to];
             
             initialSetup[moveData.to] = piece;
             delete initialSetup[moveData.from];
             
-            // Log history and sounds
             if (isCapture) playCaptureSound(piece.name); else playMoveSound();
             logMoveToHistory(piece.name, moveData.to, isCapture, piece.isWhite);
             
@@ -40,15 +34,13 @@ if (typeof io !== 'undefined') {
     console.warn("Socket.IO not found. Multiplayer features disabled, running local only.");
 }
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
     window.showPage('home');
     window.triggerReset();
 });
 
 // ==========================================
-// 2. AUDIO & HAPTIC ENGINE (Lazy Load)
+// 3. AUDIO & HAPTIC ENGINE
 // ==========================================
 let audioCtx;
 function initAudio() {
@@ -84,7 +76,7 @@ function playCaptureSound(capturedPieceName) {
 function triggerVibration(pattern) { if (navigator.vibrate) navigator.vibrate(pattern); }
 
 // ==========================================
-// 3. CORE GAME ENGINE & AI LOGIC
+// 4. CORE GAME ENGINE LOGIC
 // ==========================================
 function resetInitialSetup() {
     initialSetup = {
@@ -97,7 +89,7 @@ function resetInitialSetup() {
 
 window.switchMode = function(mode) {
     currentMode = mode;
-    if (mode === "Vs-AI") { gameMetrics.currentStage = 1; gameMetrics.consecutiveUserLosses = 0; gameMetrics.adaptiveDifficultyScore = 50; }
+    if (mode === "Vs-AI") { gameMetrics.currentStage = 1; gameMetrics.consecutiveUserLosses = 0; }
     window.triggerReset();
 }
 
@@ -113,19 +105,8 @@ window.triggerReset = function() {
 
     const btn2P = document.getElementById('btn2P');
     const btnAI = document.getElementById('btnAI');
-    if (btn2P) {
-        btn2P.className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
-        btn2P.setAttribute('aria-pressed', currentMode === '2-Player' ? 'true' : 'false');
-    }
-    if (btnAI) {
-        btnAI.className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded cursor-pointer transition uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
-        btnAI.setAttribute('aria-pressed', currentMode === 'Vs-AI' ? 'true' : 'false');
-    }
-    
-    const lossTitle1 = document.getElementById('loss-title-1');
-    const lossTitle2 = document.getElementById('loss-title-2');
-    if (lossTitle1) lossTitle1.innerText = currentMode === 'Vs-AI' ? "💀 YOUR LOSSES" : "💀 PLAYER 1 LOSSES";
-    if (lossTitle2) lossTitle2.innerText = currentMode === 'Vs-AI' ? "🤖 COMPUTER LOSSES" : "💀 PLAYER 2 LOSSES";
+    if (btn2P) btn2P.className = currentMode === '2-Player' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
+    if (btnAI) btnAI.className = currentMode === 'Vs-AI' ? 'flex-1 py-2 text-[11px] font-bold bg-amber-600 text-stone-950 rounded uppercase tracking-wider' : 'flex-1 py-2 text-[11px] font-bold bg-stone-900/60 rounded mode-button';
     
     createBoard();
 }
@@ -142,32 +123,11 @@ function logMoveToHistory(pieceName, toSquare, isCapture, isWhite) {
     historyFeed.appendChild(entry); historyFeed.scrollTop = historyFeed.scrollHeight; 
 }
 
-function generateAITeachingReport(userWon) {
-    if (currentMode !== 'Vs-AI') return "Match finished locally.";
-    if (userWon) {
-        gameMetrics.consecutiveUserLosses = 0; gameMetrics.currentStage = Math.min(gameMetrics.currentStage + 1, 3);
-        return "🎉 Victory! The system has analyzed your tactics and will adapt for the next encounter.";
-    }
-    gameMetrics.consecutiveUserLosses++; let advise = "📋 [Engine Evaluation]:\n";
-    if (gameMetrics.consecutiveUserLosses >= 2) {
-        gameMetrics.currentStage = Math.max(gameMetrics.currentStage - 1, 1); gameMetrics.consecutiveUserLosses = 0;
-        advise += "🛡️ Engine difficulty dynamically scaled down for balance.\n";
-    } else {
-        advise += "⚡ Engine playing at tactical level. ";
-        if (gameMetrics.userAggressionCount < 3) advise += "Develop Padati and Ashva pieces in the early phase.";
-        else if (gameMetrics.userMistakes.includes("Raja_exposed")) advise += "Tactical Error: Raja was left vulnerable with open lines of attack.";
-        else advise += "Coordinate your Ratha and Gaja forces to establish board dominance.";
-    }
-    return advise;
-}
-
 function showEndGameModal(title, description, icon, userWon) {
-    const teachingReport = generateAITeachingReport(userWon);
     document.getElementById('modalTitle').innerText = title;
-    document.getElementById('modalDesc').innerHTML = `<span class="block mb-3">${description}</span><div class="text-[11px] bg-amber-500/10 p-2 rounded text-amber-400 border border-amber-500/20">${teachingReport}</div>`;
+    document.getElementById('modalDesc').innerHTML = `<span class="block mb-3">${description}</span>`;
     document.getElementById('modalIcon').innerText = icon;
     document.getElementById('gameOverModal').classList.remove('hidden');
-    gameMetrics.userMistakes = []; gameMetrics.userAggressionCount = 0;
 }
 
 function checkLegalMove(piece, fromR, fromC, toR, toC) {
@@ -195,48 +155,59 @@ function calculatePossibleMoves(row, col, piece) {
 function updateGraveyardUI() {
     const bYard = document.getElementById('black-graveyard');
     const wYard = document.getElementById('white-graveyard');
-    if (bYard) bYard.innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 graveyard-piece text-xs">${pieceSigns[p]}</span>`).join('');
-    if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 graveyard-piece text-xs">${pieceSigns[p]}</span>`).join('');
+    if (bYard) bYard.innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
+    if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
 }
 
 
 // ==========================================
-// 4. THREE.JS BOARD RENDERING
+// 5. THREE.JS BOARD RENDERING (PREMIUM LOOK)
 // ==========================================
 let scene, camera, renderer, boardGroup, piecesGroup;
 let isThreeInitialized = false;
 
-// Geometry caching for pieces
 const pieceGeometries = {
-    "Raja": new THREE.CylinderGeometry(0.3, 0.4, 0.8, 16),
-    "Mantri": new THREE.CylinderGeometry(0.2, 0.35, 0.7, 16),
-    "Gaja": new THREE.BoxGeometry(0.5, 0.6, 0.5),
-    "Ashva": new THREE.ConeGeometry(0.3, 0.6, 16),
-    "Ratha": new THREE.BoxGeometry(0.4, 0.5, 0.4),
-    "Padati": new THREE.CylinderGeometry(0.2, 0.25, 0.4, 16)
+    "Raja": new THREE.CylinderGeometry(0.35, 0.4, 0.25, 32),
+    "Mantri": new THREE.CylinderGeometry(0.3, 0.35, 0.2, 32),
+    "Gaja": new THREE.CylinderGeometry(0.35, 0.35, 0.15, 32),
+    "Ashva": new THREE.CylinderGeometry(0.3, 0.3, 0.15, 32),
+    "Ratha": new THREE.CylinderGeometry(0.3, 0.3, 0.15, 32),
+    "Padati": new THREE.CylinderGeometry(0.25, 0.25, 0.1, 32)
 };
 
 function initThreeJS() {
     if(isThreeInitialized) return;
+    if(typeof THREE === 'undefined') return; // Safe check if ThreeJS failed to load
+
     const container = document.getElementById('three-game-container');
     if(!container) return;
 
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1614); 
+    // Mobile fallback for height
+    let w = container.clientWidth || window.innerWidth - 30;
+    let h = container.clientHeight;
+    if (h === 0) { h = w; container.style.height = h + 'px'; }
 
-    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-    // Position camera for 3D isometric view looking at the board
-    camera.position.set(0, 10, 8);
-    camera.lookAt(0, 0, 0);
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x120c08); 
+
+    camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
+    camera.position.set(0, 9, 7);
+    camera.lookAt(0, -1, 0);
 
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setSize(w, h);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    const ambientLight = new THREE.AmbientLight(0xffe4ce, 0.6); 
     scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 10, 5);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    directionalLight.position.set(5, 12, 8);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
     scene.add(directionalLight);
 
     boardGroup = new THREE.Group();
@@ -244,7 +215,6 @@ function initThreeJS() {
     piecesGroup = new THREE.Group();
     scene.add(piecesGroup);
 
-    // Interaction setup
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
@@ -255,7 +225,6 @@ function initThreeJS() {
 
         raycaster.setFromCamera(mouse, camera);
         
-        // Check intersections with board tiles
         const intersects = raycaster.intersectObjects(boardGroup.children);
         if (intersects.length > 0) {
             const userData = intersects[0].object.userData;
@@ -273,85 +242,77 @@ function initThreeJS() {
 
     window.addEventListener('resize', () => {
         if(!container) return;
-        camera.aspect = container.clientWidth / container.clientHeight;
+        let newW = container.clientWidth;
+        let newH = container.clientHeight || newW;
+        camera.aspect = newW / newH;
         camera.updateProjectionMatrix();
-        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setSize(newW, newH);
     });
 
     isThreeInitialized = true;
 }
 
 function createBoard() {
-    initThreeJS();
+    if(typeof THREE !== 'undefined') initThreeJS();
+    if(!isThreeInitialized) return;
     
-    // Clear existing meshes
-    while(boardGroup.children.length > 0){ 
-        boardGroup.remove(boardGroup.children[0]); 
-    }
-    while(piecesGroup.children.length > 0){ 
-        piecesGroup.remove(piecesGroup.children[0]); 
-    }
+    while(boardGroup.children.length > 0) boardGroup.remove(boardGroup.children[0]); 
+    while(piecesGroup.children.length > 0) piecesGroup.remove(piecesGroup.children[0]); 
 
     const boardSize = 8;
     const tileSize = 1;
     const offset = (boardSize * tileSize) / 2 - (tileSize / 2);
 
-    // Draw the 3D Board
     for (let row = 0; row < boardSize; row++) {
         for (let col = 0; col < boardSize; col++) {
             const squareId = `${row}-${col}`;
             const isBlack = (row + col) % 2 === 1;
             
-            // Highlight Logic
-            let tileColor = isBlack ? 0x8b5a2b : 0xdeb887; // Wood colors
-            if (markedSquares.includes(squareId)) tileColor = isBlack ? 0x734a23 : 0xbc9c72;
+            let tileColor = isBlack ? 0x5c3a21 : 0xd2a679; 
+            if (markedSquares.includes(squareId)) tileColor = isBlack ? 0x4a2e1a : 0xb58c60;
             
-            if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col) {
-                tileColor = 0xffd700; // Gold for selected
-            }
-            if (selectedSquare && highlightedMoves.includes(squareId)) {
-                tileColor = initialSetup[squareId] ? 0xff4500 : 0x32cd32; // Red if capture, Green if empty
-            }
+            if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col) tileColor = 0xf59e0b; 
+            if (selectedSquare && highlightedMoves.includes(squareId)) tileColor = initialSetup[squareId] ? 0xef4444 : 0x22c55e; 
 
             const tileGeometry = new THREE.BoxGeometry(tileSize, 0.2, tileSize);
-            const tileMaterial = new THREE.MeshStandardMaterial({ color: tileColor });
+            const tileMaterial = new THREE.MeshStandardMaterial({ color: tileColor, roughness: 0.8, metalness: 0.1 });
             const tile = new THREE.Mesh(tileGeometry, tileMaterial);
+            tile.receiveShadow = true;
             
-            // Map 2D grid to 3D Space (X and Z axis)
             const xPos = col * tileSize - offset;
             const zPos = row * tileSize - offset;
             
             tile.position.set(xPos, -0.1, zPos);
-            tile.userData = { row: row, col: col }; // Attach grid data for raycaster
+            tile.userData = { row: row, col: col }; 
             boardGroup.add(tile);
 
-            // Draw the 3D Piece if it exists on this square
             const pieceData = initialSetup[squareId];
             if (pieceData) {
-                const geom = pieceGeometries[pieceData.name] || new THREE.BoxGeometry(0.3, 0.3, 0.3);
-                const mat = new THREE.MeshStandardMaterial({ 
-                    color: pieceData.isWhite ? 0xffffff : 0x222222,
-                    roughness: 0.4
-                });
-                const pieceMesh = new THREE.Mesh(geom, mat);
+                const geom = pieceGeometries[pieceData.name] || new THREE.CylinderGeometry(0.3, 0.3, 0.2, 32);
+                const pieceColor = pieceData.isWhite ? 0xffd700 : 0x1c1917;
+                const mat = new THREE.MeshStandardMaterial({ color: pieceColor, roughness: pieceData.isWhite ? 0.3 : 0.5, metalness: pieceData.isWhite ? 0.8 : 0.2 });
                 
-                // Position piece slightly above the tile
-                pieceMesh.position.set(xPos, 0.2, zPos);
+                const pieceMesh = new THREE.Mesh(geom, mat);
+                pieceMesh.castShadow = true;
+                pieceMesh.receiveShadow = true;
+                pieceMesh.position.set(xPos, 0.1 + (geom.parameters.height / 2), zPos);
+                
+                const ringGeom = new THREE.TorusGeometry(0.12, 0.03, 16, 32);
+                const ringMat = new THREE.MeshStandardMaterial({ color: pieceData.isWhite ? 0xffffff : 0x8b0000 });
+                const ring = new THREE.Mesh(ringGeom, ringMat);
+                ring.position.set(0, geom.parameters.height / 2, 0);
+                ring.rotation.x = Math.PI / 2;
+                pieceMesh.add(ring);
+
                 piecesGroup.add(pieceMesh);
             }
         }
     }
-    
-    // Hide old 2D board
-    const oldBoardElement = document.getElementById('board');
-    if (oldBoardElement) oldBoardElement.style.display = 'none';
-
     updateGraveyardUI();
 }
 
 window.handleSquareClick = async function(row, col) {
     if (isGameOver) return;
-    
     const squareId = `${row}-${col}`, targetPiece = initialSetup[squareId];
 
     if (selectedSquare === null) {
@@ -367,11 +328,6 @@ window.handleSquareClick = async function(row, col) {
         const isCapture = !!targetPiece;
         if (isCapture) playCaptureSound(targetPiece.name); else playMoveSound();
         logMoveToHistory(selectedSquare.piece.name, squareId, isCapture, selectedSquare.piece.isWhite);
-
-        if (targetPiece) gameMetrics.userAggressionCount++;
-        if (selectedSquare.piece.name === 'Raja' && row < 6) gameMetrics.userMistakes.push("Raja_exposed");
-
-        gameMetrics.matchMoveHistory.push({ from: fromKey, to: squareId, piece: selectedSquare.piece.name });
 
         if (targetPiece) {
             if (targetPiece.isWhite) {
@@ -389,14 +345,9 @@ window.handleSquareClick = async function(row, col) {
         delete initialSetup[fromKey]; initialSetup[squareId] = { name: pieceNameToDeploy, isWhite: selectedSquare.piece.isWhite };
         selectedSquare = null; highlightedMoves = []; createBoard();
         
-        // Broadcast move in Multiplayer
-        if(currentMode === '2-Player') {
+        if(currentMode === '2-Player' && socket) {
             isPlayer1Turn = !isPlayer1Turn;
-            socket.emit('playerMove', {
-                from: fromKey,
-                to: squareId,
-                nextTurn: isPlayer1Turn
-            });
+            socket.emit('playerMove', { from: fromKey, to: squareId, nextTurn: isPlayer1Turn });
         }
 
         if (isGameOver) return;
@@ -405,7 +356,7 @@ window.handleSquareClick = async function(row, col) {
 }
 
 // ==========================================
-// AI LOGIC (Unchanged - Minimax algorithm)
+// 6. AI ENGINE LOGIC
 // ==========================================
 function evaluateBoardState() {
     const scores = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 }; let totalVal = 0;
@@ -451,21 +402,20 @@ function triggerAiEngineLogic() {
     }
     if (allLegalAiMoves.length === 0) { isGameOver = true; showEndGameModal("STALEMATE", "The battle ended in a draw.", "🏳️", false); return; }
 
-    if (gameMetrics.currentStage === 1) allLegalAiMoves.sort(() => Math.random() - 0.5);
-    else {
-        for (const move of allLegalAiMoves) {
-            const backup = initialSetup[move.toKey]; initialSetup[move.toKey] = initialSetup[move.fromKey]; delete initialSetup[move.fromKey];
-            move.minimaxWeight = gameMetrics.currentStage === 2 ? evaluateBoardState() : minimax(2, false); 
-            if(gameMetrics.currentStage > 2) aiDatabase.userWinningTraps.forEach(trap => { if (trap.to === move.toKey) move.minimaxWeight += 250; });
-            initialSetup[move.fromKey] = initialSetup[move.toKey]; if (backup) initialSetup[move.toKey] = backup; else delete initialSetup[move.toKey];
-        }
-        allLegalAiMoves.sort((a, b) => b.minimaxWeight - a.minimaxWeight);
+    for (const move of allLegalAiMoves) {
+        const backup = initialSetup[move.toKey]; initialSetup[move.toKey] = initialSetup[move.fromKey]; delete initialSetup[move.fromKey];
+        move.minimaxWeight = minimax(2, false); 
+        initialSetup[move.fromKey] = initialSetup[move.toKey]; if (backup) initialSetup[move.toKey] = backup; else delete initialSetup[move.toKey];
     }
+    allLegalAiMoves.sort((a, b) => b.minimaxWeight - a.minimaxWeight);
     
     const bestMove = allLegalAiMoves[0], isCapture = !!bestMove.targetPiece;
     if (isCapture) playCaptureSound(bestMove.targetPiece.name); else playMoveSound();
     logMoveToHistory(bestMove.piece.name, bestMove.toKey, isCapture, false);
 
-    if (bestMove.targetPiece) { capturedWhite.push(bestMove.targetPiece.name); if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } }
+    if (bestMove.targetPiece) { 
+        capturedWhite.push(bestMove.targetPiece.name); 
+        if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } 
+    }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
 }
