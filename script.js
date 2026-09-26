@@ -169,43 +169,64 @@ function updateGraveyardUI() {
     const wYard = document.getElementById('white-graveyard');
     if (bYard) bYard.innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
     if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
-}
-
+                                                                                                    }
 // ==========================================
 // 6. THREE.JS RENDERING (TRANSPARENT + UNIQUE PIECES)
 // ==========================================
 let scene, camera, renderer, boardGroup, piecesGroup;
 let isThreeInitialized = false;
 
+// Generate Emoji Textures for the pieces
+function createEmojiSprite(emoji) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 128;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+    ctx.font = '70px Arial'; 
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(emoji, 64, 70); 
+    
+    const texture = new THREE.CanvasTexture(canvas);
+    const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
+    const sprite = new THREE.Sprite(spriteMaterial);
+    sprite.scale.set(0.65, 0.65, 1); 
+    return sprite;
+}
+
 // Generate Distinct 3D Shapes for Each Piece
 function create3DPiece(name, isWhite) {
     const group = new THREE.Group();
-    const pieceColor = isWhite ? 0xffd700 : 0x1c1917; // Gold for Player, Obsidian for AI
+    const pieceColor = isWhite ? 0xffd700 : 0x1c1917; 
     const mat = new THREE.MeshStandardMaterial({ color: pieceColor, roughness: isWhite ? 0.3 : 0.5, metalness: isWhite ? 0.8 : 0.2 });
 
-    // Common Base
     const baseGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.1, 32);
     const base = new THREE.Mesh(baseGeo, mat);
     base.position.y = 0.05;
     base.castShadow = true; base.receiveShadow = true;
     group.add(base);
 
-    if (name === 'Padati') { // Pawn - Small
+    let heightOffset = 0.25;
+
+    if (name === 'Padati') { 
         let topGeo = new THREE.SphereGeometry(0.15, 16, 16);
         let top = new THREE.Mesh(topGeo, mat);
         top.position.y = 0.25; top.castShadow = true;
         group.add(top);
-    } else if (name === 'Ratha') { // Rook - Boxy
+        heightOffset = 0.45;
+    } else if (name === 'Ratha') { 
         let bodyGeo = new THREE.BoxGeometry(0.3, 0.3, 0.3);
         let body = new THREE.Mesh(bodyGeo, mat);
         body.position.y = 0.25; body.castShadow = true;
         group.add(body);
-    } else if (name === 'Ashva') { // Knight - Tilted
+        heightOffset = 0.5;
+    } else if (name === 'Ashva') { 
         let bodyGeo = new THREE.CylinderGeometry(0.15, 0.25, 0.35, 16);
         let body = new THREE.Mesh(bodyGeo, mat);
         body.position.y = 0.25; body.rotation.z = Math.PI / 6; body.castShadow = true;
         group.add(body);
-    } else if (name === 'Gaja') { // Bishop - Pointy Dome
+        heightOffset = 0.5;
+    } else if (name === 'Gaja') { 
         let bodyGeo = new THREE.CylinderGeometry(0.05, 0.25, 0.35, 16);
         let body = new THREE.Mesh(bodyGeo, mat);
         body.position.y = 0.25; body.castShadow = true;
@@ -213,7 +234,8 @@ function create3DPiece(name, isWhite) {
         let top = new THREE.Mesh(topGeo, mat);
         top.position.y = 0.45;
         group.add(body, top);
-    } else if (name === 'Mantri') { // Queen - Tall and round
+        heightOffset = 0.65;
+    } else if (name === 'Mantri') { 
         let bodyGeo = new THREE.CylinderGeometry(0.15, 0.3, 0.45, 16);
         let body = new THREE.Mesh(bodyGeo, mat);
         body.position.y = 0.3; body.castShadow = true;
@@ -221,7 +243,8 @@ function create3DPiece(name, isWhite) {
         let top = new THREE.Mesh(topGeo, mat);
         top.position.y = 0.55;
         group.add(body, top);
-    } else if (name === 'Raja') { // King - Tallest with a cross
+        heightOffset = 0.75;
+    } else if (name === 'Raja') { 
         let bodyGeo = new THREE.CylinderGeometry(0.15, 0.3, 0.5, 16);
         let body = new THREE.Mesh(bodyGeo, mat);
         body.position.y = 0.35; body.castShadow = true;
@@ -232,7 +255,14 @@ function create3DPiece(name, isWhite) {
         let cross2 = new THREE.Mesh(crossV, mat);
         cross2.position.y = 0.65;
         group.add(body, cross, cross2);
+        heightOffset = 0.85;
     }
+
+    // Add Emoji Sprite on top
+    const emojiSprite = createEmojiSprite(pieceSigns[name]);
+    emojiSprite.position.set(0, heightOffset, 0); 
+    group.add(emojiSprite);
+
     return group;
 }
 
@@ -247,13 +277,13 @@ function initThreeJS() {
     let h = container.clientHeight || w;
 
     scene = new THREE.Scene();
-    scene.background = null; // TRANSPARENT BACKGROUND
+    scene.background = null; 
 
-    camera = new THREE.PerspectiveCamera(32, w / h, 0.1, 1000);
-    camera.position.set(0, 8, 8.5); 
+    // FIX CAMERA: Increased FOV to 42 and pushed back to 10 so the whole board fits
+    camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 1000);
+    camera.position.set(0, 10, 10); 
     camera.lookAt(0, 0, 0); 
 
-    // Set alpha: true and clear color for transparency
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setClearColor( 0x000000, 0 );
     renderer.setSize(w, h);
@@ -316,13 +346,11 @@ function updateEvalBar() {
     if (!evalFill) return;
     const score = evaluateBoardState();
     
-    // Negative score = Player (White) advantage, Positive = AI (Black) advantage
-    // 50% is balanced. 100% means White dominates, 0% means Black dominates.
     let percentage = 50 - (score / 40); 
-    percentage = Math.max(5, Math.min(95, percentage)); // Clamp between 5% and 95%
+    percentage = Math.max(5, Math.min(95, percentage)); 
     
     evalFill.style.height = percentage + '%';
-    evalFill.style.backgroundColor = percentage > 50 ? '#f59e0b' : '#dc2626'; // Yellow/Amber for player, Red for AI
+    evalFill.style.backgroundColor = percentage > 50 ? '#f59e0b' : '#dc2626'; 
 }
 
 function createBoard() {
@@ -361,7 +389,6 @@ function createBoard() {
 
             const pieceData = initialSetup[squareId];
             if (pieceData) {
-                // Use the new distinct 3D shape generation
                 const pieceMesh = create3DPiece(pieceData.name, pieceData.isWhite);
                 pieceMesh.position.set(xPos, 0.1, zPos);
                 piecesGroup.add(pieceMesh);
@@ -370,8 +397,9 @@ function createBoard() {
     }
     
     updateGraveyardUI();
-    updateEvalBar(); // Update Win Percentage Graph
+    updateEvalBar(); 
 }
+
 window.handleSquareClick = async function(row, col) {
     if (isGameOver) return;
     const squareId = `${row}-${col}`, targetPiece = initialSetup[squareId];
@@ -479,4 +507,5 @@ function triggerAiEngineLogic() {
         if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } 
     }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
-                }
+                                                 }
+            
