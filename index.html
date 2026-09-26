@@ -8,20 +8,19 @@
     <link rel="icon" href="logo.svg?v=2" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
+    
     <!-- Three.js Library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<!-- Socket.IO Client -->
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Socket.IO Client -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- প্রজেক্ট পেজের জন্য কাস্টম স্টাইল -->
+    
     <style>
         .repo-grid { display: flex; flex-direction: column; gap: 15px; }
         .repo-card { background: rgba(28, 25, 23, 0.6); border: 1px solid rgba(217, 119, 6, 0.2); padding: 15px; border-radius: 8px; display: flex; flex-direction: column; }
-        
         .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(217, 119, 6, 0.2); }
         .card-header h3 { margin: 0; font-size: 1.1em; color: var(--amber-400, #fbbf24); font-weight: bold; }
         .repo-card p { color: #d6d3d1; font-size: 11px; line-height: 1.5; margin-bottom: 12px; font-family: sans-serif;}
-        
         .card-buttons { display: flex; gap: 8px; }
         .card-buttons a { flex: 1; text-align: center; padding: 6px; text-decoration: none; font-size: 10px; font-weight: bold; text-transform: uppercase; border-radius: 4px;}
         .live-btn { background: var(--amber-600, #d97706); color: #0a0a0a; }
@@ -32,7 +31,7 @@
 </head>
 <body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
 
-    <!-- ==================== RESPONSIVE MENU BAR ==================== -->
+    <!-- MENU BAR -->
     <nav class="w-full max-w-[400px] md:max-w-[600px] heritage-card rounded-lg p-3 mt-4 mb-2 z-50 relative transition-all mx-auto">
         <div class="flex justify-between items-center relative z-20">
             <div class="text-amber-500 font-extrabold tracking-widest text-sm uppercase">चतुरङ्ग</div>
@@ -45,10 +44,8 @@
                 <button onclick="window.showPage('projects')" class="nav-btn-projects text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Projects</button>
             </div>
 
-            <button id="mobile-menu-btn" onclick="window.toggleMobileMenu()" class="sm:hidden text-amber-500 hover:text-amber-300 focus:outline-none transition" aria-label="Toggle mobile menu" aria-controls="mobile-menu" aria-expanded="false">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
+            <button id="mobile-menu-btn" onclick="window.toggleMobileMenu()" class="sm:hidden text-amber-500 hover:text-amber-300 focus:outline-none transition">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
         </div>
 
@@ -61,7 +58,7 @@
         </div>
     </nav>
 
-    <!-- ==================== ALL PAGES CONTAINER ==================== -->
+    <!-- ALL PAGES CONTAINER -->
     <div class="w-full max-w-[400px] relative mt-2 mx-auto">
         
         <!-- 1. HOME PAGE -->
@@ -79,25 +76,19 @@
 
         <!-- 2. GAME PAGE -->
         <div id="game-container" class="hidden flex-col gap-2 pt-1 mb-6 animate-fade-in">
-            <!-- Game Mode Buttons -->
-            <div class="flex gap-2 heritage-card p-1 rounded-lg justify-between" role="group">
+            <div class="flex gap-2 heritage-card p-1 rounded-lg justify-between">
                 <button id="btn2P" onclick="window.switchMode('2-Player')" class="flex-1 py-1.5 text-[11px] font-bold bg-stone-900/60 rounded mode-button">👥 Pass & Play</button>
                 <button id="btnAI" onclick="window.switchMode('Vs-AI')" class="flex-1 py-1.5 text-[11px] font-bold bg-amber-600 text-stone-950 rounded mode-button">💻 VS Computer</button>
             </div>
             
-            <!-- 3D Board & Win Percentage Bar -->
             <div class="flex justify-center w-full relative mt-1">
-                <!-- Evaluation Bar (Win Percentage) -->
                 <div id="eval-bar-container" class="absolute left-0 top-0 bottom-0 w-2.5 bg-stone-950/80 rounded-l-md overflow-hidden z-10 flex flex-col-reverse border-y border-l border-amber-600/30 shadow-lg" title="Win Percentage">
                     <div id="eval-fill" class="w-full bg-amber-500 transition-all duration-700 ease-in-out" style="height: 50%;"></div>
                 </div>
-                <!-- 3D Board -->
                 <div id="three-game-container" class="w-full aspect-square max-h-[380px] relative rounded-r-md overflow-hidden border border-amber-600/30 ml-2.5 bg-transparent"></div>
             </div>
 
-            <!-- Graveyard & History -->
             <div class="flex flex-col gap-2 mt-1">
-                <!-- Graveyard -->
                 <div class="heritage-card rounded-lg p-2">
                     <div class="flex justify-between items-start">
                         <div class="w-1/2 pr-1 border-r border-stone-700/50">
@@ -111,7 +102,6 @@
                     </div>
                 </div>
 
-                <!-- Battle Chronicles -->
                 <div class="heritage-card rounded-lg p-2 h-20 flex flex-col">
                     <h4 class="text-[9px] font-bold text-amber-500 uppercase mb-1 border-b border-amber-600/30 pb-0.5">📜 Battle Chronicles</h4>
                     <div id="move-history-feed" class="overflow-y-auto flex-1 space-y-1 text-[10px] text-stone-300 pr-1">
@@ -120,17 +110,6 @@
                 </div>
             </div>
         </div>
-        
-                <!-- Battle Chronicles (Move History) -->
-                <div class="heritage-card rounded-lg p-2 h-20 flex flex-col">
-                    <h4 class="text-[9px] font-bold text-amber-500 uppercase mb-1 border-b border-amber-600/30 pb-0.5">📜 Battle Chronicles</h4>
-                    <div id="move-history-feed" class="overflow-y-auto flex-1 space-y-1 text-[10px] text-stone-300 pr-1">
-                        <div class="text-stone-500 italic text-center mt-1">The battlefield awaits...</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
 
         <!-- 3. RULES PAGE -->
         <div id="rules-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in text-stone-300">
@@ -155,10 +134,8 @@
             </div>
         </div>
 
-        <!-- 5. MY PROJECTS PAGE (আপডেট করা ডিজাইন) -->
+        <!-- 5. MY PROJECTS PAGE -->
         <div id="projects-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in font-sans">
-            
-            <!-- মোবাইলের জন্য অপ্টিমাইজড প্রোফাইল সেকশন -->
             <div class="flex flex-row items-center justify-start gap-5 p-4 rounded-xl border border-amber-600/20 bg-stone-900/60 shadow-lg">
                 <img src="https://github.com/Kiran-mondal.png" alt="Kiran Mondal" class="w-[75px] h-[75px] rounded-full border-[3px] border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.5)]">
                 <div class="text-left flex flex-col justify-center">
@@ -172,9 +149,7 @@
                 <h3 class="text-sm font-bold text-amber-500 uppercase tracking-wider">My Other Live Projects</h3>
             </div>
 
-            <!-- প্রজেক্ট লিস্ট (Chaturanga বাদ দিয়ে) -->
             <div class="repo-grid">
-                
                 <!-- TriScout -->
                 <div class="repo-card">
                     <div class="card-header">
@@ -182,13 +157,7 @@
                             <g fill="none" stroke="#66ED1E" stroke-linecap="round" stroke-linejoin="round">
                                 <polygon points="50,2 91.6,26 91.6,74 50,98 8.4,74 8.4,26" stroke-width="1.5" />
                                 <polygon points="50,10 84.6,30 84.6,70 50,90 15.4,70 15.4,30" stroke-width="3" />
-                                <g stroke-width="2.5">
-                                    <line x1="15.4" y1="30" x2="84.6" y2="70" />
-                                    <line x1="32.7" y1="20" x2="84.6" y2="50" />
-                                    <line x1="15.4" y1="50" x2="67.3" y2="80" />
-                                    <line x1="15.4" y1="50" x2="67.3" y2="20" />
-                                    <line x1="32.7" y1="80" x2="84.6" y2="50" />
-                                </g>
+                                <g stroke-width="2.5"><line x1="15.4" y1="30" x2="84.6" y2="70" /><line x1="32.7" y1="20" x2="84.6" y2="50" /><line x1="15.4" y1="50" x2="67.3" y2="80" /><line x1="15.4" y1="50" x2="67.3" y2="20" /><line x1="32.7" y1="80" x2="84.6" y2="50" /></g>
                             </g>
                         </svg>
                         <h3>TriScout</h3>
@@ -254,12 +223,7 @@
                 <div class="repo-card">
                     <div class="card-header">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="30" height="30">
-                            <defs>
-                                <mask id="pasha-hole">
-                                    <rect width="512" height="512" fill="white" />
-                                    <circle cx="256" cy="256" r="32" fill="black" />
-                                </mask>
-                            </defs>
+                            <defs><mask id="pasha-hole"><rect width="512" height="512" fill="white" /><circle cx="256" cy="256" r="32" fill="black" /></mask></defs>
                             <g mask="url(#pasha-hole)" fill="#dc2626">
                                 <rect x="232" y="16" width="48" height="480" rx="12" />
                                 <rect x="232" y="16" width="48" height="480" rx="12" transform="rotate(45 256 256)" />
@@ -277,12 +241,11 @@
                         <a href="https://github.com/Kiran-mondal" target="_blank" class="code-btn">Source Code</a>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <!-- Game Over Modal -->
+     <!-- Game Over Modal -->
     <div id="gameOverModal" class="hidden fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
         <div class="bg-stone-950/95 border border-amber-500/50 p-6 rounded-xl max-w-xs w-full text-center modal-content">
             <div id="modalIcon" class="text-4xl mb-2 modal-icon">👑</div>
@@ -292,7 +255,7 @@
         </div>
     </div>
 
-     <!-- UI/Menu Logic -->
+    <!-- UI Logic -->
     <script>
         window.showPage = function(targetPage) {
             const pages = ['home', 'game', 'rules', 'heritage', 'projects'];
@@ -304,14 +267,12 @@
                     btns.forEach(btn => {
                         btn.classList.add('text-amber-200', 'border-amber-500');
                         btn.classList.remove('text-stone-400', 'border-transparent');
-                        btn.setAttribute('aria-current', 'page');
                     });
                 } else {
                     if(container) { container.style.display = 'none'; container.classList.add('hidden'); }
                     btns.forEach(btn => {
                         btn.classList.add('text-stone-400', 'border-transparent');
                         btn.classList.remove('text-amber-200', 'border-amber-500');
-                        btn.removeAttribute('aria-current');
                     });
                 }
             });
@@ -321,8 +282,6 @@
             if (menu) { menu.classList.toggle('hidden'); menu.classList.toggle('flex'); }
         };
     </script>
-
-    <!-- Game Engine Logic -->
-    <script src="script.js"></script>
+    <script src="script.js?t=1717200000"></script>
 </body>
 </html>
