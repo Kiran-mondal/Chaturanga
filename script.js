@@ -4,13 +4,12 @@
 let currentMode = "Vs-AI", isGameOver = false, capturedWhite = [], capturedBlack = [], initialSetup = {};
 let selectedSquare = null, highlightedMoves = [], isPlayer1Turn = true;
 let gameMetrics = { currentStage: 1, userAggressionCount: 0, userMistakes: [], matchMoveHistory: [], consecutiveUserLosses: 0, adaptiveDifficultyScore: 50 };
-let aiDatabase = { userWinningTraps: [] };
 
 const pieceSigns = { "Raja": "👑", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" };
 const markedSquares = ["0-0", "0-3", "0-4", "0-7", "3-0", "3-3", "3-4", "3-7", "4-0", "4-3", "4-4", "4-7", "7-0", "7-3", "7-4", "7-7"];
 
 // ==========================================
-// 2. SOCKET.IO CONNECTION (Safe Initialization)
+// 2. SOCKET.IO CONNECTION (Safe)
 // ==========================================
 let socket = null;
 if (typeof io !== 'undefined') {
@@ -30,17 +29,41 @@ if (typeof io !== 'undefined') {
             createBoard(); 
         }
     });
-} else {
-    console.warn("Socket.IO not found. Multiplayer features disabled, running local only.");
 }
 
+// ==========================================
+// 3. UI TAB SWITCH FIX & INITIALIZATION
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    // 0x0 Size Bug Fix: Force 3D board to resize when Game tab is opened
+    const originalShowPage = window.showPage;
+    window.showPage = function(targetPage) {
+        if(originalShowPage) originalShowPage(targetPage);
+        
+        if(targetPage === 'game') {
+            setTimeout(() => {
+                if(isThreeInitialized && renderer && camera) {
+                    const container = document.getElementById('three-game-container');
+                    if(container && container.clientWidth > 0) {
+                        let newW = container.clientWidth;
+                        let newH = container.clientHeight || newW;
+                        camera.aspect = newW / newH;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(newW, newH);
+                    }
+                } else {
+                    createBoard();
+                }
+            }, 100);
+        }
+    };
+
     window.showPage('home');
     window.triggerReset();
 });
 
 // ==========================================
-// 3. AUDIO & HAPTIC ENGINE
+// 4. AUDIO & HAPTIC ENGINE
 // ==========================================
 let audioCtx;
 function initAudio() {
@@ -72,11 +95,10 @@ function playCaptureSound(capturedPieceName) {
     }
     new Audio(audioSrc).play().catch(e => console.log("Audio Error:", e));
 }
-
 function triggerVibration(pattern) { if (navigator.vibrate) navigator.vibrate(pattern); }
 
 // ==========================================
-// 4. CORE GAME ENGINE LOGIC
+// 5. CORE GAME ENGINE LOGIC
 // ==========================================
 function resetInitialSetup() {
     initialSetup = {
@@ -159,9 +181,8 @@ function updateGraveyardUI() {
     if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
 }
 
-
 // ==========================================
-// 5. THREE.JS BOARD RENDERING (PREMIUM LOOK)
+// 6. THREE.JS PREMIUM RENDERING
 // ==========================================
 let scene, camera, renderer, boardGroup, piecesGroup;
 let isThreeInitialized = false;
@@ -177,15 +198,13 @@ const pieceGeometries = {
 
 function initThreeJS() {
     if(isThreeInitialized) return;
-    if(typeof THREE === 'undefined') return; // Safe check if ThreeJS failed to load
+    if(typeof THREE === 'undefined') return; 
 
     const container = document.getElementById('three-game-container');
     if(!container) return;
 
-    // Mobile fallback for height
     let w = container.clientWidth || window.innerWidth - 30;
-    let h = container.clientHeight;
-    if (h === 0) { h = w; container.style.height = h + 'px'; }
+    let h = container.clientHeight || w;
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x120c08); 
@@ -241,7 +260,7 @@ function initThreeJS() {
     animate();
 
     window.addEventListener('resize', () => {
-        if(!container) return;
+        if(!container || container.clientWidth === 0) return;
         let newW = container.clientWidth;
         let newH = container.clientHeight || newW;
         camera.aspect = newW / newH;
@@ -308,6 +327,11 @@ function createBoard() {
             }
         }
     }
+    
+    // Hide old 2D board if it exists
+    const oldBoardElement = document.getElementById('board');
+    if (oldBoardElement) oldBoardElement.style.display = 'none';
+
     updateGraveyardUI();
 }
 
@@ -354,9 +378,8 @@ window.handleSquareClick = async function(row, col) {
         if (currentMode === 'Vs-AI') { setTimeout(triggerAiEngineLogic, 300); } 
     }
 }
-
 // ==========================================
-// 6. AI ENGINE LOGIC
+// 7. AI ENGINE LOGIC
 // ==========================================
 function evaluateBoardState() {
     const scores = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 }; let totalVal = 0;
@@ -418,4 +441,4 @@ function triggerAiEngineLogic() {
         if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } 
     }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
-}
+                }
