@@ -6,37 +6,33 @@ let selectedSquare = null, highlightedMoves = [], isPlayer1Turn = true;
 let gameMetrics = { currentStage: 1, userAggressionCount: 0, userMistakes: [], matchMoveHistory: [], consecutiveUserLosses: 0, adaptiveDifficultyScore: 50 };
 let aiDatabase = { userWinningTraps: [] };
 
-const pieceSigns = { "Raja": "⚜️", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" };
+const pieceSigns = { "Raja": "👑", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" };
 const markedSquares = ["0-0", "0-3", "0-4", "0-7", "3-0", "3-3", "3-4", "3-7", "4-0", "4-3", "4-4", "4-7", "7-0", "7-3", "7-4", "7-7"];
 const VERCEL_API_URL = "https://chaturanga.quarry.dpdns.org/api";
 
-window.showPage = function(targetPage) {
-    const pages = ['home', 'game', 'rules', 'heritage', 'projects'];
-    pages.forEach(page => {
-        const container = document.getElementById(`${page}-container`);
-        const btns = document.querySelectorAll(`.nav-btn-${page}`);
-        if (page === targetPage) {
-            if(container) { container.style.display = 'flex'; container.classList.remove('hidden'); }
-            btns.forEach(btn => { btn.classList.add('text-amber-200', 'border-amber-500'); btn.classList.remove('text-stone-400', 'border-transparent'); });
-        } else {
-            if(container) { container.style.display = 'none'; container.classList.add('hidden'); }
-            btns.forEach(btn => { btn.classList.add('text-stone-400', 'border-transparent'); btn.classList.remove('text-amber-200', 'border-amber-500'); });
-        }
-    });
-};
+// ==========================================
+// SOCKET.IO CONNECTION
+// ==========================================
+const socket = io(); 
 
-window.toggleMobileMenu = function() {
-    const menu = document.getElementById('mobile-menu');
-    const btn = document.getElementById('mobile-menu-btn');
-    if (menu) {
-        menu.classList.toggle('hidden');
-        menu.classList.toggle('flex');
+socket.on('updateBoard', (moveData) => {
+    if(currentMode === '2-Player' && initialSetup[moveData.from]) {
+        console.log("Opponent moved:", moveData);
+        const piece = initialSetup[moveData.from];
+        const isCapture = !!initialSetup[moveData.to];
+        
+        initialSetup[moveData.to] = piece;
+        delete initialSetup[moveData.from];
+        
+        // Log history and sounds
+        if (isCapture) playCaptureSound(piece.name); else playMoveSound();
+        logMoveToHistory(piece.name, moveData.to, isCapture, piece.isWhite);
+        
+        isPlayer1Turn = moveData.nextTurn;
+        createBoard(); 
     }
-    if (btn) {
-        const isExpanded = btn.getAttribute('aria-expanded') === 'true';
-        btn.setAttribute('aria-expanded', !isExpanded);
-    }
-};
+});
+
 
 document.addEventListener('DOMContentLoaded', () => {
     window.showPage('home');
@@ -191,65 +187,158 @@ function calculatePossibleMoves(row, col, piece) {
 function updateGraveyardUI() {
     const bYard = document.getElementById('black-graveyard');
     const wYard = document.getElementById('white-graveyard');
-    if (bYard) bYard.innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 graveyard-piece">${pieceSigns[p]}</span>`).join('');
-    if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 graveyard-piece">${pieceSigns[p]}</span>`).join('');
+    if (bYard) bYard.innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 graveyard-piece text-xs">${pieceSigns[p]}</span>`).join('');
+    if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 graveyard-piece text-xs">${pieceSigns[p]}</span>`).join('');
+}
+
+
+// ==========================================
+// 4. THREE.JS BOARD RENDERING
+// ==========================================
+let scene, camera, renderer, boardGroup, piecesGroup;
+let isThreeInitialized = false;
+
+// Geometry caching for pieces
+const pieceGeometries = {
+    "Raja": new THREE.CylinderGeometry(0.3, 0.4, 0.8, 16),
+    "Mantri": new THREE.CylinderGeometry(0.2, 0.35, 0.7, 16),
+    "Gaja": new THREE.BoxGeometry(0.5, 0.6, 0.5),
+    "Ashva": new THREE.ConeGeometry(0.3, 0.6, 16),
+    "Ratha": new THREE.BoxGeometry(0.4, 0.5, 0.4),
+    "Padati": new THREE.CylinderGeometry(0.2, 0.25, 0.4, 16)
+};
+
+function initThreeJS() {
+    if(isThreeInitialized) return;
+    const container = document.getElementById('three-game-container');
+    if(!container) return;
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a1614); 
+
+    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    // Position camera for 3D isometric view looking at the board
+    camera.position.set(0, 10, 8);
+    camera.lookAt(0, 0, 0);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 10, 5);
+    scene.add(directionalLight);
+
+    boardGroup = new THREE.Group();
+    scene.add(boardGroup);
+    piecesGroup = new THREE.Group();
+    scene.add(piecesGroup);
+
+    // Interaction setup
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    container.addEventListener('pointerdown', (event) => {
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
+        mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        
+        // Check intersections with board tiles
+        const intersects = raycaster.intersectObjects(boardGroup.children);
+        if (intersects.length > 0) {
+            const userData = intersects[0].object.userData;
+            if(userData.row !== undefined) {
+                 handleSquareClick(userData.row, userData.col);
+            }
+        }
+    });
+
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+        if(!container) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+
+    isThreeInitialized = true;
 }
 
 function createBoard() {
-    const boardElement = document.getElementById('board');
-    if (!boardElement) return;
+    initThreeJS();
+    
+    // Clear existing meshes
+    while(boardGroup.children.length > 0){ 
+        boardGroup.remove(boardGroup.children[0]); 
+    }
+    while(piecesGroup.children.length > 0){ 
+        piecesGroup.remove(piecesGroup.children[0]); 
+    }
 
-    const activeElementId = document.activeElement ? document.activeElement.id : null;
+    const boardSize = 8;
+    const tileSize = 1;
+    const offset = (boardSize * tileSize) / 2 - (tileSize / 2);
 
-    boardElement.innerHTML = '';
-    for (let row = 0; row < 8; row++) {
-        for (let col = 0; col < 8; col++) {
-            const squareId = `${row}-${col}`, square = document.createElement('div');
-            square.id = `square-${squareId}`;
-            square.setAttribute('role', 'button');
-            square.setAttribute('tabindex', '0');
-            square.className = 'ashtapada-square flex flex-col items-center justify-center cursor-pointer select-none relative aspect-square';
-
-            const piece = initialSetup[squareId];
-            let ariaLabel = piece ? `${piece.isWhite ? 'White' : 'Black'} ${piece.name} at row ${row}, column ${col}` : `Empty square at row ${row}, column ${col}`;
-
-            if (markedSquares.includes(squareId)) square.classList.add('marked-square');
+    // Draw the 3D Board
+    for (let row = 0; row < boardSize; row++) {
+        for (let col = 0; col < boardSize; col++) {
+            const squareId = `${row}-${col}`;
+            const isBlack = (row + col) % 2 === 1;
+            
+            // Highlight Logic
+            let tileColor = isBlack ? 0x8b5a2b : 0xdeb887; // Wood colors
+            if (markedSquares.includes(squareId)) tileColor = isBlack ? 0x734a23 : 0xbc9c72;
+            
             if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col) {
-                square.classList.add('selected');
-                ariaLabel += ' (Selected)';
+                tileColor = 0xffd700; // Gold for selected
             }
-            if (!isGameOver && selectedSquare && highlightedMoves.includes(squareId)) {
-                if (piece) {
-                    square.classList.add('possible-capture-marker');
-                    ariaLabel += ' (Possible Capture)';
-                } else {
-                    square.classList.add('possible-move-marker');
-                    ariaLabel += ' (Possible Move)';
-                }
+            if (selectedSquare && highlightedMoves.includes(squareId)) {
+                tileColor = initialSetup[squareId] ? 0xff4500 : 0x32cd32; // Red if capture, Green if empty
             }
 
-            square.setAttribute('aria-label', ariaLabel);
+            const tileGeometry = new THREE.BoxGeometry(tileSize, 0.2, tileSize);
+            const tileMaterial = new THREE.MeshStandardMaterial({ color: tileColor });
+            const tile = new THREE.Mesh(tileGeometry, tileMaterial);
+            
+            // Map 2D grid to 3D Space (X and Z axis)
+            const xPos = col * tileSize - offset;
+            const zPos = row * tileSize - offset;
+            
+            tile.position.set(xPos, -0.1, zPos);
+            tile.userData = { row: row, col: col }; // Attach grid data for raycaster
+            boardGroup.add(tile);
 
-            if (piece) {
-                const labelColor = piece.isWhite ? 'text-amber-700' : 'text-red-700';
-                square.innerHTML = `<span class="text-2xl md:text-3xl filter drop-shadow-sm">${pieceSigns[piece.name]}</span><span class="text-[7px] ${labelColor} font-sans font-extrabold z-10 uppercase tracking-tighter absolute bottom-0.5">${piece.name}</span>`;
+            // Draw the 3D Piece if it exists on this square
+            const pieceData = initialSetup[squareId];
+            if (pieceData) {
+                const geom = pieceGeometries[pieceData.name] || new THREE.BoxGeometry(0.3, 0.3, 0.3);
+                const mat = new THREE.MeshStandardMaterial({ 
+                    color: pieceData.isWhite ? 0xffffff : 0x222222,
+                    roughness: 0.4
+                });
+                const pieceMesh = new THREE.Mesh(geom, mat);
+                
+                // Position piece slightly above the tile
+                pieceMesh.position.set(xPos, 0.2, zPos);
+                piecesGroup.add(pieceMesh);
             }
-            square.addEventListener('click', () => handleSquareClick(row, col));
-            square.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleSquareClick(row, col);
-                }
-            });
-            boardElement.appendChild(square);
         }
     }
-    updateGraveyardUI();
+    
+    // Hide old 2D board
+    const oldBoardElement = document.getElementById('board');
+    if (oldBoardElement) oldBoardElement.style.display = 'none';
 
-    if (activeElementId) {
-        const toFocus = document.getElementById(activeElementId);
-        if (toFocus) toFocus.focus();
-    }
+    updateGraveyardUI();
 }
 
 window.handleSquareClick = async function(row, col) {
@@ -291,18 +380,29 @@ window.handleSquareClick = async function(row, col) {
 
         delete initialSetup[fromKey]; initialSetup[squareId] = { name: pieceNameToDeploy, isWhite: selectedSquare.piece.isWhite };
         selectedSquare = null; highlightedMoves = []; createBoard();
+        
+        // Broadcast move in Multiplayer
+        if(currentMode === '2-Player') {
+            isPlayer1Turn = !isPlayer1Turn;
+            socket.emit('playerMove', {
+                from: fromKey,
+                to: squareId,
+                nextTurn: isPlayer1Turn
+            });
+        }
 
         if (isGameOver) return;
-        if (currentMode === 'Vs-AI') { setTimeout(triggerAiEngineLogic, 300); } else { isPlayer1Turn = !isPlayer1Turn; }
+        if (currentMode === 'Vs-AI') { setTimeout(triggerAiEngineLogic, 300); } 
     }
 }
 
+// ==========================================
+// AI LOGIC (Unchanged - Minimax algorithm)
+// ==========================================
 function evaluateBoardState() {
     const scores = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 }; let totalVal = 0;
     for (const key in initialSetup) {
         const piece = initialSetup[key];
-        // ⚡ Bolt Optimization: Replace slow key.split('-').map(Number) with fast charCodeAt math.
-        // Board size is fixed 8x8 (single digits), so this is safe and avoids array allocations.
         const r = key.charCodeAt(0) - 48;
         let weight = scores[piece.name];
         if (piece.name === 'Padati') weight += piece.isWhite ? (7 - r) : r;
@@ -316,7 +416,6 @@ function minimax(depth, isAiMaximizing) {
     const aiMoves = [];
     for (const key in initialSetup) {
         if ((isAiMaximizing && !initialSetup[key].isWhite) || (!isAiMaximizing && initialSetup[key].isWhite)) {
-            // ⚡ Bolt Optimization: Use fast charCodeAt instead of split
             const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48, piece = initialSetup[key];
             for (let toR = 0; toR < 8; toR++) { for (let toC = 0; toC < 8; toC++) { if (checkLegalMove(piece, fromR, fromC, toR, toC)) aiMoves.push({ from: key, to: `${toR}-${toC}`, piece: piece }); } }
         }
@@ -338,7 +437,6 @@ function triggerAiEngineLogic() {
     const allLegalAiMoves = [];
     for (const key in initialSetup) {
         if (!initialSetup[key].isWhite) {
-            // ⚡ Bolt Optimization: Use fast charCodeAt instead of split
             const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48, piece = initialSetup[key];
             for (let toR = 0; toR < 8; toR++) { for (let toC = 0; toC < 8; toC++) { if (checkLegalMove(piece, fromR, fromC, toR, toC)) allLegalAiMoves.push({ fromKey: key, toKey: `${toR}-${toC}`, piece: piece, targetPiece: initialSetup[`${toR}-${toC}`] }); } }
         }
@@ -362,5 +460,4 @@ function triggerAiEngineLogic() {
 
     if (bestMove.targetPiece) { capturedWhite.push(bestMove.targetPiece.name); if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
-                                                                                                                                                                                                                                   }
-        
+}
