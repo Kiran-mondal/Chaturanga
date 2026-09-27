@@ -103,9 +103,8 @@ function resetInitialSetup() {
 window.switchMode = function(mode) {
     currentMode = mode;
     if (mode === "Vs-AI") { gameMetrics.currentStage = 1; gameMetrics.consecutiveUserLosses = 0; }
-    // নতুন অ্যানিমেশন ট্রিগার করার জন্য ফ্ল্যাগ রিসেট
     isCameraAnimating = true;
-    if (camera) camera.position.set(0, 20, 2);
+    if (camera) camera.position.set(0, 25, 0); // Drop down animation starts here
     window.triggerReset();
 }
 window.triggerReset = function() {
@@ -168,68 +167,81 @@ function updateGraveyardUI() {
     const wYard = document.getElementById('white-graveyard');
     if (bYard) bYard.innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
     if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
-        }
+}
+
 // ==========================================
-// 6. THREE.JS RENDERING (TABLE + CAMERA ANIMATION)
+// 6. THREE.JS RENDERING (BETTER CAMERA & TABLE)
 // ==========================================
 let scene, camera, renderer, boardGroup, piecesGroup;
 let isThreeInitialized = false;
-let targetCameraPos = new THREE.Vector3(0, 8.5, 9.5); // খেলার সময়ের পারফেক্ট অ্যাঙ্গেল
+
+// নতুন উন্নত ক্যামেরা পজিশন (আরেকটু উপর থেকে টেবিলের ভিউ)
+let targetCameraPos = new THREE.Vector3(0, 11, 7.5);
 let isCameraAnimating = true;
 
-function createEmojiSprite(emoji) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 128; canvas.height = 128;
-    const ctx = canvas.getContext('2d');
-    ctx.font = '70px Arial'; 
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(emoji, 64, 70); 
-    const texture = new THREE.CanvasTexture(canvas);
-    const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
-    const sprite = new THREE.Sprite(spriteMaterial);
-    sprite.scale.set(0.65, 0.65, 1); 
-    return sprite;
-}
-
+// Custom 3D Models
 function create3DPiece(name, isWhite) {
     const group = new THREE.Group();
-    const pieceColor = isWhite ? 0xffd700 : 0x1c1917; 
-    const mat = new THREE.MeshStandardMaterial({ color: pieceColor, roughness: isWhite ? 0.3 : 0.5, metalness: isWhite ? 0.8 : 0.2 });
+    const pieceColor = isWhite ? 0xe8c382 : 0x22201e; 
+    const mat = new THREE.MeshStandardMaterial({ color: pieceColor, roughness: isWhite ? 0.2 : 0.4, metalness: isWhite ? 0.6 : 0.2 });
 
-    const baseGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.1, 32);
+    const baseGeo = new THREE.CylinderGeometry(0.35, 0.4, 0.15, 64);
     const base = new THREE.Mesh(baseGeo, mat);
-    base.position.y = 0.05; base.castShadow = true; base.receiveShadow = true;
+    base.position.y = 0.075; base.castShadow = true; base.receiveShadow = true;
     group.add(base);
-
-    let heightOffset = 0.25;
+    
+    const ringGeo = new THREE.TorusGeometry(0.3, 0.04, 32, 64);
+    const ring = new THREE.Mesh(ringGeo, mat);
+    ring.position.y = 0.15; ring.rotation.x = Math.PI / 2;
+    group.add(ring);
 
     if (name === 'Padati') { 
-        let topGeo = new THREE.SphereGeometry(0.15, 16, 16); let top = new THREE.Mesh(topGeo, mat);
-        top.position.y = 0.25; top.castShadow = true; group.add(top); heightOffset = 0.45;
+        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.25, 0.35, 32), mat);
+        body.position.y = 0.35; body.castShadow = true;
+        let top = new THREE.Mesh(new THREE.SphereGeometry(0.18, 32, 32), mat);
+        top.position.y = 0.6; top.castShadow = true;
+        group.add(body, top);
     } else if (name === 'Ratha') { 
-        let bodyGeo = new THREE.BoxGeometry(0.3, 0.3, 0.3); let body = new THREE.Mesh(bodyGeo, mat);
-        body.position.y = 0.25; body.castShadow = true; group.add(body); heightOffset = 0.5;
+        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.3, 0.45, 32), mat);
+        body.position.y = 0.4; body.castShadow = true;
+        let top = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.15, 0.4), mat);
+        top.position.y = 0.65; top.castShadow = true;
+        group.add(body, top);
     } else if (name === 'Ashva') { 
-        let bodyGeo = new THREE.CylinderGeometry(0.15, 0.25, 0.35, 16); let body = new THREE.Mesh(bodyGeo, mat);
-        body.position.y = 0.25; body.rotation.z = Math.PI / 6; body.castShadow = true; group.add(body); heightOffset = 0.5;
+        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.25, 0.35, 32), mat);
+        body.position.y = 0.35; body.castShadow = true;
+        let head = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 0.4, 32), mat);
+        head.position.set(0, 0.6, 0.1); head.rotation.x = Math.PI / 4; head.castShadow = true;
+        let snout = new THREE.Mesh(new THREE.SphereGeometry(0.15, 32, 32), mat);
+        snout.position.set(0, 0.7, 0.25); snout.castShadow = true;
+        group.add(body, head, snout);
     } else if (name === 'Gaja') { 
-        let bodyGeo = new THREE.CylinderGeometry(0.05, 0.25, 0.35, 16); let body = new THREE.Mesh(bodyGeo, mat);
-        body.position.y = 0.25; body.castShadow = true; let topGeo = new THREE.SphereGeometry(0.1, 16, 16);
-        let top = new THREE.Mesh(topGeo, mat); top.position.y = 0.45; group.add(body, top); heightOffset = 0.65;
+        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.28, 0.45, 32), mat);
+        body.position.y = 0.4; body.castShadow = true;
+        let dome = new THREE.Mesh(new THREE.SphereGeometry(0.22, 32, 32), mat);
+        dome.position.y = 0.65; dome.scale.y = 0.7; dome.castShadow = true;
+        let point = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.2, 32), mat);
+        point.position.y = 0.8; point.castShadow = true;
+        group.add(body, dome, point);
     } else if (name === 'Mantri') { 
-        let bodyGeo = new THREE.CylinderGeometry(0.15, 0.3, 0.45, 16); let body = new THREE.Mesh(bodyGeo, mat);
-        body.position.y = 0.3; body.castShadow = true; let topGeo = new THREE.SphereGeometry(0.12, 16, 16);
-        let top = new THREE.Mesh(topGeo, mat); top.position.y = 0.55; group.add(body, top); heightOffset = 0.75;
+        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.25, 0.65, 32), mat);
+        body.position.y = 0.5; body.castShadow = true;
+        let top = new THREE.Mesh(new THREE.SphereGeometry(0.16, 32, 32), mat);
+        top.position.y = 0.9; top.castShadow = true;
+        let crown = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.03, 16, 32), mat);
+        crown.position.y = 1.0; crown.rotation.x = Math.PI / 2;
+        group.add(body, top, crown);
     } else if (name === 'Raja') { 
-        let bodyGeo = new THREE.CylinderGeometry(0.15, 0.3, 0.5, 16); let body = new THREE.Mesh(bodyGeo, mat);
-        body.position.y = 0.35; body.castShadow = true; let crossGeo = new THREE.BoxGeometry(0.2, 0.05, 0.05);
-        let cross = new THREE.Mesh(crossGeo, mat); cross.position.y = 0.65; let crossV = new THREE.BoxGeometry(0.05, 0.2, 0.05);
-        let cross2 = new THREE.Mesh(crossV, mat); cross2.position.y = 0.65; group.add(body, cross, cross2); heightOffset = 0.85;
+        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.28, 0.8, 32), mat);
+        body.position.y = 0.55; body.castShadow = true;
+        let top = new THREE.Mesh(new THREE.SphereGeometry(0.2, 32, 32), mat);
+        top.position.y = 1.0; top.castShadow = true;
+        let crossV = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.25, 0.06), mat);
+        crossV.position.y = 1.25; crossV.castShadow = true;
+        let crossH = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.06, 0.06), mat);
+        crossH.position.y = 1.25; crossH.castShadow = true;
+        group.add(body, top, crossV, crossH);
     }
-
-    const emojiSprite = createEmojiSprite(pieceSigns[name]);
-    emojiSprite.position.set(0, heightOffset, 0); 
-    group.add(emojiSprite);
     return group;
 }
 
@@ -246,30 +258,32 @@ function initThreeJS() {
     scene = new THREE.Scene();
     scene.background = null; 
 
-    // ক্যামেরা উঁচুতে সেট করা হয়েছে (উড়ে আসার অ্যানিমেশনের জন্য)
     camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 1000);
-    camera.position.set(0, 20, 2); 
+    camera.position.set(0, 25, 0); 
     camera.lookAt(0, 0, 0); 
 
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(window.devicePixelRatio); 
     renderer.setClearColor( 0x000000, 0 );
     renderer.setSize(w, h);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
-    const ambientLight = new THREE.AmbientLight(0xffe4ce, 0.8); 
+    const ambientLight = new THREE.AmbientLight(0xffe4ce, 0.9); 
     scene.add(ambientLight);
     
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.3);
     directionalLight.position.set(5, 15, 5);
     directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 2048; 
+    directionalLight.shadow.mapSize.height = 2048;
     directionalLight.shadow.camera.left = -10; directionalLight.shadow.camera.right = 10;
     directionalLight.shadow.camera.top = 10; directionalLight.shadow.camera.bottom = -10;
     scene.add(directionalLight);
 
-    // কাঠের টেবিল তৈরি
-    const tableGeo = new THREE.CylinderGeometry(7.5, 7.5, 0.5, 64);
+    // টেবিলটিকে আরেকটু চওড়া ও সুন্দর করা হলো
+    const tableGeo = new THREE.CylinderGeometry(8.5, 8.5, 0.6, 64);
     const tableMat = new THREE.MeshStandardMaterial({ color: 0x3d2314, roughness: 0.9, metalness: 0.1 });
     const table = new THREE.Mesh(tableGeo, tableMat);
     table.position.set(0, -0.4, 0); 
@@ -298,14 +312,11 @@ function initThreeJS() {
 
     function animate() {
         requestAnimationFrame(animate);
-        
-        // ফ্লাইং ক্যামেরা অ্যানিমেশন লজিক
         if(isCameraAnimating) {
             camera.position.lerp(targetCameraPos, 0.04); 
             camera.lookAt(0, 0, 0);
             if(camera.position.distanceTo(targetCameraPos) < 0.1) isCameraAnimating = false;
         }
-
         renderer.render(scene, camera);
     }
     animate();
@@ -320,16 +331,6 @@ function initThreeJS() {
     });
 
     isThreeInitialized = true;
-}
-
-function updateEvalBar() {
-    const evalFill = document.getElementById('eval-fill');
-    if (!evalFill) return;
-    const score = evaluateBoardState();
-    let percentage = 50 - (score / 40); 
-    percentage = Math.max(5, Math.min(95, percentage)); 
-    evalFill.style.height = percentage + '%';
-    evalFill.style.backgroundColor = percentage >= 50 ? '#f59e0b' : '#dc2626'; 
 }
 
 function createBoard() {
@@ -350,11 +351,10 @@ function createBoard() {
             
             let tileColor = isBlack ? 0x5c3a21 : 0xd2a679; 
             if (markedSquares.includes(squareId)) tileColor = isBlack ? 0x4a2e1a : 0xb58c60;
-            
             if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col) tileColor = 0xf59e0b; 
             if (selectedSquare && highlightedMoves.includes(squareId)) tileColor = initialSetup[squareId] ? 0xef4444 : 0x22c55e; 
 
-            const tileGeometry = new THREE.BoxGeometry(tileSize, 0.2, tileSize);
+            const tileGeometry = new THREE.BoxGeometry(tileSize, 0.2, tileSize, 4, 1, 4);
             const tileMaterial = new THREE.MeshStandardMaterial({ color: tileColor, roughness: 0.8, metalness: 0.1 });
             const tile = new THREE.Mesh(tileGeometry, tileMaterial);
             tile.receiveShadow = true;
@@ -376,7 +376,6 @@ function createBoard() {
     }
     
     updateGraveyardUI();
-    updateEvalBar(); 
 }
 
 window.handleSquareClick = async function(row, col) {
@@ -486,5 +485,5 @@ function triggerAiEngineLogic() {
         if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } 
     }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
-}
-    
+    }
+        
