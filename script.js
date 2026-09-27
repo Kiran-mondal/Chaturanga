@@ -170,78 +170,80 @@ function updateGraveyardUI() {
 }
 
 // ==========================================
-// 6. THREE.JS RENDERING (BETTER CAMERA & TABLE)
+// 6. THREE.JS RENDERING (CARVED WOOD SILHOUETTE)
 // ==========================================
 let scene, camera, renderer, boardGroup, piecesGroup;
 let isThreeInitialized = false;
 
-// নতুন উন্নত ক্যামেরা পজিশন (আরেকটু উপর থেকে টেবিলের ভিউ)
 let targetCameraPos = new THREE.Vector3(0, 11, 7.5);
 let isCameraAnimating = true;
 
-// Custom 3D Models
 function create3DPiece(name, isWhite) {
     const group = new THREE.Group();
-    const pieceColor = isWhite ? 0xe8c382 : 0x22201e; 
-    const mat = new THREE.MeshStandardMaterial({ color: pieceColor, roughness: isWhite ? 0.2 : 0.4, metalness: isWhite ? 0.6 : 0.2 });
+    // রেফারেন্স ছবির মতো ন্যাচারাল কাঠের রং
+    const pieceColor = isWhite ? 0xc49a6c : 0x4a2e15; 
+    const mat = new THREE.MeshStandardMaterial({ 
+        color: pieceColor, 
+        roughness: 0.85, // কাঠের মতো অমসৃণ ভাব
+        metalness: 0.05 
+    });
 
-    const baseGeo = new THREE.CylinderGeometry(0.35, 0.4, 0.15, 64);
+    // ছবির মতো ভারী এবং চওড়া বেস
+    const baseGeo = new THREE.CylinderGeometry(0.42, 0.45, 0.15, 32);
     const base = new THREE.Mesh(baseGeo, mat);
     base.position.y = 0.075; base.castShadow = true; base.receiveShadow = true;
     group.add(base);
     
-    const ringGeo = new THREE.TorusGeometry(0.3, 0.04, 32, 64);
-    const ring = new THREE.Mesh(ringGeo, mat);
-    ring.position.y = 0.15; ring.rotation.x = Math.PI / 2;
-    group.add(ring);
+    const stepGeo = new THREE.CylinderGeometry(0.35, 0.42, 0.1, 32);
+    const step = new THREE.Mesh(stepGeo, mat);
+    step.position.y = 0.2; step.castShadow = true;
+    group.add(step);
 
+    // ছবির শেপ অনুযায়ী বেসিক আকার
     if (name === 'Padati') { 
-        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.25, 0.35, 32), mat);
-        body.position.y = 0.35; body.castShadow = true;
-        let top = new THREE.Mesh(new THREE.SphereGeometry(0.18, 32, 32), mat);
-        top.position.y = 0.6; top.castShadow = true;
-        group.add(body, top);
+        // বসে থাকা সৈন্যের মতো নিচু এবং ছড়ানো শেপ
+        let body = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
+        body.position.y = 0.4; body.castShadow = true;
+        let head = new THREE.Mesh(new THREE.SphereGeometry(0.15, 16, 16), mat);
+        head.position.y = 0.6; head.castShadow = true;
+        group.add(body, head);
     } else if (name === 'Ratha') { 
-        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.3, 0.45, 32), mat);
-        body.position.y = 0.4; body.castShadow = true;
-        let top = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.15, 0.4), mat);
-        top.position.y = 0.65; top.castShadow = true;
-        group.add(body, top);
+        // রথের মতো চারকোনা ও চওড়া
+        let body = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.4, 0.45), mat);
+        body.position.y = 0.45; body.castShadow = true;
+        group.add(body);
     } else if (name === 'Ashva') { 
-        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.25, 0.35, 32), mat);
-        body.position.y = 0.35; body.castShadow = true;
-        let head = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 0.4, 32), mat);
-        head.position.set(0, 0.6, 0.1); head.rotation.x = Math.PI / 4; head.castShadow = true;
-        let snout = new THREE.Mesh(new THREE.SphereGeometry(0.15, 32, 32), mat);
-        snout.position.set(0, 0.7, 0.25); snout.castShadow = true;
-        group.add(body, head, snout);
+        // ঘোড়ার মুখের মতো সামনের দিকে ঝোঁকা শেপ
+        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.3, 0.4, 16), mat);
+        body.position.y = 0.45; body.castShadow = true;
+        let head = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 0.4, 16), mat);
+        head.position.set(0, 0.7, 0.15); head.rotation.x = Math.PI / 3; head.castShadow = true;
+        group.add(body, head);
     } else if (name === 'Gaja') { 
-        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.28, 0.45, 32), mat);
-        body.position.y = 0.4; body.castShadow = true;
-        let dome = new THREE.Mesh(new THREE.SphereGeometry(0.22, 32, 32), mat);
-        dome.position.y = 0.65; dome.scale.y = 0.7; dome.castShadow = true;
-        let point = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.2, 32), mat);
-        point.position.y = 0.8; point.castShadow = true;
-        group.add(body, dome, point);
+        // হাতির মতো বিশাল বডি এবং পিঠের ওপর বসার জায়গা
+        let body = new THREE.Mesh(new THREE.SphereGeometry(0.35, 32, 32), mat);
+        body.position.y = 0.5; body.scale.z = 1.2; body.castShadow = true;
+        let howdah = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.2, 0.25), mat);
+        howdah.position.y = 0.9; howdah.castShadow = true;
+        group.add(body, howdah);
     } else if (name === 'Mantri') { 
-        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.25, 0.65, 32), mat);
-        body.position.y = 0.5; body.castShadow = true;
-        let top = new THREE.Mesh(new THREE.SphereGeometry(0.16, 32, 32), mat);
-        top.position.y = 0.9; top.castShadow = true;
-        let crown = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.03, 16, 32), mat);
-        crown.position.y = 1.0; crown.rotation.x = Math.PI / 2;
-        group.add(body, top, crown);
-    } else if (name === 'Raja') { 
-        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.28, 0.8, 32), mat);
+        // মন্ত্রীর জন্য মাঝারি উচ্চতার মুকুট
+        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 0.6, 32), mat);
         body.position.y = 0.55; body.castShadow = true;
-        let top = new THREE.Mesh(new THREE.SphereGeometry(0.2, 32, 32), mat);
+        let crown = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.05, 16, 32), mat);
+        crown.position.y = 0.9; crown.rotation.x = Math.PI / 2;
+        group.add(body, crown);
+    } else if (name === 'Raja') { 
+        // রাজার জন্য সবচেয়ে উঁচু এবং ছড়ানো শেপ
+        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 0.7, 32), mat);
+        body.position.y = 0.6; body.castShadow = true;
+        let top = new THREE.Mesh(new THREE.SphereGeometry(0.25, 32, 32), mat);
         top.position.y = 1.0; top.castShadow = true;
-        let crossV = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.25, 0.06), mat);
-        crossV.position.y = 1.25; crossV.castShadow = true;
-        let crossH = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.06, 0.06), mat);
-        crossH.position.y = 1.25; crossH.castShadow = true;
-        group.add(body, top, crossV, crossH);
+        let point = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.3, 16), mat);
+        point.position.y = 1.3; point.castShadow = true;
+        group.add(body, top, point);
     }
+
     return group;
 }
 
@@ -282,7 +284,6 @@ function initThreeJS() {
     directionalLight.shadow.camera.top = 10; directionalLight.shadow.camera.bottom = -10;
     scene.add(directionalLight);
 
-    // টেবিলটিকে আরেকটু চওড়া ও সুন্দর করা হলো
     const tableGeo = new THREE.CylinderGeometry(8.5, 8.5, 0.6, 64);
     const tableMat = new THREE.MeshStandardMaterial({ color: 0x3d2314, roughness: 0.9, metalness: 0.1 });
     const table = new THREE.Mesh(tableGeo, tableMat);
@@ -485,5 +486,5 @@ function triggerAiEngineLogic() {
         if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } 
     }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
-    }
-        
+            }
+            
