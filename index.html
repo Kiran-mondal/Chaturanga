@@ -6,6 +6,7 @@
     <title>Chaturanga - Ancient Indian Strategy Board Game</title>
     <meta name="description" content="Chaturanga is a modern, serverless revival of the ancient Indian strategy board game.">
     <link rel="icon" href="logo.svg?v=2" type="image/svg+xml">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
     
@@ -24,68 +25,53 @@
         .card-buttons { display: flex; gap: 8px; }
         .card-buttons a { flex: 1; text-align: center; padding: 6px; text-decoration: none; font-size: 10px; font-weight: bold; text-transform: uppercase; border-radius: 4px;}
         .live-btn { background: var(--amber-600, #d97706); color: #0a0a0a; }
-        .live-btn:hover { background: var(--amber-500, #f59e0b); }
         .code-btn { background: transparent; color: var(--amber-500, #f59e0b); border: 1px solid rgba(217, 119, 6, 0.5); }
-        .code-btn:hover { background: rgba(217, 119, 6, 0.1); }
     </style>
 </head>
 <body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
 
-    <!-- MENU BAR -->
-    <nav class="w-full max-w-[400px] md:max-w-[600px] heritage-card rounded-lg p-3 mt-4 mb-2 z-50 relative transition-all mx-auto">
-        <div class="flex justify-between items-center relative z-20">
+    <!-- MENU BAR (সিম্পল করা হয়েছে) -->
+    <nav class="w-full max-w-[400px] md:max-w-[600px] heritage-card rounded-lg p-3 mt-4 mb-2 z-50 relative mx-auto">
+        <div class="flex justify-between items-center">
             <div class="text-amber-500 font-extrabold tracking-widest text-sm uppercase">चतुरङ्ग</div>
-            
-            <div class="hidden sm:flex gap-4">
-                <button onclick="window.showPage('home')" class="nav-btn-home text-[11px] text-amber-200 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-amber-500 pb-1 transition-all">Home</button>
-                <button onclick="window.showPage('game')" class="nav-btn-game text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Play</button>
-                <button onclick="window.showPage('rules')" class="nav-btn-rules text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Rules</button>
-                <button onclick="window.showPage('heritage')" class="nav-btn-heritage text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Heritage</button>
-                <button onclick="window.showPage('projects')" class="nav-btn-projects text-[11px] text-stone-400 font-bold uppercase tracking-wider hover:text-amber-500 border-b-2 border-transparent pb-1 transition-all">Projects</button>
-            </div>
-
-            <button id="mobile-menu-btn" onclick="window.toggleMobileMenu()" class="sm:hidden text-amber-500 hover:text-amber-300 focus:outline-none transition">
+            <button id="mobile-menu-btn" onclick="window.toggleMobileMenu()" class="text-amber-500">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
         </div>
-
-        <div id="mobile-menu" class="hidden flex-col items-center gap-5 pt-6 pb-6 w-full bg-[#160d07]/95 backdrop-blur-md absolute left-0 top-full rounded-b-xl border-x border-b border-amber-600/30 shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-10 transition-all">
-            <button onclick="window.showPage('home'); window.toggleMobileMenu()" class="nav-btn-home text-[14px] text-amber-200 font-extrabold uppercase tracking-[0.2em] transition-all">Home</button>
-            <button onclick="window.showPage('game'); window.toggleMobileMenu()" class="nav-btn-game text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">Play</button>
-            <button onclick="window.showPage('rules'); window.toggleMobileMenu()" class="nav-btn-rules text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">Rules</button>
-            <button onclick="window.showPage('heritage'); window.toggleMobileMenu()" class="nav-btn-heritage text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">Heritage</button>
-            <button onclick="window.showPage('projects'); window.toggleMobileMenu()" class="nav-btn-projects text-[14px] text-stone-400 font-extrabold uppercase tracking-[0.2em] transition-all">Projects</button>
+        <div id="mobile-menu" class="hidden flex-col items-center gap-5 pt-6 pb-6 w-full bg-[#160d07]/95 absolute left-0 top-full rounded-b-xl z-10 border-b border-amber-600/30">
+            <button onclick="window.showPage('home'); window.toggleMobileMenu()" class="nav-btn-home text-[14px] text-amber-200 uppercase tracking-[0.2em]">Home</button>
+            <button onclick="window.showPage('game'); window.toggleMobileMenu()" class="nav-btn-game text-[14px] text-stone-400 uppercase tracking-[0.2em]">Play</button>
+            <button onclick="window.showPage('projects'); window.toggleMobileMenu()" class="nav-btn-projects text-[14px] text-stone-400 uppercase tracking-[0.2em]">Projects</button>
         </div>
     </nav>
 
     <!-- ALL PAGES CONTAINER -->
     <div class="w-full max-w-[400px] relative mt-2 mx-auto">
         
-        <!-- 1. HOME PAGE -->
+        <!-- HOME PAGE -->
         <div id="home-container" class="flex flex-col gap-5 pt-6 mb-8 text-center animate-fade-in">
-            <div class="py-4 select-none flex flex-col items-center gap-1">
+            <div class="py-4 select-none">
                 <h1 class="text-4xl text-amber-500 tracking-widest font-bold">चतुरङ्ग</h1>
                 <h2 class="text-2xl text-amber-500 tracking-widest font-extrabold uppercase">(CHATURANGA)</h2>
-                <h3 class="text-[10px] text-amber-600/90 font-bold tracking-widest uppercase mt-2">ROYAL SANDALWOOD ASHTAPADA ENGINE</h3>
             </div>
-            <div class="heritage-card p-6 rounded-xl space-y-4 text-sm leading-relaxed text-stone-300">
-                <p>Welcome to the ancient Indian battlefield. Experience the common ancestor of modern chess on an 8x8 Ashtapada board.</p>
-                <button onclick="window.showPage('game')" class="w-full py-3 bg-amber-600 rounded-lg font-bold text-stone-950 hover:bg-amber-500 uppercase tracking-widest transition shadow-lg mt-2">Play Game Now</button>
+            <div class="heritage-card p-6 rounded-xl space-y-4 text-sm text-stone-300">
+                <p>Welcome to the ancient Indian battlefield. Experience the common ancestor of modern chess.</p>
+                <button onclick="window.showPage('game')" class="w-full py-3 bg-amber-600 rounded-lg font-bold text-stone-950 uppercase mt-2">Play Game Now</button>
             </div>
         </div>
 
-        <!-- 2. GAME PAGE -->
+        <!-- GAME PAGE (আউটলাইন রিমুভ করা হয়েছে) -->
         <div id="game-container" class="hidden flex-col gap-2 pt-1 mb-6 animate-fade-in">
             <div class="flex gap-2 heritage-card p-1 rounded-lg justify-between">
-                <button id="btn2P" onclick="window.switchMode('2-Player')" class="flex-1 py-1.5 text-[11px] font-bold bg-stone-900/60 rounded mode-button">👥 Pass & Play</button>
-                <button id="btnAI" onclick="window.switchMode('Vs-AI')" class="flex-1 py-1.5 text-[11px] font-bold bg-amber-600 text-stone-950 rounded mode-button">💻 VS Computer</button>
+                <button id="btn2P" onclick="window.switchMode('2-Player')" class="flex-1 py-1.5 text-[11px] font-bold bg-stone-900/60 rounded uppercase">👥 Pass & Play</button>
+                <button id="btnAI" onclick="window.switchMode('Vs-AI')" class="flex-1 py-1.5 text-[11px] font-bold bg-amber-600 text-stone-950 rounded uppercase">💻 VS Computer</button>
             </div>
             
             <div class="flex justify-center w-full relative mt-1">
-                <div id="eval-bar-container" class="absolute left-0 top-0 bottom-0 w-2.5 bg-stone-950/80 rounded-l-md overflow-hidden z-10 flex flex-col-reverse border-y border-l border-amber-600/30 shadow-lg" title="Win Percentage">
-                    <div id="eval-fill" class="w-full bg-amber-500 transition-all duration-700 ease-in-out" style="height: 50%;"></div>
+                <div id="eval-bar-container" class="absolute left-0 top-0 bottom-0 w-2.5 bg-stone-950/80 rounded-l-md overflow-hidden z-10 border-y border-l border-amber-600/30 flex flex-col-reverse shadow-lg">
+                    <div id="eval-fill" class="w-full bg-amber-500 transition-all duration-700" style="height: 50%;"></div>
                 </div>
-                <div id="three-game-container" class="w-full aspect-square max-h-[380px] relative rounded-r-md overflow-hidden border border-amber-600/30 ml-2.5 bg-transparent"></div>
+                <div id="three-game-container" class="w-full aspect-square max-h-[380px] relative ml-2.5 bg-transparent" style="min-height: 300px;"></div>
             </div>
 
             <div class="flex flex-col gap-2 mt-1">
@@ -111,170 +97,35 @@
             </div>
         </div>
 
-        <!-- 3. RULES PAGE -->
-        <div id="rules-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in text-stone-300">
-            <h2 class="text-xl font-bold text-amber-500 uppercase tracking-widest text-center border-b border-amber-600/30 pb-2 mb-2">Rules of War</h2>
-            <div class="heritage-card p-5 rounded-lg space-y-4 text-sm leading-relaxed">
-                <p><span class="text-lg">⚜️</span> <strong>Raja (King):</strong> Moves 1 square in any direction.</p>
-                <p><span class="text-lg">📜</span> <strong>Mantri (Minister):</strong> Moves 1 square diagonally.</p>
-                <p><span class="text-lg">🐘</span> <strong>Gaja (Elephant):</strong> Moves 2 squares diagonally.</p>
-                <p><span class="text-lg">🐎</span> <strong>Ashva (Horse):</strong> Moves in an L-shape.</p>
-                <p><span class="text-lg">🛕</span> <strong>Ratha (Chariot):</strong> Moves straight horizontally or vertically.</p>
-                <p><span class="text-lg">⚔️</span> <strong>Padati (Foot-soldier):</strong> Moves 1 square straight forward.</p>
-            </div>
-            <button onclick="window.showPage('game')" class="w-full py-3 bg-amber-600 rounded font-bold text-stone-950 hover:bg-amber-500 uppercase tracking-widest mt-2">Start Battle</button>
-        </div>
-
-        <!-- 4. HERITAGE PAGE -->
-        <div id="heritage-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in text-stone-300 text-center">
-            <h2 class="text-xl font-bold text-amber-500 uppercase tracking-widest border-b border-amber-600/30 pb-2 mb-2">The Heritage</h2>
-            <div class="heritage-card p-6 rounded-lg space-y-5 text-sm leading-relaxed">
-                <p><strong>Chaturanga</strong> is an ancient Indian strategy game developed during the Gupta Empire (6th century CE).</p>
-                <p>The term <i>Chaturanga</i> translates to the "four divisions of the military": Infantry, Cavalry, Elephantry, and Chariotry.</p>
-            </div>
-        </div>
-
-        <!-- 5. MY PROJECTS PAGE -->
+        <!-- PROJECTS PAGE -->
         <div id="projects-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in font-sans">
             <div class="flex flex-row items-center justify-start gap-5 p-4 rounded-xl border border-amber-600/20 bg-stone-900/60 shadow-lg">
-                <img src="https://github.com/Kiran-mondal.png" alt="Kiran Mondal" class="w-[75px] h-[75px] rounded-full border-[3px] border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.5)]">
+                <img src="https://github.com/Kiran-mondal.png" alt="Kiran Mondal" class="w-[75px] h-[75px] rounded-full border-[3px] border-amber-500">
                 <div class="text-left flex flex-col justify-center">
                     <h2 class="text-xl font-bold text-amber-500 uppercase tracking-widest m-0 leading-tight">Kiran Mondal</h2>
-                    <p class="text-[9px] text-amber-200 uppercase tracking-widest mt-1 mb-2 leading-relaxed">Full-Stack Developer<br>& Cyber Security</p>
-                    <a href="https://github.com/Kiran-mondal" target="_blank" class="inline-block px-3 py-1 text-[9px] font-bold bg-transparent border border-amber-600/50 text-amber-500 rounded uppercase hover:bg-amber-600 hover:text-stone-950 transition-all text-center w-max">GitHub Profile</a>
-                </div>
-            </div>
-            
-            <div class="text-center border-b border-amber-600/30 pb-2 mb-1 mt-2">
-                <h3 class="text-sm font-bold text-amber-500 uppercase tracking-wider">My Other Live Projects</h3>
-            </div>
-
-            <div class="repo-grid">
-                <!-- TriScout -->
-                <div class="repo-card">
-                    <div class="card-header">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="30" height="30">
-                            <g fill="none" stroke="#66ED1E" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="50,2 91.6,26 91.6,74 50,98 8.4,74 8.4,26" stroke-width="1.5" />
-                                <polygon points="50,10 84.6,30 84.6,70 50,90 15.4,70 15.4,30" stroke-width="3" />
-                                <g stroke-width="2.5"><line x1="15.4" y1="30" x2="84.6" y2="70" /><line x1="32.7" y1="20" x2="84.6" y2="50" /><line x1="15.4" y1="50" x2="67.3" y2="80" /><line x1="15.4" y1="50" x2="67.3" y2="20" /><line x1="32.7" y1="80" x2="84.6" y2="50" /></g>
-                            </g>
-                        </svg>
-                        <h3>TriScout</h3>
-                    </div>
-                    <p>An advanced defensive cybersecurity tool designed for passive vulnerability assessments and automated reporting.</p>
-                    <div class="card-buttons">
-                        <a href="https://triscout.quarry.dpdns.org/" target="_blank" class="live-btn">Live App</a>
-                        <a href="https://github.com/Kiran-mondal/tri-scout" target="_blank" class="code-btn">Source Code</a>
-                    </div>
-                </div>
-
-                <!-- Password Guard -->
-                <div class="repo-card">
-                    <div class="card-header">
-                        <svg width="30" height="30" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="512" height="512" rx="120" fill="#0D4FF0"/>
-                            <path d="M256 80L120 140V240C120 330 176 407 256 432C336 407 392 330 392 240V140L256 80Z" fill="white"/>
-                            <circle cx="256" cy="255" r="70" fill="#0D4FF0"/>
-                            <rect x="235" y="240" width="42" height="75" rx="8" fill="white"/>
-                        </svg>
-                        <h3>Password Guard</h3>
-                    </div>
-                    <p>Advanced AI-powered password protection & vault management tool with 3D Cyber UI.</p>
-                    <div class="card-buttons">
-                        <a href="https://passwordguard.quarry.dpdns.org" target="_blank" class="live-btn">Live App</a>
-                        <a href="https://github.com/Kiran-mondal/Password-Guard" target="_blank" class="code-btn">Source Code</a>
-                    </div>
-                </div>
-                
-                <!-- ZenDrift -->
-                <div class="repo-card">
-                    <div class="card-header">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="30" height="30">
-                            <path d="M 120 390 C 120 270, 392 350, 392 210 C 392 130, 310 90, 256 90" fill="none" stroke="#58a6ff" stroke-width="45" stroke-linecap="round" />
-                            <circle cx="256" cy="90" r="45" fill="#58a6ff" />
-                        </svg>
-                        <h3>ZenDrift</h3>
-                    </div>
-                    <p>Dynamic performance tracking system built for an engaging and smooth web experience.</p>
-                    <div class="card-buttons">
-                        <a href="https://zendrift.quarry.dpdns.org" target="_blank" class="live-btn">Live App</a>
-                        <a href="https://github.com/Kiran-mondal" target="_blank" class="code-btn">Source Code</a>
-                    </div>
-                </div>
-                
-                <!-- Omlang -->
-                <div class="repo-card">
-                    <div class="card-header">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="30" height="30">
-                            <path d="M 280 250 C 420 250, 420 380, 350 400 C 450 420, 450 580, 280 580" stroke="#00f2fe" stroke-width="45" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                            <circle cx="450" cy="120" r="30" fill="#00f2fe" />
-                        </svg>
-                        <h3>Omlang</h3>
-                    </div>
-                    <p>A modern language and communication-focused platform with an intuitive user interface.</p>
-                    <div class="card-buttons">
-                        <a href="https://omlang.quarry.dpdns.org" target="_blank" class="live-btn">Live App</a>
-                        <a href="https://github.com/Kiran-mondal" target="_blank" class="code-btn">Source Code</a>
-                    </div>
-                </div>
-                
-                <!-- Pachisi -->
-                <div class="repo-card">
-                    <div class="card-header">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="30" height="30">
-                            <defs><mask id="pasha-hole"><rect width="512" height="512" fill="white" /><circle cx="256" cy="256" r="32" fill="black" /></mask></defs>
-                            <g mask="url(#pasha-hole)" fill="#dc2626">
-                                <rect x="232" y="16" width="48" height="480" rx="12" />
-                                <rect x="232" y="16" width="48" height="480" rx="12" transform="rotate(45 256 256)" />
-                                <rect x="232" y="16" width="48" height="480" rx="12" transform="rotate(90 256 256)" />
-                                <rect x="232" y="16" width="48" height="480" rx="12" transform="rotate(135 256 256)" />
-                                <circle cx="256" cy="256" r="168" fill="none" stroke="#dc2626" stroke-width="48" />
-                                <circle cx="256" cy="256" r="56" fill="none" stroke="#dc2626" stroke-width="48" />
-                            </g>
-                        </svg>
-                        <h3>Pachisi</h3>
-                    </div>
-                    <p>Play the ancient Indian epic board game of strategy, heritage, and royal culture.</p>
-                    <div class="card-buttons">
-                        <a href="https://pachisi.quarry.dpdns.org" target="_blank" class="live-btn">Live App</a>
-                        <a href="https://github.com/Kiran-mondal" target="_blank" class="code-btn">Source Code</a>
-                    </div>
+                    <p class="text-[9px] text-amber-200 uppercase tracking-widest mt-1 mb-2 leading-relaxed">Full-Stack Developer</p>
+                    <a href="https://github.com/Kiran-mondal" target="_blank" class="inline-block px-3 py-1 text-[9px] font-bold bg-transparent border border-amber-600/50 text-amber-500 rounded uppercase">GitHub Profile</a>
                 </div>
             </div>
         </div>
     </div>
 
-     <!-- Game Over Modal -->
-    <div id="gameOverModal" class="hidden fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-stone-950/95 border border-amber-500/50 p-6 rounded-xl max-w-xs w-full text-center modal-content">
-            <div id="modalIcon" class="text-4xl mb-2 modal-icon">👑</div>
+    <!-- Modal -->
+    <div id="gameOverModal" class="hidden fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-4">
+        <div class="bg-stone-950/95 border border-amber-500/50 p-6 rounded-xl max-w-xs w-full text-center">
+            <div id="modalIcon" class="text-4xl mb-2">👑</div>
             <h2 id="modalTitle" class="text-xl font-black text-amber-500 uppercase">Battle Settled</h2>
             <p id="modalDesc" class="text-sm text-amber-200 my-3"></p>
-            <button onclick="window.triggerReset(); document.getElementById('gameOverModal').classList.add('hidden')" class="w-full py-2 bg-amber-600 rounded font-bold text-stone-950 hover:bg-amber-500">Restart Battle</button>
+            <button onclick="window.triggerReset(); document.getElementById('gameOverModal').classList.add('hidden')" class="w-full py-2 bg-amber-600 rounded font-bold text-stone-950">Restart Battle</button>
         </div>
     </div>
 
-    <!-- UI Logic -->
     <script>
         window.showPage = function(targetPage) {
-            const pages = ['home', 'game', 'rules', 'heritage', 'projects'];
+            const pages = ['home', 'game', 'projects'];
             pages.forEach(page => {
                 const container = document.getElementById(`${page}-container`);
-                const btns = document.querySelectorAll(`.nav-btn-${page}`);
-                if (page === targetPage) {
-                    if(container) { container.style.display = 'flex'; container.classList.remove('hidden'); }
-                    btns.forEach(btn => {
-                        btn.classList.add('text-amber-200', 'border-amber-500');
-                        btn.classList.remove('text-stone-400', 'border-transparent');
-                    });
-                } else {
-                    if(container) { container.style.display = 'none'; container.classList.add('hidden'); }
-                    btns.forEach(btn => {
-                        btn.classList.add('text-stone-400', 'border-transparent');
-                        btn.classList.remove('text-amber-200', 'border-amber-500');
-                    });
-                }
+                if(container) container.style.display = (page === targetPage) ? 'flex' : 'none';
             });
         };
         window.toggleMobileMenu = function() {
@@ -282,6 +133,6 @@
             if (menu) { menu.classList.toggle('hidden'); menu.classList.toggle('flex'); }
         };
     </script>
-    <script src="script.js?t=1717200000"></script>
+    <script src="script.js?v=9"></script>
 </body>
 </html>
