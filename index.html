@@ -30,7 +30,7 @@
 </head>
 <body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
 
-    <!-- MENU BAR (সিম্পল করা হয়েছে) -->
+    <!-- MENU BAR -->
     <nav class="w-full max-w-[400px] md:max-w-[600px] heritage-card rounded-lg p-3 mt-4 mb-2 z-50 relative mx-auto">
         <div class="flex justify-between items-center">
             <div class="text-amber-500 font-extrabold tracking-widest text-sm uppercase">चतुरङ्ग</div>
@@ -60,7 +60,7 @@
             </div>
         </div>
 
-        <!-- GAME PAGE (আউটলাইন রিমুভ করা হয়েছে) -->
+        <!-- GAME PAGE -->
         <div id="game-container" class="hidden flex-col gap-2 pt-1 mb-6 animate-fade-in">
             <div class="flex gap-2 heritage-card p-1 rounded-lg justify-between">
                 <button id="btn2P" onclick="window.switchMode('2-Player')" class="flex-1 py-1.5 text-[11px] font-bold bg-stone-900/60 rounded uppercase">👥 Pass & Play</button>
@@ -68,10 +68,8 @@
             </div>
             
             <div class="flex justify-center w-full relative mt-1">
-                <div id="eval-bar-container" class="absolute left-0 top-0 bottom-0 w-2.5 bg-stone-950/80 rounded-l-md overflow-hidden z-10 border-y border-l border-amber-600/30 flex flex-col-reverse shadow-lg">
-                    <div id="eval-fill" class="w-full bg-amber-500 transition-all duration-700" style="height: 50%;"></div>
-                </div>
-                <div id="three-game-container" class="w-full aspect-square max-h-[380px] relative ml-2.5 bg-transparent" style="min-height: 300px;"></div>
+                <!-- Evaluation Bar removed. Board perfectly centered -->
+                <div id="three-game-container" class="w-full aspect-square max-h-[380px] relative bg-transparent" style="min-height: 300px;"></div>
             </div>
 
             <div class="flex flex-col gap-2 mt-1">
@@ -133,6 +131,6 @@
             if (menu) { menu.classList.toggle('hidden'); menu.classList.toggle('flex'); }
         };
     </script>
-    <script src="script.js?v=9"></script>
+    <script src="script.js?v=11"></script>
 </body>
 </html>
