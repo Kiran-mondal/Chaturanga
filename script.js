@@ -178,7 +178,6 @@ let isThreeInitialized = false;
 let targetCameraPos = new THREE.Vector3(0, 11, 7.5);
 let isCameraAnimating = true;
 
-// কাস্টম জ্যামিতিক থ্রিডি গুটি তৈরি
 function create3DPiece(name, isWhite) {
     const group = new THREE.Group();
     const pieceColor = isWhite ? 0xc49a6c : 0x4a2e15; 
@@ -325,6 +324,7 @@ function initThreeJS() {
 
     isThreeInitialized = true;
 }
+
 function createBoard() {
     if(typeof THREE !== 'undefined') initThreeJS();
     if(!isThreeInitialized) return;
@@ -368,7 +368,11 @@ function createBoard() {
     }
     
     updateGraveyardUI();
-}
+            }
+    // ==========================================
+// 6.5 AI LEARNING MEMORY (LOCAL STORAGE)
+// ==========================================
+let aiMemory = JSON.parse(localStorage.getItem('chaturanga_ai_memory')) || { skillLevel: 1, userAggression: 0, totalMatches: 0 };
 
 window.handleSquareClick = async function(row, col) {
     if (isGameOver) return;
@@ -388,13 +392,30 @@ window.handleSquareClick = async function(row, col) {
         if (isCapture) playCaptureSound(targetPiece.name); else playMoveSound();
         logMoveToHistory(selectedSquare.piece.name, squareId, isCapture, selectedSquare.piece.isWhite);
 
+        // --- AI LEARNING FROM USER MOVE ---
+        if (isCapture && selectedSquare.piece.isWhite && currentMode === 'Vs-AI') {
+            aiMemory.userAggression++;
+            if (targetPiece.name === 'Mantri' || targetPiece.name === 'Ratha' || targetPiece.name === 'Gaja') {
+                aiMemory.skillLevel += 2; // প্লেয়ার ভালো চাল দিলে এআই-এর স্কিল লেভেল বাড়বে
+            } else {
+                aiMemory.skillLevel += 0.5;
+            }
+            localStorage.setItem('chaturanga_ai_memory', JSON.stringify(aiMemory));
+        }
+
         if (targetPiece) {
             if (targetPiece.isWhite) {
                 capturedWhite.push(targetPiece.name);
                 if (targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The opponent has captured your Raja!", "💀", false); return; }
             } else {
                 capturedBlack.push(targetPiece.name);
-                if (targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("VICTORY!", "You have conquered the opposing throne!", "👑", true); return; }
+                if (targetPiece.name === 'Raja') { 
+                    isGameOver = true; createBoard(); 
+                    aiMemory.totalMatches++;
+                    localStorage.setItem('chaturanga_ai_memory', JSON.stringify(aiMemory));
+                    showEndGameModal("VICTORY!", "You have conquered the opposing throne!", "👑", true); 
+                    return; 
+                }
             }
         }
 
@@ -410,73 +431,121 @@ window.handleSquareClick = async function(row, col) {
         }
 
         if (isGameOver) return;
-        if (currentMode === 'Vs-AI') { setTimeout(triggerAiEngineLogic, 300); } 
+        if (currentMode === 'Vs-AI') { 
+            setTimeout(triggerAiEngineLogic, 400); 
+        } 
     }
 }
 
 // ==========================================
-// 7. AI ENGINE LOGIC (WITH RANDOMIZED BEST MOVES)
+// 7. ADVANCED AI ENGINE LOGIC (ALPHA-BETA PRUNING & LEARNING)
 // ==========================================
 function evaluateBoardState() {
-    const scores = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 }; let totalVal = 0;
+    const scores = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 }; 
+    let totalVal = 0;
+    
+    // প্লেয়ার খুব এগ্রেসিভ হলে এআই ডিফেন্স মজবুত করবে
+    let defenseMultiplier = aiMemory.userAggression > 20 ? 1.2 : 1.0;
+
     for (const key in initialSetup) {
         const piece = initialSetup[key];
         const r = key.charCodeAt(0) - 48;
         let weight = scores[piece.name];
-        if (piece.name === 'Padati') weight += piece.isWhite ? (7 - r) : r;
-        if (piece.isWhite) totalVal -= weight; else totalVal += weight;
+        
+        if (piece.name === 'Padati') {
+            weight += piece.isWhite ? (7 - r) : r; 
+        }
+        
+        if (piece.isWhite) {
+            totalVal -= weight; 
+        } else {
+            totalVal += (weight * defenseMultiplier); 
+        }
     }
     return totalVal;
 }
 
-function minimax(depth, isAiMaximizing) {
+// Alpha-Beta Pruning Algorithm 
+function minimax(depth, isAiMaximizing, alpha, beta) {
     if (depth === 0 || isGameOver) return evaluateBoardState();
+    
     const aiMoves = [];
     for (const key in initialSetup) {
         if ((isAiMaximizing && !initialSetup[key].isWhite) || (!isAiMaximizing && initialSetup[key].isWhite)) {
             const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48, piece = initialSetup[key];
-            for (let toR = 0; toR < 8; toR++) { for (let toC = 0; toC < 8; toC++) { if (checkLegalMove(piece, fromR, fromC, toR, toC)) aiMoves.push({ from: key, to: `${toR}-${toC}`, piece: piece }); } }
+            for (let toR = 0; toR < 8; toR++) { 
+                for (let toC = 0; toC < 8; toC++) { 
+                    if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
+                        aiMoves.push({ from: key, to: `${toR}-${toC}`, piece: piece }); 
+                    }
+                } 
+            }
         }
     }
     if (aiMoves.length === 0) return evaluateBoardState();
 
-    let bestEval = isAiMaximizing ? -Infinity : Infinity;
-    for (const move of aiMoves) {
-        const backup = initialSetup[move.to]; initialSetup[move.to] = initialSetup[move.from]; delete initialSetup[move.from];
-        let evaluation = minimax(depth - 1, !isAiMaximizing);
-        bestEval = isAiMaximizing ? Math.max(bestEval, evaluation) : Math.min(bestEval, evaluation);
-        initialSetup[move.from] = initialSetup[move.to]; if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
+    if (isAiMaximizing) {
+        let maxEval = -Infinity;
+        for (const move of aiMoves) {
+            const backup = initialSetup[move.to]; initialSetup[move.to] = initialSetup[move.from]; delete initialSetup[move.from];
+            let evaluation = minimax(depth - 1, false, alpha, beta);
+            initialSetup[move.from] = initialSetup[move.to]; if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
+            
+            maxEval = Math.max(maxEval, evaluation);
+            alpha = Math.max(alpha, evaluation);
+            if (beta <= alpha) break; // Pruning
+        }
+        return maxEval;
+    } else {
+        let minEval = Infinity;
+        for (const move of aiMoves) {
+            const backup = initialSetup[move.to]; initialSetup[move.to] = initialSetup[move.from]; delete initialSetup[move.from];
+            let evaluation = minimax(depth - 1, true, alpha, beta);
+            initialSetup[move.from] = initialSetup[move.to]; if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
+            
+            minEval = Math.min(minEval, evaluation);
+            beta = Math.min(beta, evaluation);
+            if (beta <= alpha) break; // Pruning
+        }
+        return minEval;
     }
-    return bestEval;
 }
 
 function triggerAiEngineLogic() {
     if (isGameOver) return;
     const allLegalAiMoves = [];
+    
     for (const key in initialSetup) {
         if (!initialSetup[key].isWhite) {
             const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48, piece = initialSetup[key];
-            for (let toR = 0; toR < 8; toR++) { for (let toC = 0; toC < 8; toC++) { if (checkLegalMove(piece, fromR, fromC, toR, toC)) allLegalAiMoves.push({ fromKey: key, toKey: `${toR}-${toC}`, piece: piece, targetPiece: initialSetup[`${toR}-${toC}`] }); } }
+            for (let toR = 0; toR < 8; toR++) { 
+                for (let toC = 0; toC < 8; toC++) { 
+                    if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
+                        allLegalAiMoves.push({ fromKey: key, toKey: `${toR}-${toC}`, piece: piece, targetPiece: initialSetup[`${toR}-${toC}`] }); 
+                    }
+                } 
+            }
         }
     }
+    
     if (allLegalAiMoves.length === 0) { isGameOver = true; showEndGameModal("STALEMATE", "The battle ended in a draw.", "🏳️", false); return; }
+
+    // প্লেয়ারের স্কিল যত বেশি, এআই তত গভীরে (Depth) ভাববে
+    let thinkingDepth = aiMemory.skillLevel > 15 ? 3 : 2; 
 
     for (const move of allLegalAiMoves) {
         const backup = initialSetup[move.toKey]; initialSetup[move.toKey] = initialSetup[move.fromKey]; delete initialSetup[move.fromKey];
-        move.minimaxWeight = minimax(2, false); 
+        // Alpha-Beta Pruning ব্যবহার করে স্কোর বের করা
+        move.minimaxWeight = minimax(thinkingDepth, false, -Infinity, Infinity); 
         initialSetup[move.fromKey] = initialSetup[move.toKey]; if (backup) initialSetup[move.toKey] = backup; else delete initialSetup[move.toKey];
     }
     
-    // চালগুলোকে সেরা স্কোরের ভিত্তিতে সাজানো
+    // চালগুলোকে স্কোরের ভিত্তিতে সাজানো
     allLegalAiMoves.sort((a, b) => b.minimaxWeight - a.minimaxWeight);
-    
-    // সেরা স্কোরটি কত তা বের করা
     const bestScore = allLegalAiMoves[0].minimaxWeight;
     
-    // যেসব চালের স্কোর সেরা স্কোরের সমান, সেগুলোকে আলাদা করা
+    // সমান স্কোরের সেরা চালগুলো থেকে রেন্ডমলি একটি বেছে নেওয়া
     const topMoves = allLegalAiMoves.filter(move => move.minimaxWeight === bestScore);
-    
-    // সেরা চালগুলোর মধ্যে থেকে রেন্ডমলি একটি চাল বেছে নেওয়া
     const bestMove = topMoves[Math.floor(Math.random() * topMoves.length)];
     
     const isCapture = !!bestMove.targetPiece;
@@ -485,8 +554,17 @@ function triggerAiEngineLogic() {
 
     if (bestMove.targetPiece) { 
         capturedWhite.push(bestMove.targetPiece.name); 
-        if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } 
+        if (bestMove.targetPiece.name === 'Raja') { 
+            isGameOver = true; createBoard(); 
+            // প্লেয়ার হেরে গেলে এআই-এর স্কিল কিছুটা ব্যালেন্স করা
+            aiMemory.skillLevel = Math.max(1, aiMemory.skillLevel - 1);
+            localStorage.setItem('chaturanga_ai_memory', JSON.stringify(aiMemory));
+            showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); 
+            return; 
+        } 
     }
-    delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
+    
+    delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; 
+    createBoard();
     }
-            
+        
