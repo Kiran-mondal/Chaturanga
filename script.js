@@ -445,7 +445,8 @@ function evaluateBoardState() {
     return totalVal;
 }
 
-function minimax(depth, isAiMaximizing) {
+// Alpha-beta pruning implemented to significantly speed up AI move calculation
+function minimax(depth, isAiMaximizing, alpha = -Infinity, beta = Infinity) {
     if (depth === 0 || isGameOver) return evaluateBoardState();
     const aiMoves = [];
     for (const key in initialSetup) {
@@ -456,14 +457,29 @@ function minimax(depth, isAiMaximizing) {
     }
     if (aiMoves.length === 0) return evaluateBoardState();
 
-    let bestEval = isAiMaximizing ? -Infinity : Infinity;
-    for (const move of aiMoves) {
-        const backup = initialSetup[move.to]; initialSetup[move.to] = initialSetup[move.from]; delete initialSetup[move.from];
-        let evaluation = minimax(depth - 1, !isAiMaximizing);
-        bestEval = isAiMaximizing ? Math.max(bestEval, evaluation) : Math.min(bestEval, evaluation);
-        initialSetup[move.from] = initialSetup[move.to]; if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
+    if (isAiMaximizing) {
+        let maxEval = -Infinity;
+        for (const move of aiMoves) {
+            const backup = initialSetup[move.to]; initialSetup[move.to] = initialSetup[move.from]; delete initialSetup[move.from];
+            let evaluation = minimax(depth - 1, false, alpha, beta);
+            initialSetup[move.from] = initialSetup[move.to]; if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
+            maxEval = Math.max(maxEval, evaluation);
+            alpha = Math.max(alpha, evaluation);
+            if (beta <= alpha) break; // Alpha-beta pruning
+        }
+        return maxEval;
+    } else {
+        let minEval = Infinity;
+        for (const move of aiMoves) {
+            const backup = initialSetup[move.to]; initialSetup[move.to] = initialSetup[move.from]; delete initialSetup[move.from];
+            let evaluation = minimax(depth - 1, true, alpha, beta);
+            initialSetup[move.from] = initialSetup[move.to]; if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
+            minEval = Math.min(minEval, evaluation);
+            beta = Math.min(beta, evaluation);
+            if (beta <= alpha) break; // Alpha-beta pruning
+        }
+        return minEval;
     }
-    return bestEval;
 }
 
 function triggerAiEngineLogic() {
@@ -477,10 +493,12 @@ function triggerAiEngineLogic() {
     }
     if (allLegalAiMoves.length === 0) { isGameOver = true; showEndGameModal("STALEMATE", "The battle ended in a draw.", "🏳️", false); return; }
 
+    let alpha = -Infinity;
     for (const move of allLegalAiMoves) {
         const backup = initialSetup[move.toKey]; initialSetup[move.toKey] = initialSetup[move.fromKey]; delete initialSetup[move.fromKey];
-        move.minimaxWeight = minimax(2, false); 
+        move.minimaxWeight = minimax(2, false, alpha, Infinity);
         initialSetup[move.fromKey] = initialSetup[move.toKey]; if (backup) initialSetup[move.toKey] = backup; else delete initialSetup[move.toKey];
+        alpha = Math.max(alpha, move.minimaxWeight);
     }
     allLegalAiMoves.sort((a, b) => b.minimaxWeight - a.minimaxWeight);
     
