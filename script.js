@@ -169,8 +169,8 @@ function updateGraveyardUI() {
     if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
 }
 
-// ==========================================
-// 6. THREE.JS RENDERING (ULTIMATE MODEL LOADER)
+/ ==========================================
+// 6. THREE.JS RENDERING (CUSTOM GEOMETRIC PIECES)
 // ==========================================
 let scene, camera, renderer, boardGroup, piecesGroup;
 let isThreeInitialized = false;
@@ -178,47 +178,63 @@ let isThreeInitialized = false;
 let targetCameraPos = new THREE.Vector3(0, 11, 7.5);
 let isCameraAnimating = true;
 
-// 3D Model Variables
-let basePieceModel = null;
-let isLoadingModel = false;
-
+// আপনার পছন্দের কাস্টম জ্যামিতিক থ্রিডি গুটি তৈরি
 function create3DPiece(name, isWhite) {
     const group = new THREE.Group();
     const pieceColor = isWhite ? 0xc49a6c : 0x4a2e15; 
-    
     const mat = new THREE.MeshStandardMaterial({ 
         color: pieceColor, 
-        roughness: 0.85, 
+        roughness: 0.85,
         metalness: 0.05 
     });
 
-    if (basePieceModel) {
-        const clone = basePieceModel.clone();
-        
-        clone.traverse((child) => {
-            if (child.isMesh) {
-                child.material = mat;
-                child.castShadow = true;
-                child.receiveShadow = true;
-            }
-        });
+    // ভারী এবং চওড়া বেস
+    const baseGeo = new THREE.CylinderGeometry(0.42, 0.45, 0.15, 32);
+    const base = new THREE.Mesh(baseGeo, mat);
+    base.position.y = 0.075; base.castShadow = true; base.receiveShadow = true;
+    group.add(base);
+    
+    const stepGeo = new THREE.CylinderGeometry(0.35, 0.42, 0.1, 32);
+    const step = new THREE.Mesh(stepGeo, mat);
+    step.position.y = 0.2; step.castShadow = true;
+    group.add(step);
 
-        let scaleMult = 1.0;
-        if (name === 'Raja') scaleMult = 1.5;
-        else if (name === 'Mantri') scaleMult = 1.35;
-        else if (name === 'Gaja') scaleMult = 1.25;
-        else if (name === 'Ashva') scaleMult = 1.15;
-        else if (name === 'Ratha') scaleMult = 1.15;
-        else if (name === 'Padati') scaleMult = 0.9;
-
-        clone.scale.set(scaleMult, scaleMult, scaleMult);
-        clone.position.y = 0.1;
-        group.add(clone);
-    } else {
-        const fallbackGeo = new THREE.CylinderGeometry(0.35, 0.4, 0.15, 32);
-        const fallbackMesh = new THREE.Mesh(fallbackGeo, mat);
-        fallbackMesh.position.y = 0.075;
-        group.add(fallbackMesh);
+    if (name === 'Padati') { 
+        let body = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
+        body.position.y = 0.4; body.castShadow = true;
+        let head = new THREE.Mesh(new THREE.SphereGeometry(0.15, 16, 16), mat);
+        head.position.y = 0.6; head.castShadow = true;
+        group.add(body, head);
+    } else if (name === 'Ratha') { 
+        let body = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.4, 0.45), mat);
+        body.position.y = 0.45; body.castShadow = true;
+        group.add(body);
+    } else if (name === 'Ashva') { 
+        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.3, 0.4, 16), mat);
+        body.position.y = 0.45; body.castShadow = true;
+        let head = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 0.4, 16), mat);
+        head.position.set(0, 0.7, 0.15); head.rotation.x = Math.PI / 3; head.castShadow = true;
+        group.add(body, head);
+    } else if (name === 'Gaja') { 
+        let body = new THREE.Mesh(new THREE.SphereGeometry(0.35, 32, 32), mat);
+        body.position.y = 0.5; body.scale.z = 1.2; body.castShadow = true;
+        let howdah = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.2, 0.25), mat);
+        howdah.position.y = 0.9; howdah.castShadow = true;
+        group.add(body, howdah);
+    } else if (name === 'Mantri') { 
+        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 0.6, 32), mat);
+        body.position.y = 0.55; body.castShadow = true;
+        let crown = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.05, 16, 32), mat);
+        crown.position.y = 0.9; crown.rotation.x = Math.PI / 2;
+        group.add(body, crown);
+    } else if (name === 'Raja') { 
+        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 0.7, 32), mat);
+        body.position.y = 0.6; body.castShadow = true;
+        let top = new THREE.Mesh(new THREE.SphereGeometry(0.25, 32, 32), mat);
+        top.position.y = 1.0; top.castShadow = true;
+        let point = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.3, 16), mat);
+        point.position.y = 1.3; point.castShadow = true;
+        group.add(body, top, point);
     }
 
     return group;
@@ -230,36 +246,6 @@ function initThreeJS() {
 
     const container = document.getElementById('three-game-container');
     if(!container) return;
-
-    // --- মডেল লোডিং লজিক ---
-    if (typeof THREE.GLTFLoader !== 'undefined' && !isLoadingModel) {
-        isLoadingModel = true;
-        const loader = new THREE.GLTFLoader();
-        
-        // Error ফিক্স: এখানে Vercel-এর 404 Routing বাইপাস করার জন্য সরাসরি ./model.glb দেওয়া হয়েছে
-        loader.load('./model.glb', function(gltf) {
-            const model = gltf.scene;
-            
-            const box = new THREE.Box3().setFromObject(model);
-            const center = box.getCenter(new THREE.Vector3());
-            const size = box.getSize(new THREE.Vector3());
-            const maxDim = Math.max(size.x, size.y, size.z);
-            
-            const wrapper = new THREE.Group();
-            model.position.set(-center.x, -box.min.y, -center.z); 
-            wrapper.add(model);
-            
-            if(maxDim > 0) {
-                const targetScale = 0.55 / maxDim;
-                wrapper.scale.set(targetScale, targetScale, targetScale);
-            }
-            
-            basePieceModel = wrapper;
-            createBoard(); 
-        }, undefined, function(error) {
-            console.error("Model File Error:", error); 
-        });
-    }
 
     let w = container.clientWidth || window.innerWidth - 30;
     let h = container.clientHeight || w;
@@ -445,8 +431,7 @@ function evaluateBoardState() {
     return totalVal;
 }
 
-// Alpha-beta pruning implemented to significantly speed up AI move calculation
-function minimax(depth, isAiMaximizing, alpha = -Infinity, beta = Infinity) {
+function minimax(depth, isAiMaximizing) {
     if (depth === 0 || isGameOver) return evaluateBoardState();
     const aiMoves = [];
     for (const key in initialSetup) {
@@ -457,29 +442,14 @@ function minimax(depth, isAiMaximizing, alpha = -Infinity, beta = Infinity) {
     }
     if (aiMoves.length === 0) return evaluateBoardState();
 
-    if (isAiMaximizing) {
-        let maxEval = -Infinity;
-        for (const move of aiMoves) {
-            const backup = initialSetup[move.to]; initialSetup[move.to] = initialSetup[move.from]; delete initialSetup[move.from];
-            let evaluation = minimax(depth - 1, false, alpha, beta);
-            initialSetup[move.from] = initialSetup[move.to]; if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
-            maxEval = Math.max(maxEval, evaluation);
-            alpha = Math.max(alpha, evaluation);
-            if (beta <= alpha) break; // Alpha-beta pruning
-        }
-        return maxEval;
-    } else {
-        let minEval = Infinity;
-        for (const move of aiMoves) {
-            const backup = initialSetup[move.to]; initialSetup[move.to] = initialSetup[move.from]; delete initialSetup[move.from];
-            let evaluation = minimax(depth - 1, true, alpha, beta);
-            initialSetup[move.from] = initialSetup[move.to]; if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
-            minEval = Math.min(minEval, evaluation);
-            beta = Math.min(beta, evaluation);
-            if (beta <= alpha) break; // Alpha-beta pruning
-        }
-        return minEval;
+    let bestEval = isAiMaximizing ? -Infinity : Infinity;
+    for (const move of aiMoves) {
+        const backup = initialSetup[move.to]; initialSetup[move.to] = initialSetup[move.from]; delete initialSetup[move.from];
+        let evaluation = minimax(depth - 1, !isAiMaximizing);
+        bestEval = isAiMaximizing ? Math.max(bestEval, evaluation) : Math.min(bestEval, evaluation);
+        initialSetup[move.from] = initialSetup[move.to]; if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
     }
+    return bestEval;
 }
 
 function triggerAiEngineLogic() {
@@ -493,12 +463,10 @@ function triggerAiEngineLogic() {
     }
     if (allLegalAiMoves.length === 0) { isGameOver = true; showEndGameModal("STALEMATE", "The battle ended in a draw.", "🏳️", false); return; }
 
-    let alpha = -Infinity;
     for (const move of allLegalAiMoves) {
         const backup = initialSetup[move.toKey]; initialSetup[move.toKey] = initialSetup[move.fromKey]; delete initialSetup[move.fromKey];
-        move.minimaxWeight = minimax(2, false, alpha, Infinity);
+        move.minimaxWeight = minimax(2, false); 
         initialSetup[move.fromKey] = initialSetup[move.toKey]; if (backup) initialSetup[move.toKey] = backup; else delete initialSetup[move.toKey];
-        alpha = Math.max(alpha, move.minimaxWeight);
     }
     allLegalAiMoves.sort((a, b) => b.minimaxWeight - a.minimaxWeight);
     
@@ -511,4 +479,4 @@ function triggerAiEngineLogic() {
         if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } 
     }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
-        }
+}
