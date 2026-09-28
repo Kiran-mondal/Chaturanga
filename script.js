@@ -415,7 +415,7 @@ window.handleSquareClick = async function(row, col) {
 }
 
 // ==========================================
-// 7. AI ENGINE LOGIC
+// 7. AI ENGINE LOGIC (WITH RANDOMIZED BEST MOVES)
 // ==========================================
 function evaluateBoardState() {
     const scores = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 }; let totalVal = 0;
@@ -466,9 +466,20 @@ function triggerAiEngineLogic() {
         move.minimaxWeight = minimax(2, false); 
         initialSetup[move.fromKey] = initialSetup[move.toKey]; if (backup) initialSetup[move.toKey] = backup; else delete initialSetup[move.toKey];
     }
+    
+    // চালগুলোকে সেরা স্কোরের ভিত্তিতে সাজানো
     allLegalAiMoves.sort((a, b) => b.minimaxWeight - a.minimaxWeight);
     
-    const bestMove = allLegalAiMoves[0], isCapture = !!bestMove.targetPiece;
+    // সেরা স্কোরটি কত তা বের করা
+    const bestScore = allLegalAiMoves[0].minimaxWeight;
+    
+    // যেসব চালের স্কোর সেরা স্কোরের সমান, সেগুলোকে আলাদা করা
+    const topMoves = allLegalAiMoves.filter(move => move.minimaxWeight === bestScore);
+    
+    // সেরা চালগুলোর মধ্যে থেকে রেন্ডমলি একটি চাল বেছে নেওয়া
+    const bestMove = topMoves[Math.floor(Math.random() * topMoves.length)];
+    
+    const isCapture = !!bestMove.targetPiece;
     if (isCapture) playCaptureSound(bestMove.targetPiece.name); else playMoveSound();
     logMoveToHistory(bestMove.piece.name, bestMove.toKey, isCapture, false);
 
@@ -478,4 +489,4 @@ function triggerAiEngineLogic() {
     }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
     }
-                
+            
