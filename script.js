@@ -168,8 +168,9 @@ function updateGraveyardUI() {
     if (bYard) bYard.innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
     if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
 }
+
 // ==========================================
-// 6. THREE.JS RENDERING (MULTI-MESH GLB EXTRACTOR)
+// 6. THREE.JS RENDERING (ULTIMATE MODEL LOADER)
 // ==========================================
 let scene, camera, renderer, boardGroup, piecesGroup;
 let isThreeInitialized = false;
@@ -178,70 +179,42 @@ let targetCameraPos = new THREE.Vector3(0, 11, 7.5);
 let isCameraAnimating = true;
 
 // 3D Model Variables
-let extractedGeometries = [];
+let basePieceModel = null;
 let isLoadingModel = false;
-
-// ফাইলের ভেতর থেকে নির্দিষ্ট গুটি খুঁজে বের করার ফাংশন
-function getGeometryForPiece(name) {
-    if (extractedGeometries.length === 0) return null;
-
-    let keywords = [];
-    if (name === 'Raja') keywords = ['king', 'raja'];
-    else if (name === 'Mantri') keywords = ['queen', 'mantri', 'minister'];
-    else if (name === 'Gaja') keywords = ['bishop', 'gaja', 'elephant', 'camel'];
-    else if (name === 'Ashva') keywords = ['knight', 'ashva', 'horse'];
-    else if (name === 'Ratha') keywords = ['rook', 'ratha', 'chariot', 'castle'];
-    else if (name === 'Padati') keywords = ['pawn', 'padati', 'soldier'];
-
-    // ১. থ্রিডি সফটওয়্যারে দেওয়া নামের সাথে মিলিয়ে খোঁজা
-    for (let k of keywords) {
-        let found = extractedGeometries.find(g => g.name.includes(k));
-        if (found) return found.geo;
-    }
-    
-    // ২. যদি নাম না মেলে, তবে ফাইলের ভেতরের সিরিয়াল অনুযায়ী খোঁজা
-    if (extractedGeometries.length >= 6) {
-        if (name === 'Raja') return extractedGeometries[0].geo;
-        if (name === 'Mantri') return extractedGeometries[1].geo;
-        if (name === 'Gaja') return extractedGeometries[2].geo;
-        if (name === 'Ashva') return extractedGeometries[3].geo;
-        if (name === 'Ratha') return extractedGeometries[4].geo;
-        if (name === 'Padati') return extractedGeometries[5].geo;
-    }
-    
-    return extractedGeometries[0].geo; // কোনোটি না মিললে ডিফল্ট হিসেবে প্রথমটি
-}
 
 function create3DPiece(name, isWhite) {
     const group = new THREE.Group();
-    // ন্যাচারাল কাঠের রং (সাদা ও কালোর জন্য)
     const pieceColor = isWhite ? 0xc49a6c : 0x4a2e15; 
+    
     const mat = new THREE.MeshStandardMaterial({ 
-        color: pieceColor, roughness: 0.85, metalness: 0.05 
+        color: pieceColor, 
+        roughness: 0.85, 
+        metalness: 0.05 
     });
 
-    let geo = getGeometryForPiece(name);
+    if (basePieceModel) {
+        const clone = basePieceModel.clone();
+        
+        clone.traverse((child) => {
+            if (child.isMesh) {
+                child.material = mat;
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+        });
 
-    if (geo) {
-        // ফাইল থেকে বের করা অরিজিনাল থ্রিডি আকার ব্যবহার করা হচ্ছে
-        const mesh = new THREE.Mesh(geo, mat);
-        
-        // পদমর্যাদা অনুযায়ী গুটিগুলোকে একটু ছোট/বড় করা
         let scaleMult = 1.0;
-        if (name === 'Raja') scaleMult = 1.2;
-        else if (name === 'Padati') scaleMult = 0.8;
-        
-        mesh.scale.set(scaleMult, scaleMult, scaleMult);
-        
-        // গুটিটি যাতে ঠিক বোর্ডের সারফেসে বসে তাই উচ্চতা (Y axis) মাপা হচ্ছে
-        mesh.geometry.computeBoundingBox();
-        mesh.position.y = Math.abs(mesh.geometry.boundingBox.min.y) * scaleMult + 0.1;
-        
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        group.add(mesh);
+        if (name === 'Raja') scaleMult = 1.5;
+        else if (name === 'Mantri') scaleMult = 1.35;
+        else if (name === 'Gaja') scaleMult = 1.25;
+        else if (name === 'Ashva') scaleMult = 1.15;
+        else if (name === 'Ratha') scaleMult = 1.15;
+        else if (name === 'Padati') scaleMult = 0.9;
+
+        clone.scale.set(scaleMult, scaleMult, scaleMult);
+        clone.position.y = 0.1;
+        group.add(clone);
     } else {
-        // মডেল ডাউনলোড হওয়ার আগে ফলব্যাক কাঠের বেস
         const fallbackGeo = new THREE.CylinderGeometry(0.35, 0.4, 0.15, 32);
         const fallbackMesh = new THREE.Mesh(fallbackGeo, mat);
         fallbackMesh.position.y = 0.075;
@@ -258,37 +231,33 @@ function initThreeJS() {
     const container = document.getElementById('three-game-container');
     if(!container) return;
 
-    // --- মডেল আনপ্যাকিং এবং অটো-স্কেলিং ---
+    // --- মডেল লোডিং লজিক ---
     if (typeof THREE.GLTFLoader !== 'undefined' && !isLoadingModel) {
         isLoadingModel = true;
         const loader = new THREE.GLTFLoader();
         
+        // Error ফিক্স: এখানে Vercel-এর 404 Routing বাইপাস করার জন্য সরাসরি ./model.glb দেওয়া হয়েছে
         loader.load('./model.glb', function(gltf) {
-            {
-            // ফাইলের ভেতর থেকে আলাদা আলাদা গুটির ডিজাইন (Meshes) এক্সট্রাক্ট করা
-            gltf.scene.traverse((child) => {
-                if (child.isMesh) {
-                    let geo = child.geometry.clone();
-                    geo.center(); // জ্যামিতিকে একদম সেন্টারে আনা হচ্ছে
-                    
-                    // যেকোনো সাইজের মডেলকে বোর্ডের ঘরের মাপে (0.55) ফিট করা
-                    geo.computeBoundingBox();
-                    let maxDim = Math.max(
-                        geo.boundingBox.max.x - geo.boundingBox.min.x,
-                        geo.boundingBox.max.y - geo.boundingBox.min.y,
-                        geo.boundingBox.max.z - geo.boundingBox.min.z
-                    );
-                    let targetScale = 0.55 / maxDim;
-                    geo.scale(targetScale, targetScale, targetScale);
-                    
-                    extractedGeometries.push({ name: child.name.toLowerCase(), geo: geo });
-                }
-            });
+            const model = gltf.scene;
             
-            console.log("Successfully extracted pieces:", extractedGeometries.length);
-            createBoard();
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            
+            const wrapper = new THREE.Group();
+            model.position.set(-center.x, -box.min.y, -center.z); 
+            wrapper.add(model);
+            
+            if(maxDim > 0) {
+                const targetScale = 0.55 / maxDim;
+                wrapper.scale.set(targetScale, targetScale, targetScale);
+            }
+            
+            basePieceModel = wrapper;
+            createBoard(); 
         }, undefined, function(error) {
-            alert("3D Model Error: " + error.message);
+            console.error("Model File Error:", error); 
         });
     }
 
@@ -524,5 +493,4 @@ function triggerAiEngineLogic() {
         if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } 
     }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
-                                   }
-            
+        }
