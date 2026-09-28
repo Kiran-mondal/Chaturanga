@@ -104,7 +104,7 @@ window.switchMode = function(mode) {
     currentMode = mode;
     if (mode === "Vs-AI") { gameMetrics.currentStage = 1; gameMetrics.consecutiveUserLosses = 0; }
     isCameraAnimating = true;
-    if (camera) camera.position.set(0, 25, 0); // Drop down animation starts here
+    if (camera) camera.position.set(0, 25, 0); 
     window.triggerReset();
 }
 window.triggerReset = function() {
@@ -168,9 +168,8 @@ function updateGraveyardUI() {
     if (bYard) bYard.innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
     if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
 }
-
 // ==========================================
-// 6. THREE.JS RENDERING (CARVED WOOD SILHOUETTE)
+// 6. THREE.JS RENDERING (WITH CUSTOM GLB MODEL)
 // ==========================================
 let scene, camera, renderer, boardGroup, piecesGroup;
 let isThreeInitialized = false;
@@ -178,70 +177,49 @@ let isThreeInitialized = false;
 let targetCameraPos = new THREE.Vector3(0, 11, 7.5);
 let isCameraAnimating = true;
 
+// 3D Model Loading Variables
+let basePieceModel = null;
+let isLoadingModel = false;
+
 function create3DPiece(name, isWhite) {
     const group = new THREE.Group();
-    // রেফারেন্স ছবির মতো ন্যাচারাল কাঠের রং
+    // ন্যাচারাল কাঠের রং (সাদা এবং কালোর জন্য আলাদা)
     const pieceColor = isWhite ? 0xc49a6c : 0x4a2e15; 
     const mat = new THREE.MeshStandardMaterial({ 
         color: pieceColor, 
-        roughness: 0.85, // কাঠের মতো অমসৃণ ভাব
+        roughness: 0.85, 
         metalness: 0.05 
     });
 
-    // ছবির মতো ভারী এবং চওড়া বেস
-    const baseGeo = new THREE.CylinderGeometry(0.42, 0.45, 0.15, 32);
-    const base = new THREE.Mesh(baseGeo, mat);
-    base.position.y = 0.075; base.castShadow = true; base.receiveShadow = true;
-    group.add(base);
-    
-    const stepGeo = new THREE.CylinderGeometry(0.35, 0.42, 0.1, 32);
-    const step = new THREE.Mesh(stepGeo, mat);
-    step.position.y = 0.2; step.castShadow = true;
-    group.add(step);
+    if (basePieceModel) {
+        // আপনার আপলোড করা মডেলটি ক্লোন করা হচ্ছে
+        const clone = basePieceModel.clone();
 
-    // ছবির শেপ অনুযায়ী বেসিক আকার
-    if (name === 'Padati') { 
-        // বসে থাকা সৈন্যের মতো নিচু এবং ছড়ানো শেপ
-        let body = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), mat);
-        body.position.y = 0.4; body.castShadow = true;
-        let head = new THREE.Mesh(new THREE.SphereGeometry(0.15, 16, 16), mat);
-        head.position.y = 0.6; head.castShadow = true;
-        group.add(body, head);
-    } else if (name === 'Ratha') { 
-        // রথের মতো চারকোনা ও চওড়া
-        let body = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.4, 0.45), mat);
-        body.position.y = 0.45; body.castShadow = true;
-        group.add(body);
-    } else if (name === 'Ashva') { 
-        // ঘোড়ার মুখের মতো সামনের দিকে ঝোঁকা শেপ
-        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.3, 0.4, 16), mat);
-        body.position.y = 0.45; body.castShadow = true;
-        let head = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 0.4, 16), mat);
-        head.position.set(0, 0.7, 0.15); head.rotation.x = Math.PI / 3; head.castShadow = true;
-        group.add(body, head);
-    } else if (name === 'Gaja') { 
-        // হাতির মতো বিশাল বডি এবং পিঠের ওপর বসার জায়গা
-        let body = new THREE.Mesh(new THREE.SphereGeometry(0.35, 32, 32), mat);
-        body.position.y = 0.5; body.scale.z = 1.2; body.castShadow = true;
-        let howdah = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.2, 0.25), mat);
-        howdah.position.y = 0.9; howdah.castShadow = true;
-        group.add(body, howdah);
-    } else if (name === 'Mantri') { 
-        // মন্ত্রীর জন্য মাঝারি উচ্চতার মুকুট
-        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 0.6, 32), mat);
-        body.position.y = 0.55; body.castShadow = true;
-        let crown = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.05, 16, 32), mat);
-        crown.position.y = 0.9; crown.rotation.x = Math.PI / 2;
-        group.add(body, crown);
-    } else if (name === 'Raja') { 
-        // রাজার জন্য সবচেয়ে উঁচু এবং ছড়ানো শেপ
-        let body = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 0.7, 32), mat);
-        body.position.y = 0.6; body.castShadow = true;
-        let top = new THREE.Mesh(new THREE.SphereGeometry(0.25, 32, 32), mat);
-        top.position.y = 1.0; top.castShadow = true;
-        let point = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.3, 16), mat);
-        point.position.y = 1.3; point.castShadow = true;
-        group.add(body, top, point);
+        clone.traverse((child) => {
+            if (child.isMesh) {
+                child.material = mat;
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+        });
+
+        // গুটি অনুযায়ী মডেলের সাইজ পরিবর্তন করা হচ্ছে (যাতে সব একরকম না লাগে)
+        let baseScale = 0.5; // যদি মডেল অনেক বড় বা ছোট হয়, তবে এই মানটি পরিবর্তন করতে হবে
+        if (name === 'Raja') baseScale *= 1.5;
+        else if (name === 'Mantri') baseScale *= 1.35;
+        else if (name === 'Gaja') baseScale *= 1.25;
+        else if (name === 'Ashva') baseScale *= 1.15;
+        else if (name === 'Ratha') baseScale *= 1.15;
+
+        clone.scale.set(baseScale, baseScale, baseScale);
+        clone.position.y = 0.1; // বোর্ডের ওপর বসানোর জন্য
+        group.add(clone);
+    } else {
+        // মডেল লোড হওয়ার আগে সাময়িকভাবে একটি সাধারণ কাঠের বেস দেখাবে
+        const fallbackGeo = new THREE.CylinderGeometry(0.35, 0.4, 0.15, 32);
+        const fallbackMesh = new THREE.Mesh(fallbackGeo, mat);
+        fallbackMesh.position.y = 0.075;
+        group.add(fallbackMesh);
     }
 
     return group;
@@ -253,6 +231,19 @@ function initThreeJS() {
 
     const container = document.getElementById('three-game-container');
     if(!container) return;
+
+    // আপনার 3D মডেল (GLB) লোড করার ফাংশন
+    if (typeof THREE.GLTFLoader !== 'undefined' && !isLoadingModel) {
+        isLoadingModel = true;
+        const loader = new THREE.GLTFLoader();
+        // আপনার মডেলটির নাম 'model.glb' করা হয়েছে
+        loader.load('model.glb', function(gltf) {
+            basePieceModel = gltf.scene;
+            createBoard();
+        }, undefined, function(error) {
+            console.error('Error loading custom 3D model:', error);
+        });
+    }
 
     let w = container.clientWidth || window.innerWidth - 30;
     let h = container.clientHeight || w;
@@ -486,5 +477,4 @@ function triggerAiEngineLogic() {
         if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } 
     }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
-            }
-            
+        }
