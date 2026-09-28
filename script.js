@@ -167,7 +167,7 @@ function updateGraveyardUI() {
     const wYard = document.getElementById('white-graveyard');
     if (bYard) bYard.innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
     if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
-    }
+}
 
 // ==========================================
 // 6. THREE.JS RENDERING (CUSTOM GEOMETRIC PIECES)
@@ -325,7 +325,6 @@ function initThreeJS() {
 
     isThreeInitialized = true;
 }
-
 function createBoard() {
     if(typeof THREE !== 'undefined') initThreeJS();
     if(!isThreeInitialized) return;
@@ -478,5 +477,5 @@ function triggerAiEngineLogic() {
         if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } 
     }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
-                                                               }
-                                                                                                                                                     
+    }
+                
