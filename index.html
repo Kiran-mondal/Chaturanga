@@ -10,8 +10,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
     
-    <!-- Three.js Library -->
+    <!-- Three.js Library & GLTF Loader -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    
     <!-- Socket.IO Client -->
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -94,7 +96,7 @@
             </div>
         </div>
 
-        <!-- 5. MY PROJECTS PAGE (NEWLY UPDATED) -->
+        <!-- PROJECTS PAGE -->
         <div id="projects-container" class="hidden flex-col gap-4 pt-4 mb-8 animate-fade-in font-sans">
             <div class="flex flex-row items-center justify-start gap-5 p-4 rounded-xl border border-amber-600/20 bg-stone-900/60 shadow-lg">
                 <img src="https://github.com/Kiran-mondal.png" alt="Kiran Mondal" class="w-[75px] h-[75px] rounded-full border-[3px] border-amber-500">
@@ -110,7 +112,6 @@
             </div>
 
             <div class="repo-grid">
-                <!-- StormSentinel -->
                 <div class="repo-card">
                     <div class="card-header">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="30" height="30"><defs><mask id="storm-hole"><rect width="512" height="512" fill="white" /><circle cx="256" cy="256" r="32" fill="black" /></mask></defs><g mask="url(#storm-hole)" fill="#4cd7f6"><path d="M312.5 16L112 272h128l-40 224 216.5-304h-128L312.5 16z" /><circle cx="256" cy="256" r="168" fill="none" stroke="#4cd7f6" stroke-width="32" /><circle cx="256" cy="256" r="64" fill="none" stroke="#4cd7f6" stroke-width="24" opacity="0.5" /></g></svg>
@@ -122,7 +123,6 @@
                     </div>
                 </div>
 
-                <!-- Password Guard -->
                 <div class="repo-card">
                     <div class="card-header">
                         <svg width="30" height="30" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="512" height="512" rx="120" fill="#0D4FF0"/><path d="M256 80L120 140V240C120 330 176 407 256 432C336 407 392 330 392 240V140L256 80Z" fill="white"/><circle cx="256" cy="255" r="70" fill="#0D4FF0"/><rect x="235" y="240" width="42" height="75" rx="8" fill="white"/></svg>
@@ -134,7 +134,6 @@
                     </div>
                 </div>
 
-                <!-- TriScout -->
                 <div class="repo-card">
                     <div class="card-header">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="30" height="30"><g fill="none" stroke="#66ED1E" stroke-linecap="round" stroke-linejoin="round"><polygon points="50,2 91.6,26 91.6,74 50,98 8.4,74 8.4,26" stroke-width="1.5" /><polygon points="50,10 84.6,30 84.6,70 50,90 15.4,70 15.4,30" stroke-width="3" /><g stroke-width="2.5"><line x1="15.4" y1="30" x2="84.6" y2="70" /><line x1="32.7" y1="20" x2="84.6" y2="50" /><line x1="15.4" y1="50" x2="67.3" y2="80" /><line x1="15.4" y1="50" x2="67.3" y2="20" /><line x1="32.7" y1="80" x2="84.6" y2="50" /></g></g></svg>
@@ -146,7 +145,6 @@
                     </div>
                 </div>
 
-                <!-- VisionLang Toolkit -->
                 <div class="repo-card">
                     <div class="card-header">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="30" height="30"><rect width="512" height="512" rx="112" fill="#FFFFFF"/><circle cx="256" cy="256" r="192" fill="#1E293B"/><circle cx="256" cy="256" r="162" fill="none" stroke="#004ac6" stroke-width="14"/><circle cx="256" cy="256" r="118" fill="#FFFFFF"/><path d="M 212 208 L 264 256 L 212 304" fill="none" stroke="#004ac6" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/><line x1="276" y1="304" x2="308" y2="304" stroke="#1E293B" stroke-width="22" stroke-linecap="round"/></svg>
@@ -158,7 +156,6 @@
                     </div>
                 </div>
 
-                <!-- OmLang -->
                 <div class="repo-card">
                     <div class="card-header">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="30" height="30"><path d="M 280 250 C 420 250, 420 380, 350 400 C 450 420, 450 580, 280 580" stroke="#00f2fe" stroke-width="45" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="450" cy="120" r="30" fill="#00f2fe" /></svg>
@@ -170,7 +167,6 @@
                     </div>
                 </div>
 
-                <!-- Pachisi -->
                 <div class="repo-card">
                     <div class="card-header">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="30" height="30"><defs><mask id="pasha-hole"><rect width="512" height="512" fill="white" /><circle cx="256" cy="256" r="32" fill="black" /></mask></defs><g mask="url(#pasha-hole)" fill="#dc2626"><rect x="232" y="16" width="48" height="480" rx="12" /><rect x="232" y="16" width="48" height="480" rx="12" transform="rotate(45 256 256)" /><rect x="232" y="16" width="48" height="480" rx="12" transform="rotate(90 256 256)" /><rect x="232" y="16" width="48" height="480" rx="12" transform="rotate(135 256 256)" /><circle cx="256" cy="256" r="168" fill="none" stroke="#dc2626" stroke-width="48" /><circle cx="256" cy="256" r="56" fill="none" stroke="#dc2626" stroke-width="48" /></g></svg>
@@ -182,7 +178,6 @@
                     </div>
                 </div>
 
-                <!-- ZenDrift -->
                 <div class="repo-card">
                     <div class="card-header">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="30" height="30"><path d="M 120 390 C 120 270, 392 350, 392 210 C 392 130, 310 90, 256 90" fill="none" stroke="#58a6ff" stroke-width="45" stroke-linecap="round" /><circle cx="256" cy="90" r="45" fill="#58a6ff" /></svg>
@@ -220,7 +215,7 @@
             if (menu) { menu.classList.toggle('hidden'); menu.classList.toggle('flex'); }
         };
     </script>
-    <script src="script.js?v=12"></script>
+    <script src="script.js?v=13"></script>
 </body>
     </html>
                             
