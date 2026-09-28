@@ -263,7 +263,8 @@ function initThreeJS() {
         isLoadingModel = true;
         const loader = new THREE.GLTFLoader();
         
-        loader.load('model.glb?v=' + Date.now(), function(gltf) {
+        loader.load('./model.glb', function(gltf) {
+            {
             // ফাইলের ভেতর থেকে আলাদা আলাদা গুটির ডিজাইন (Meshes) এক্সট্রাক্ট করা
             gltf.scene.traverse((child) => {
                 if (child.isMesh) {
