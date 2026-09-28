@@ -167,9 +167,9 @@ function updateGraveyardUI() {
     const wYard = document.getElementById('white-graveyard');
     if (bYard) bYard.innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
     if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
-}
+    }
 
-/ ==========================================
+// ==========================================
 // 6. THREE.JS RENDERING (CUSTOM GEOMETRIC PIECES)
 // ==========================================
 let scene, camera, renderer, boardGroup, piecesGroup;
@@ -178,7 +178,7 @@ let isThreeInitialized = false;
 let targetCameraPos = new THREE.Vector3(0, 11, 7.5);
 let isCameraAnimating = true;
 
-// আপনার পছন্দের কাস্টম জ্যামিতিক থ্রিডি গুটি তৈরি
+// কাস্টম জ্যামিতিক থ্রিডি গুটি তৈরি
 function create3DPiece(name, isWhite) {
     const group = new THREE.Group();
     const pieceColor = isWhite ? 0xc49a6c : 0x4a2e15; 
@@ -188,7 +188,6 @@ function create3DPiece(name, isWhite) {
         metalness: 0.05 
     });
 
-    // ভারী এবং চওড়া বেস
     const baseGeo = new THREE.CylinderGeometry(0.42, 0.45, 0.15, 32);
     const base = new THREE.Mesh(baseGeo, mat);
     base.position.y = 0.075; base.castShadow = true; base.receiveShadow = true;
@@ -479,4 +478,5 @@ function triggerAiEngineLogic() {
         if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } 
     }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
-}
+                                                               }
+                                                                                                                                                     
