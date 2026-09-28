@@ -169,7 +169,7 @@ function updateGraveyardUI() {
     if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
 }
 // ==========================================
-// 6. THREE.JS RENDERING (WITH CUSTOM GLB MODEL)
+// 6. THREE.JS RENDERING (AUTO-SCALING GLB MODEL)
 // ==========================================
 let scene, camera, renderer, boardGroup, piecesGroup;
 let isThreeInitialized = false;
@@ -177,13 +177,12 @@ let isThreeInitialized = false;
 let targetCameraPos = new THREE.Vector3(0, 11, 7.5);
 let isCameraAnimating = true;
 
-// 3D Model Loading Variables
+// 3D Model Variables
 let basePieceModel = null;
 let isLoadingModel = false;
 
 function create3DPiece(name, isWhite) {
     const group = new THREE.Group();
-    // ন্যাচারাল কাঠের রং (সাদা এবং কালোর জন্য আলাদা)
     const pieceColor = isWhite ? 0xc49a6c : 0x4a2e15; 
     const mat = new THREE.MeshStandardMaterial({ 
         color: pieceColor, 
@@ -192,7 +191,7 @@ function create3DPiece(name, isWhite) {
     });
 
     if (basePieceModel) {
-        // আপনার আপলোড করা মডেলটি ক্লোন করা হচ্ছে
+        // মডেল লোড হয়ে থাকলে সেটিকে ক্লোন করা হচ্ছে
         const clone = basePieceModel.clone();
 
         clone.traverse((child) => {
@@ -203,19 +202,23 @@ function create3DPiece(name, isWhite) {
             }
         });
 
-        // গুটি অনুযায়ী মডেলের সাইজ পরিবর্তন করা হচ্ছে (যাতে সব একরকম না লাগে)
-        let baseScale = 0.5; // যদি মডেল অনেক বড় বা ছোট হয়, তবে এই মানটি পরিবর্তন করতে হবে
-        if (name === 'Raja') baseScale *= 1.5;
-        else if (name === 'Mantri') baseScale *= 1.35;
-        else if (name === 'Gaja') baseScale *= 1.25;
-        else if (name === 'Ashva') baseScale *= 1.15;
-        else if (name === 'Ratha') baseScale *= 1.15;
+        // গুটির পদমর্যাদা অনুযায়ী স্কেল মডিফায়ার
+        let scaleMultiplier = 1.0; 
+        if (name === 'Raja') scaleMultiplier = 1.5;
+        else if (name === 'Mantri') scaleMultiplier = 1.35;
+        else if (name === 'Gaja') scaleMultiplier = 1.25;
+        else if (name === 'Ashva') scaleMultiplier = 1.15;
+        else if (name === 'Ratha') scaleMultiplier = 1.15;
 
-        clone.scale.set(baseScale, baseScale, baseScale);
-        clone.position.y = 0.1; // বোর্ডের ওপর বসানোর জন্য
-        group.add(clone);
+        // একটি র‍্যাপার গ্রুপের সাহায্যে স্কেলিং করা হচ্ছে যাতে মূল অরিজিন ঠিক থাকে
+        const wrapper = new THREE.Group();
+        wrapper.add(clone);
+        wrapper.scale.set(scaleMultiplier, scaleMultiplier, scaleMultiplier);
+        wrapper.position.y = 0.1; // বোর্ডের সারফেসে বসানোর জন্য
+        
+        group.add(wrapper);
     } else {
-        // মডেল লোড হওয়ার আগে সাময়িকভাবে একটি সাধারণ কাঠের বেস দেখাবে
+        // মডেল ডাউনলোড হওয়ার আগে ফলব্যাক হিসেবে কাঠের বেস দেখাবে
         const fallbackGeo = new THREE.CylinderGeometry(0.35, 0.4, 0.15, 32);
         const fallbackMesh = new THREE.Mesh(fallbackGeo, mat);
         fallbackMesh.position.y = 0.075;
@@ -232,13 +235,37 @@ function initThreeJS() {
     const container = document.getElementById('three-game-container');
     if(!container) return;
 
-    // আপনার 3D মডেল (GLB) লোড করার ফাংশন
+    // --- মডেল লোডিং এবং অটো-স্কেলিং লজিক ---
     if (typeof THREE.GLTFLoader !== 'undefined' && !isLoadingModel) {
         isLoadingModel = true;
         const loader = new THREE.GLTFLoader();
-        // আপনার মডেলটির নাম 'model.glb' করা হয়েছে
-        loader.load('model.glb', function(gltf) {
-            basePieceModel = gltf.scene;
+        
+        // মডেলের নামের শেষে Date.now() দেওয়া হয়েছে যাতে ব্রাউজার ক্যাশ না ধরে রাখে
+        loader.load('model.glb?v=' + Date.now(), function(gltf) {
+            const loadedModel = gltf.scene;
+            
+            // মডেলের অরিজিনাল সাইজ মাপা হচ্ছে
+            const box = new THREE.Box3().setFromObject(loadedModel);
+            const size = new THREE.Vector3();
+            box.getSize(size);
+            
+            const maxDim = Math.max(size.x, size.y, size.z);
+            if(maxDim > 0) {
+                // মডেলটিকে বোর্ডের 0.55 ইউনিটের মধ্যে ফিট করার জন্য টার্গেট স্কেল বের করা
+                const targetScale = 0.55 / maxDim; 
+                loadedModel.scale.set(targetScale, targetScale, targetScale);
+                
+                // মডেলের সেন্টার পয়েন্ট বের করে সেটিকে একদম মাঝখানে আনা হচ্ছে
+                const center = new THREE.Vector3();
+                box.getCenter(center);
+                loadedModel.position.set(-center.x * targetScale, -box.min.y * targetScale, -center.z * targetScale);
+            }
+            
+            // নরমালাইজড মডেলটিকে একটি বেস গ্রুপে ঢোকানো হচ্ছে
+            basePieceModel = new THREE.Group();
+            basePieceModel.add(loadedModel);
+            
+            // মডেল সফলভাবে প্রসেস হওয়ার পর বোর্ড নতুন করে তৈরি করবে
             createBoard();
         }, undefined, function(error) {
             console.error('Error loading custom 3D model:', error);
@@ -477,4 +504,5 @@ function triggerAiEngineLogic() {
         if (bestMove.targetPiece.name === 'Raja') { isGameOver = true; createBoard(); showEndGameModal("DEFEAT", "The computer has captured your Raja!", "💀", false); return; } 
     }
     delete initialSetup[bestMove.fromKey]; initialSetup[bestMove.toKey] = { name: bestMove.piece.name, isWhite: false }; createBoard();
-        }
+                                    }
+                                      
