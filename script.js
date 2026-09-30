@@ -124,6 +124,15 @@ window.triggerReset = function() {
     
     createBoard();
 }
+function escapeHtml(unsafe) {
+    return String(unsafe)
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
+
 function logMoveToHistory(pieceName, toSquare, isCapture, isWhite) {
     const historyFeed = document.getElementById('move-history-feed');
     if (!historyFeed) return;
@@ -132,12 +141,12 @@ function logMoveToHistory(pieceName, toSquare, isCapture, isWhite) {
     const actionText = isCapture ? `<span class="text-red-400 font-bold">captured on</span>` : `moved to`;
     const entry = document.createElement('div');
     entry.className = 'border-b border-stone-800/50 pb-1 opacity-0 animate-fade-in';
-    entry.innerHTML = `> ${colorLabel}'s ${pieceName} ${actionText} [${toSquare}]`;
+    entry.innerHTML = `> ${colorLabel}'s ${escapeHtml(pieceName)} ${actionText} [${escapeHtml(toSquare)}]`;
     historyFeed.appendChild(entry); historyFeed.scrollTop = historyFeed.scrollHeight; 
 }
 function showEndGameModal(title, description, icon, userWon) {
     document.getElementById('modalTitle').innerText = title;
-    document.getElementById('modalDesc').innerHTML = `<span class="block mb-3">${description}</span>`;
+    document.getElementById('modalDesc').innerHTML = `<span class="block mb-3">${escapeHtml(description)}</span>`;
     document.getElementById('modalIcon').innerText = icon;
     document.getElementById('gameOverModal').classList.remove('hidden');
 }
