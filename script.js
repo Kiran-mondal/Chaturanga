@@ -469,44 +469,56 @@ function evaluateBoardState() {
 function minimax(depth, isAiMaximizing, alpha, beta) {
     if (depth === 0 || isGameOver) return evaluateBoardState();
     
-    const aiMoves = [];
-    for (const key in initialSetup) {
-        if ((isAiMaximizing && !initialSetup[key].isWhite) || (!isAiMaximizing && initialSetup[key].isWhite)) {
-            const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48, piece = initialSetup[key];
-            for (let toR = 0; toR < 8; toR++) { 
-                for (let toC = 0; toC < 8; toC++) { 
-                    if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
-                        aiMoves.push({ from: key, to: `${toR}-${toC}`, piece: piece }); 
-                    }
-                } 
-            }
-        }
-    }
-    if (aiMoves.length === 0) return evaluateBoardState();
+    // ⚡ BOLT OPTIMIZATION: Integrated move generation with pruning to avoid allocating/generating nodes that get pruned.
+    let foundMove = false;
 
     if (isAiMaximizing) {
         let maxEval = -Infinity;
-        for (const move of aiMoves) {
-            const backup = initialSetup[move.to]; initialSetup[move.to] = initialSetup[move.from]; delete initialSetup[move.from];
-            let evaluation = minimax(depth - 1, false, alpha, beta);
-            initialSetup[move.from] = initialSetup[move.to]; if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
-            
-            maxEval = Math.max(maxEval, evaluation);
-            alpha = Math.max(alpha, evaluation);
-            if (beta <= alpha) break; // Pruning
+        for (const key in initialSetup) {
+            if (!initialSetup[key].isWhite) {
+                const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48, piece = initialSetup[key];
+                for (let toR = 0; toR < 8; toR++) {
+                    for (let toC = 0; toC < 8; toC++) {
+                        if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
+                            foundMove = true;
+                            const toKey = `${toR}-${toC}`;
+                            const backup = initialSetup[toKey]; initialSetup[toKey] = initialSetup[key]; delete initialSetup[key];
+                            let evaluation = minimax(depth - 1, false, alpha, beta);
+                            initialSetup[key] = initialSetup[toKey]; if (backup) initialSetup[toKey] = backup; else delete initialSetup[toKey];
+
+                            maxEval = Math.max(maxEval, evaluation);
+                            alpha = Math.max(alpha, evaluation);
+                            if (beta <= alpha) return maxEval; // Pruning triggers early exit from move generation loop
+                        }
+                    }
+                }
+            }
         }
+        if (!foundMove) return evaluateBoardState();
         return maxEval;
     } else {
         let minEval = Infinity;
-        for (const move of aiMoves) {
-            const backup = initialSetup[move.to]; initialSetup[move.to] = initialSetup[move.from]; delete initialSetup[move.from];
-            let evaluation = minimax(depth - 1, true, alpha, beta);
-            initialSetup[move.from] = initialSetup[move.to]; if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
-            
-            minEval = Math.min(minEval, evaluation);
-            beta = Math.min(beta, evaluation);
-            if (beta <= alpha) break; // Pruning
+        for (const key in initialSetup) {
+            if (initialSetup[key].isWhite) {
+                const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48, piece = initialSetup[key];
+                for (let toR = 0; toR < 8; toR++) {
+                    for (let toC = 0; toC < 8; toC++) {
+                        if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
+                            foundMove = true;
+                            const toKey = `${toR}-${toC}`;
+                            const backup = initialSetup[toKey]; initialSetup[toKey] = initialSetup[key]; delete initialSetup[key];
+                            let evaluation = minimax(depth - 1, true, alpha, beta);
+                            initialSetup[key] = initialSetup[toKey]; if (backup) initialSetup[toKey] = backup; else delete initialSetup[toKey];
+
+                            minEval = Math.min(minEval, evaluation);
+                            beta = Math.min(beta, evaluation);
+                            if (beta <= alpha) return minEval; // Pruning triggers early exit from move generation loop
+                        }
+                    }
+                }
+            }
         }
+        if (!foundMove) return evaluateBoardState();
         return minEval;
     }
 }
