@@ -7,3 +7,6 @@
 ## 2024-05-19 - Minimax Node Generation & Alpha Beta Pruning
 **Learning:** Alpha-Beta pruning is most effective when it can prune nodes *before* they are generated and validated in memory. In the original Minimax implementation for this game, all possible moves for a board state were strictly generated, validated, and pushed to an array *before* evaluation occurred, rendering the pruning unable to optimize the move generation logic.
 **Action:** Always intertwine node/move generation with the recursive Minimax evaluation algorithm, instead of isolating it. This guarantees that move generation immediately halts whenever a node is successfully pruned.
+## 2026-10-01 - Minimax String Allocation Overhead
+**Learning:** During the recursive Minimax evaluations in this game, interpolating coordinate strings dynamically (e.g. \`\${toR}-\${toC}\`) inside the tight loop caused massive unnecessary object creations and overhead. Additionally, evaluating object dictionaries statically defined locally inside leaf-node evaluation loops repeated object allocation unnecessarily.
+**Action:** Always extract static dictionaries out of evaluation paths to module scope, and pre-calculate fixed lookup mapping arrays (like caching the 64 coordinate strings into a 2D map \`SQUARE_KEYS\`) to avoid costly dynamic string generation in AI hot paths.
