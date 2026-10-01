@@ -8,6 +8,10 @@ let gameMetrics = { currentStage: 1, userAggressionCount: 0, userMistakes: [], m
 const pieceSigns = { "Raja": "👑", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" };
 const markedSquares = ["0-0", "0-3", "0-4", "0-7", "3-0", "3-3", "3-4", "3-7", "4-0", "4-3", "4-4", "4-7", "7-0", "7-3", "7-4", "7-7"];
 
+// ⚡ BOLT OPTIMIZATION: Cache board coordinate strings and piece scores to avoid expensive object creation/string allocation during Minimax
+const SQUARE_KEYS = Array.from({length: 8}, (_, r) => Array.from({length: 8}, (_, c) => `${r}-${c}`));
+const PIECE_SCORES = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 };
+
 // ==========================================
 // 2. SOCKET.IO CONNECTION
 // ==========================================
@@ -80,10 +84,10 @@ function playCaptureSound(capturedPieceName) {
     triggerVibration([100, 50, 100]); 
     let audioSrc = "sword.mp3"; 
     switch(capturedPieceName) {
-        case "Ashva": audioSrc = "scottishperson-sound-effect-horse-whinny-03-372258.mp3"; break;
-        case "Gaja": audioSrc = "universfield-sad-trumpet-278822.mp3"; break;
-        case "Ratha": audioSrc = "freesound_community-slosh-a-101500.mp3"; break;
-        case "Padati": audioSrc = "data_pion-st3-footstep-sfx-323056.mp3"; break;
+        case "Ashva": audioSrc = "assets/audio/scottishperson-sound-effect-horse-whinny-03-372258.mp3"; break;
+        case "Gaja": audioSrc = "assets/audio/universfield-sad-trumpet-278822.mp3"; break;
+        case "Ratha": audioSrc = "assets/audio/freesound_community-slosh-a-101500.mp3"; break;
+        case "Padati": audioSrc = "assets/audio(data_pion-st3-footstep-sfx-323056.mp3"; break;
     }
     new Audio(audioSrc).play().catch(e => console.log("Audio Error:", e));
 }
@@ -124,31 +128,48 @@ window.triggerReset = function() {
     
     createBoard();
 }
-// Security enhancement: escape user-provided strings to prevent DOM XSS
-function escapeHTML(str) {
-    if (!str) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
-
+// 🛡️ Sentinel: Fixed DOM-based XSS via innerHTML. Using textContent for safe dynamic updates.
 function logMoveToHistory(pieceName, toSquare, isCapture, isWhite) {
     const historyFeed = document.getElementById('move-history-feed');
     if (!historyFeed) return;
-    if (historyFeed.innerText.includes('awaits')) historyFeed.innerHTML = ''; 
-    const colorLabel = isWhite ? '<span class="text-amber-500 font-bold">Player</span>' : '<span class="text-red-500 font-bold">Computer</span>';
-    const actionText = isCapture ? `<span class="text-red-400 font-bold">captured on</span>` : `moved to`;
+    if (historyFeed.innerText.includes('awaits')) historyFeed.textContent = '';
+
     const entry = document.createElement('div');
     entry.className = 'border-b border-stone-800/50 pb-1 opacity-0 animate-fade-in';
-    entry.innerHTML = `> ${colorLabel}'s ${escapeHTML(pieceName)} ${actionText} [${escapeHTML(toSquare)}]`;
-    historyFeed.appendChild(entry); historyFeed.scrollTop = historyFeed.scrollHeight; 
+
+    const textPrefix = document.createTextNode('> ');
+    entry.appendChild(textPrefix);
+
+    const colorLabel = document.createElement('span');
+    colorLabel.className = isWhite ? 'text-amber-500 font-bold' : 'text-red-500 font-bold';
+    colorLabel.textContent = isWhite ? 'Player' : 'Computer';
+    entry.appendChild(colorLabel);
+
+    const pieceText = document.createTextNode(`'s ${pieceName} `);
+    entry.appendChild(pieceText);
+
+    const actionSpan = document.createElement('span');
+    actionSpan.className = isCapture ? 'text-red-400 font-bold' : '';
+    actionSpan.textContent = isCapture ? 'captured on' : 'moved to';
+    entry.appendChild(actionSpan);
+
+    const targetText = document.createTextNode(` [${toSquare}]`);
+    entry.appendChild(targetText);
+
+    historyFeed.appendChild(entry);
+    historyFeed.scrollTop = historyFeed.scrollHeight;
 }
+
 function showEndGameModal(title, description, icon, userWon) {
     document.getElementById('modalTitle').innerText = title;
-    document.getElementById('modalDesc').innerHTML = `<span class="block mb-3">${description}</span>`;
+
+    const modalDesc = document.getElementById('modalDesc');
+    modalDesc.textContent = ''; // Clear previous content safely
+    const descSpan = document.createElement('span');
+    descSpan.className = 'block mb-3';
+    descSpan.textContent = description;
+    modalDesc.appendChild(descSpan);
+
     document.getElementById('modalIcon').innerText = icon;
     document.getElementById('gameOverModal').classList.remove('hidden');
 }
@@ -170,14 +191,31 @@ function checkLegalMove(piece, fromR, fromC, toR, toC) {
 }
 function calculatePossibleMoves(row, col, piece) {
     const validDestinations = [];
-    for (let r = 0; r < 8; r++) { for (let c = 0; c < 8; c++) { if (checkLegalMove(piece, row, col, r, c)) validDestinations.push(`${r}-${c}`); } }
+    for (let r = 0; r < 8; r++) { for (let c = 0; c < 8; c++) { if (checkLegalMove(piece, row, col, r, c)) validDestinations.push(SQUARE_KEYS[r][c]); } }
     return validDestinations;
 }
 function updateGraveyardUI() {
     const bYard = document.getElementById('black-graveyard');
     const wYard = document.getElementById('white-graveyard');
-    if (bYard) bYard.innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
-    if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
+
+    if (bYard) {
+        bYard.textContent = '';
+        capturedBlack.forEach(p => {
+            const span = document.createElement('span');
+            span.className = 'inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs';
+            span.textContent = pieceSigns[p];
+            bYard.appendChild(span);
+        });
+    }
+    if (wYard) {
+        wYard.textContent = '';
+        capturedWhite.forEach(p => {
+            const span = document.createElement('span');
+            span.className = 'inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs';
+            span.textContent = pieceSigns[p];
+            wYard.appendChild(span);
+        });
+    }
 }
 
 // ==========================================
@@ -451,8 +489,10 @@ window.handleSquareClick = async function(row, col) {
 // ==========================================
 // 7. ADVANCED AI ENGINE LOGIC (ALPHA-BETA PRUNING & LEARNING)
 // ==========================================
+// ⚡ Bolt: Cache piece scores outside the hot evaluation loop to avoid object allocation and GC pressure.
+const PIECE_SCORES = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 };
+
 function evaluateBoardState() {
-    const scores = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 }; 
     let totalVal = 0;
     
     // প্লেয়ার খুব এগ্রেসিভ হলে এআই ডিফেন্স মজবুত করবে
@@ -461,7 +501,7 @@ function evaluateBoardState() {
     for (const key in initialSetup) {
         const piece = initialSetup[key];
         const r = key.charCodeAt(0) - 48;
-        let weight = scores[piece.name];
+        let weight = PIECE_SCORES[piece.name];
         
         if (piece.name === 'Padati') {
             weight += piece.isWhite ? (7 - r) : r; 
@@ -480,44 +520,56 @@ function evaluateBoardState() {
 function minimax(depth, isAiMaximizing, alpha, beta) {
     if (depth === 0 || isGameOver) return evaluateBoardState();
     
-    const aiMoves = [];
-    for (const key in initialSetup) {
-        if ((isAiMaximizing && !initialSetup[key].isWhite) || (!isAiMaximizing && initialSetup[key].isWhite)) {
-            const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48, piece = initialSetup[key];
-            for (let toR = 0; toR < 8; toR++) { 
-                for (let toC = 0; toC < 8; toC++) { 
-                    if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
-                        aiMoves.push({ from: key, to: `${toR}-${toC}`, piece: piece }); 
-                    }
-                } 
-            }
-        }
-    }
-    if (aiMoves.length === 0) return evaluateBoardState();
+    // ⚡ BOLT OPTIMIZATION: Integrated move generation with pruning to avoid allocating/generating nodes that get pruned.
+    let foundMove = false;
 
     if (isAiMaximizing) {
         let maxEval = -Infinity;
-        for (const move of aiMoves) {
-            const backup = initialSetup[move.to]; initialSetup[move.to] = initialSetup[move.from]; delete initialSetup[move.from];
-            let evaluation = minimax(depth - 1, false, alpha, beta);
-            initialSetup[move.from] = initialSetup[move.to]; if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
-            
-            maxEval = Math.max(maxEval, evaluation);
-            alpha = Math.max(alpha, evaluation);
-            if (beta <= alpha) break; // Pruning
+        for (const key in initialSetup) {
+            if (!initialSetup[key].isWhite) {
+                const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48, piece = initialSetup[key];
+                for (let toR = 0; toR < 8; toR++) {
+                    for (let toC = 0; toC < 8; toC++) {
+                        if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
+                            foundMove = true;
+                            const toKey = SQUARE_KEYS[toR][toC];
+                            const backup = initialSetup[toKey]; initialSetup[toKey] = initialSetup[key]; delete initialSetup[key];
+                            let evaluation = minimax(depth - 1, false, alpha, beta);
+                            initialSetup[key] = initialSetup[toKey]; if (backup) initialSetup[toKey] = backup; else delete initialSetup[toKey];
+
+                            maxEval = Math.max(maxEval, evaluation);
+                            alpha = Math.max(alpha, evaluation);
+                            if (beta <= alpha) return maxEval; // Pruning triggers early exit from move generation loop
+                        }
+                    }
+                }
+            }
         }
+        if (!foundMove) return evaluateBoardState();
         return maxEval;
     } else {
         let minEval = Infinity;
-        for (const move of aiMoves) {
-            const backup = initialSetup[move.to]; initialSetup[move.to] = initialSetup[move.from]; delete initialSetup[move.from];
-            let evaluation = minimax(depth - 1, true, alpha, beta);
-            initialSetup[move.from] = initialSetup[move.to]; if (backup) initialSetup[move.to] = backup; else delete initialSetup[move.to];
-            
-            minEval = Math.min(minEval, evaluation);
-            beta = Math.min(beta, evaluation);
-            if (beta <= alpha) break; // Pruning
+        for (const key in initialSetup) {
+            if (initialSetup[key].isWhite) {
+                const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48, piece = initialSetup[key];
+                for (let toR = 0; toR < 8; toR++) {
+                    for (let toC = 0; toC < 8; toC++) {
+                        if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
+                            foundMove = true;
+                            const toKey = SQUARE_KEYS[toR][toC];
+                            const backup = initialSetup[toKey]; initialSetup[toKey] = initialSetup[key]; delete initialSetup[key];
+                            let evaluation = minimax(depth - 1, true, alpha, beta);
+                            initialSetup[key] = initialSetup[toKey]; if (backup) initialSetup[toKey] = backup; else delete initialSetup[toKey];
+
+                            minEval = Math.min(minEval, evaluation);
+                            beta = Math.min(beta, evaluation);
+                            if (beta <= alpha) return minEval; // Pruning triggers early exit from move generation loop
+                        }
+                    }
+                }
+            }
         }
+        if (!foundMove) return evaluateBoardState();
         return minEval;
     }
 }
@@ -532,7 +584,7 @@ function triggerAiEngineLogic() {
             for (let toR = 0; toR < 8; toR++) { 
                 for (let toC = 0; toC < 8; toC++) { 
                     if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
-                        allLegalAiMoves.push({ fromKey: key, toKey: `${toR}-${toC}`, piece: piece, targetPiece: initialSetup[`${toR}-${toC}`] }); 
+                        allLegalAiMoves.push({ fromKey: key, toKey: SQUARE_KEYS[toR][toC], piece: piece, targetPiece: initialSetup[SQUARE_KEYS[toR][toC]] });
                     }
                 } 
             }
