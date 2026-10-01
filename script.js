@@ -8,6 +8,10 @@ let gameMetrics = { currentStage: 1, userAggressionCount: 0, userMistakes: [], m
 const pieceSigns = { "Raja": "👑", "Mantri": "📜", "Gaja": "🐘", "Ashva": "🐎", "Ratha": "🛕", "Padati": "⚔️" };
 const markedSquares = ["0-0", "0-3", "0-4", "0-7", "3-0", "3-3", "3-4", "3-7", "4-0", "4-3", "4-4", "4-7", "7-0", "7-3", "7-4", "7-7"];
 
+// ⚡ BOLT OPTIMIZATION: Cache board coordinate strings and piece scores to avoid expensive object creation/string allocation during Minimax
+const SQUARE_KEYS = Array.from({length: 8}, (_, r) => Array.from({length: 8}, (_, c) => `${r}-${c}`));
+const PIECE_SCORES = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 };
+
 // ==========================================
 // 2. SOCKET.IO CONNECTION
 // ==========================================
@@ -168,7 +172,7 @@ function checkLegalMove(piece, fromR, fromC, toR, toC) {
 }
 function calculatePossibleMoves(row, col, piece) {
     const validDestinations = [];
-    for (let r = 0; r < 8; r++) { for (let c = 0; c < 8; c++) { if (checkLegalMove(piece, row, col, r, c)) validDestinations.push(`${r}-${c}`); } }
+    for (let r = 0; r < 8; r++) { for (let c = 0; c < 8; c++) { if (checkLegalMove(piece, row, col, r, c)) validDestinations.push(SQUARE_KEYS[r][c]); } }
     return validDestinations;
 }
 function updateGraveyardUI() {
@@ -450,7 +454,6 @@ window.handleSquareClick = async function(row, col) {
 // 7. ADVANCED AI ENGINE LOGIC (ALPHA-BETA PRUNING & LEARNING)
 // ==========================================
 function evaluateBoardState() {
-    const scores = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 }; 
     let totalVal = 0;
     
     // প্লেয়ার খুব এগ্রেসিভ হলে এআই ডিফেন্স মজবুত করবে
@@ -459,7 +462,7 @@ function evaluateBoardState() {
     for (const key in initialSetup) {
         const piece = initialSetup[key];
         const r = key.charCodeAt(0) - 48;
-        let weight = scores[piece.name];
+        let weight = PIECE_SCORES[piece.name];
         
         if (piece.name === 'Padati') {
             weight += piece.isWhite ? (7 - r) : r; 
@@ -490,7 +493,7 @@ function minimax(depth, isAiMaximizing, alpha, beta) {
                     for (let toC = 0; toC < 8; toC++) {
                         if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
                             foundMove = true;
-                            const toKey = `${toR}-${toC}`;
+                            const toKey = SQUARE_KEYS[toR][toC];
                             const backup = initialSetup[toKey]; initialSetup[toKey] = initialSetup[key]; delete initialSetup[key];
                             let evaluation = minimax(depth - 1, false, alpha, beta);
                             initialSetup[key] = initialSetup[toKey]; if (backup) initialSetup[toKey] = backup; else delete initialSetup[toKey];
@@ -514,7 +517,7 @@ function minimax(depth, isAiMaximizing, alpha, beta) {
                     for (let toC = 0; toC < 8; toC++) {
                         if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
                             foundMove = true;
-                            const toKey = `${toR}-${toC}`;
+                            const toKey = SQUARE_KEYS[toR][toC];
                             const backup = initialSetup[toKey]; initialSetup[toKey] = initialSetup[key]; delete initialSetup[key];
                             let evaluation = minimax(depth - 1, true, alpha, beta);
                             initialSetup[key] = initialSetup[toKey]; if (backup) initialSetup[toKey] = backup; else delete initialSetup[toKey];
@@ -542,7 +545,7 @@ function triggerAiEngineLogic() {
             for (let toR = 0; toR < 8; toR++) { 
                 for (let toC = 0; toC < 8; toC++) { 
                     if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
-                        allLegalAiMoves.push({ fromKey: key, toKey: `${toR}-${toC}`, piece: piece, targetPiece: initialSetup[`${toR}-${toC}`] }); 
+                        allLegalAiMoves.push({ fromKey: key, toKey: SQUARE_KEYS[toR][toC], piece: piece, targetPiece: initialSetup[SQUARE_KEYS[toR][toC]] });
                     }
                 } 
             }
