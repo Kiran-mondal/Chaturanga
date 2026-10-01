@@ -31,6 +31,14 @@
 </head>
 <body class="text-amber-100 min-h-screen flex flex-col items-center p-3 font-serif">
 
+    <!-- ANIMATED MULTI-VIDEO BACKGROUND -->
+    <div id="video-container" class="fixed inset-0 w-full h-full -z-10 bg-black transition-opacity duration-500 ease-in-out opacity-100">
+        <video id="bg-video" autoplay loop muted playsinline class="w-full h-full object-cover opacity-65">
+            <source src="assets/videos/home-bg.mp4" type="video/mp4">
+        </video>
+        <div class="absolute inset-0 bg-gradient-to-b from-[#1a0f0a]/80 to-black/95"></div>
+    </div>
+
     <!-- MENU BAR -->
     <nav class="w-full max-w-[400px] md:max-w-[600px] heritage-card rounded-lg p-3 mt-4 mb-2 z-50 relative mx-auto">
         <div class="flex justify-between items-center">
