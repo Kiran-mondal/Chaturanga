@@ -124,6 +124,17 @@ window.triggerReset = function() {
     
     createBoard();
 }
+// Security enhancement: escape user-provided strings to prevent DOM XSS
+function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 function logMoveToHistory(pieceName, toSquare, isCapture, isWhite) {
     const historyFeed = document.getElementById('move-history-feed');
     if (!historyFeed) return;
@@ -132,7 +143,7 @@ function logMoveToHistory(pieceName, toSquare, isCapture, isWhite) {
     const actionText = isCapture ? `<span class="text-red-400 font-bold">captured on</span>` : `moved to`;
     const entry = document.createElement('div');
     entry.className = 'border-b border-stone-800/50 pb-1 opacity-0 animate-fade-in';
-    entry.innerHTML = `> ${colorLabel}'s ${pieceName} ${actionText} [${toSquare}]`;
+    entry.innerHTML = `> ${colorLabel}'s ${escapeHTML(pieceName)} ${actionText} [${escapeHTML(toSquare)}]`;
     historyFeed.appendChild(entry); historyFeed.scrollTop = historyFeed.scrollHeight; 
 }
 function showEndGameModal(title, description, icon, userWon) {
