@@ -124,29 +124,48 @@ window.triggerReset = function() {
     
     createBoard();
 }
-function escapeHtml(unsafe) {
-    return String(unsafe)
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
-}
-
+// 🛡️ Sentinel: Fixed DOM-based XSS via innerHTML. Using textContent for safe dynamic updates.
 function logMoveToHistory(pieceName, toSquare, isCapture, isWhite) {
     const historyFeed = document.getElementById('move-history-feed');
     if (!historyFeed) return;
-    if (historyFeed.innerText.includes('awaits')) historyFeed.innerHTML = ''; 
-    const colorLabel = isWhite ? '<span class="text-amber-500 font-bold">Player</span>' : '<span class="text-red-500 font-bold">Computer</span>';
-    const actionText = isCapture ? `<span class="text-red-400 font-bold">captured on</span>` : `moved to`;
+    if (historyFeed.innerText.includes('awaits')) historyFeed.textContent = '';
+
     const entry = document.createElement('div');
     entry.className = 'border-b border-stone-800/50 pb-1 opacity-0 animate-fade-in';
-    entry.innerHTML = `> ${colorLabel}'s ${escapeHtml(pieceName)} ${actionText} [${escapeHtml(toSquare)}]`;
-    historyFeed.appendChild(entry); historyFeed.scrollTop = historyFeed.scrollHeight; 
+
+    const textPrefix = document.createTextNode('> ');
+    entry.appendChild(textPrefix);
+
+    const colorLabel = document.createElement('span');
+    colorLabel.className = isWhite ? 'text-amber-500 font-bold' : 'text-red-500 font-bold';
+    colorLabel.textContent = isWhite ? 'Player' : 'Computer';
+    entry.appendChild(colorLabel);
+
+    const pieceText = document.createTextNode(`'s ${pieceName} `);
+    entry.appendChild(pieceText);
+
+    const actionSpan = document.createElement('span');
+    actionSpan.className = isCapture ? 'text-red-400 font-bold' : '';
+    actionSpan.textContent = isCapture ? 'captured on' : 'moved to';
+    entry.appendChild(actionSpan);
+
+    const targetText = document.createTextNode(` [${toSquare}]`);
+    entry.appendChild(targetText);
+
+    historyFeed.appendChild(entry);
+    historyFeed.scrollTop = historyFeed.scrollHeight;
 }
+
 function showEndGameModal(title, description, icon, userWon) {
     document.getElementById('modalTitle').innerText = title;
-    document.getElementById('modalDesc').innerHTML = `<span class="block mb-3">${escapeHtml(description)}</span>`;
+
+    const modalDesc = document.getElementById('modalDesc');
+    modalDesc.textContent = ''; // Clear previous content safely
+    const descSpan = document.createElement('span');
+    descSpan.className = 'block mb-3';
+    descSpan.textContent = description;
+    modalDesc.appendChild(descSpan);
+
     document.getElementById('modalIcon').innerText = icon;
     document.getElementById('gameOverModal').classList.remove('hidden');
 }
@@ -174,8 +193,25 @@ function calculatePossibleMoves(row, col, piece) {
 function updateGraveyardUI() {
     const bYard = document.getElementById('black-graveyard');
     const wYard = document.getElementById('white-graveyard');
-    if (bYard) bYard.innerHTML = capturedBlack.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
-    if (wYard) wYard.innerHTML = capturedWhite.map(p => `<span class="inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs">${pieceSigns[p]}</span>`).join('');
+
+    if (bYard) {
+        bYard.textContent = '';
+        capturedBlack.forEach(p => {
+            const span = document.createElement('span');
+            span.className = 'inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs';
+            span.textContent = pieceSigns[p];
+            bYard.appendChild(span);
+        });
+    }
+    if (wYard) {
+        wYard.textContent = '';
+        capturedWhite.forEach(p => {
+            const span = document.createElement('span');
+            span.className = 'inline-block p-1 bg-stone-950/70 rounded border border-amber-500/10 text-xs';
+            span.textContent = pieceSigns[p];
+            wYard.appendChild(span);
+        });
+    }
 }
 
 // ==========================================
