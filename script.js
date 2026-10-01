@@ -440,8 +440,10 @@ window.handleSquareClick = async function(row, col) {
 // ==========================================
 // 7. ADVANCED AI ENGINE LOGIC (ALPHA-BETA PRUNING & LEARNING)
 // ==========================================
+// ⚡ Bolt: Cache piece scores outside the hot evaluation loop to avoid object allocation and GC pressure.
+const PIECE_SCORES = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 };
+
 function evaluateBoardState() {
-    const scores = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 }; 
     let totalVal = 0;
     
     // প্লেয়ার খুব এগ্রেসিভ হলে এআই ডিফেন্স মজবুত করবে
@@ -450,7 +452,7 @@ function evaluateBoardState() {
     for (const key in initialSetup) {
         const piece = initialSetup[key];
         const r = key.charCodeAt(0) - 48;
-        let weight = scores[piece.name];
+        let weight = PIECE_SCORES[piece.name];
         
         if (piece.name === 'Padati') {
             weight += piece.isWhite ? (7 - r) : r; 
@@ -471,8 +473,10 @@ function minimax(depth, isAiMaximizing, alpha, beta) {
     
     const aiMoves = [];
     for (const key in initialSetup) {
-        if ((isAiMaximizing && !initialSetup[key].isWhite) || (!isAiMaximizing && initialSetup[key].isWhite)) {
-            const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48, piece = initialSetup[key];
+        const piece = initialSetup[key];
+        // ⚡ Bolt: Simplify boolean logic and reuse `piece` reference to save lookups
+        if (piece.isWhite !== isAiMaximizing) {
+            const fromR = key.charCodeAt(0) - 48, fromC = key.charCodeAt(2) - 48;
             for (let toR = 0; toR < 8; toR++) { 
                 for (let toC = 0; toC < 8; toC++) { 
                     if (checkLegalMove(piece, fromR, fromC, toR, toC)) {
