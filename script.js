@@ -36,6 +36,12 @@ if (typeof io !== 'undefined') {
 // 3. UI TAB SWITCH FIX
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+        const videoSources = {
+        'home': 'assets/videos/home-bg.mp4',       
+        'game': 'assets/videos/game-bg.mp4',       
+        'projects': 'assets/videos/projects-bg.mp4' 
+    };
+    
     const originalShowPage = window.showPage;
     window.showPage = function(targetPage) {
         if(originalShowPage) originalShowPage(targetPage);
