@@ -12,27 +12,8 @@ const markedSquares = ["0-0", "0-3", "0-4", "0-7", "3-0", "3-3", "3-4", "3-7", "
 const SQUARE_KEYS = Array.from({length: 8}, (_, r) => Array.from({length: 8}, (_, c) => `${r}-${c}`));
 const PIECE_SCORES = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 };
 
-// ==========================================
-// 2. SOCKET.IO CONNECTION
-// ==========================================
-let socket = null;
-if (typeof io !== 'undefined') {
-    socket = io(); 
-    socket.on('updateBoard', (moveData) => {
-        if(currentMode === '2-Player' && initialSetup[moveData.from]) {
-            const piece = initialSetup[moveData.from];
-            const isCapture = !!initialSetup[moveData.to];
-            initialSetup[moveData.to] = piece;
-            delete initialSetup[moveData.from];
-            if (isCapture) playCaptureSound(piece.name); else playMoveSound();
-            logMoveToHistory(piece.name, moveData.to, isCapture, piece.isWhite);
-            isPlayer1Turn = moveData.nextTurn;
-            createBoard(); 
-        }
-    });
-}
 
-// ==========================================
+// ==================================
 // 3. UI TAB SWITCH FIX & DYNAMIC VIDEO BACKGROUND
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
