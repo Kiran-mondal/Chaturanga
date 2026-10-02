@@ -514,8 +514,6 @@ window.handleSquareClick = async function(row, col) {
 // ==========================================
 // 7. ADVANCED AI ENGINE LOGIC (ALPHA-BETA PRUNING & LEARNING)
 // ==========================================
-// ⚡ Bolt: Cache piece scores outside the hot evaluation loop to avoid object allocation and GC pressure.
-const PIECE_SCORES = { 'Raja': 10000, 'Mantri': 90, 'Ratha': 50, 'Gaja': 40, 'Ashva': 30, 'Padati': 10 };
 
 function evaluateBoardState() {
     let totalVal = 0;
