@@ -112,7 +112,7 @@ function playCaptureSound(capturedPieceName) {
         case "Ashva": audioSrc = "assets/audio/scottishperson-sound-effect-horse-whinny-03-372258.mp3"; break;
         case "Gaja": audioSrc = "assets/audio/universfield-sad-trumpet-278822.mp3"; break;
         case "Ratha": audioSrc = "assets/audio/freesound_community-slosh-a-101500.mp3"; break;
-        case "Padati": audioSrc = "assets/audio(data_pion-st3-footstep-sfx-323056.mp3"; break;
+        case "Padati": audioSrc = "assets/audio/data_pion-st3-footstep-sfx-323056.mp3"; break;
     }
     new Audio(audioSrc).play().catch(e => console.log("Audio Error:", e));
 }
