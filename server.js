@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app); // Socket.IO এর জন্য সার্ভার তৈরি
 const io = new Server(server, {
   cors: {
-    origin: "*", // সমস্ত অরিজিন থেকে কানেকশন নেওয়ার জন্য (প্রয়োজনে এটি পরিবর্তন করতে পারেন)
+    origin: "https://chaturanga.quarry.dpdns.org", // আপনার লাইভ ওয়েবসাইটের লিংক
     methods: ["GET", "POST"]
   }
 });
