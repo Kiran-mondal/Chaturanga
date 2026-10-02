@@ -33,33 +33,52 @@ if (typeof io !== 'undefined') {
 }
 
 // ==========================================
-// 3. UI TAB SWITCH FIX
+// 3. UI TAB SWITCH FIX & DYNAMIC VIDEO BACKGROUND
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-        const videoSources = {
+    
+    const videoSources = {
         'home': 'assets/videos/home-bg.mp4',       
         'game': 'assets/videos/game-bg.mp4',       
         'projects': 'assets/videos/projects-bg.mp4' 
     };
-    
+
     const originalShowPage = window.showPage;
     window.showPage = function(targetPage) {
         if(originalShowPage) originalShowPage(targetPage);
+        
+        const bgVideo = document.getElementById('bg-video');
+        const videoContainer = document.getElementById('video-container');
+        
+        if(bgVideo && videoContainer && videoSources[targetPage]) {
+            videoContainer.classList.replace('opacity-100', 'opacity-0');
+            
+            setTimeout(() => {
+                bgVideo.src = videoSources[targetPage];
+                bgVideo.load();
+                bgVideo.play().catch(e => console.log("Video Play Error:", e));
+                videoContainer.classList.replace('opacity-0', 'opacity-100');
+            }, 300);
+        }
+
+        // থ্রিডি বোর্ড ফিক্স এবং ব্ল্যাক স্ক্রিন দূর করার লজিক
         if(targetPage === 'game') {
             setTimeout(() => {
-                if(isThreeInitialized && renderer && camera) {
-                    const container = document.getElementById('three-game-container');
-                    if(container && container.clientWidth > 0) {
+                const container = document.getElementById('three-game-container');
+                if(container) {
+                    if(!isThreeInitialized) {
+                        initThreeJS();
+                    }
+                    if(renderer && camera && container.clientWidth > 0) {
                         let newW = container.clientWidth;
                         let newH = container.clientHeight || newW;
                         camera.aspect = newW / newH;
                         camera.updateProjectionMatrix();
                         renderer.setSize(newW, newH);
                     }
-                } else {
                     createBoard();
                 }
-            }, 100);
+            }, 200);
         }
     };
     window.showPage('home');
