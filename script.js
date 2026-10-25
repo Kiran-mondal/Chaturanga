@@ -145,7 +145,13 @@ window.triggerReset = function() {
     if (modal) modal.classList.add('hidden');
     
     const historyFeed = document.getElementById('move-history-feed');
-    if (historyFeed) historyFeed.innerHTML = '<div class="text-stone-500 italic text-center mt-6">The battlefield awaits...</div>';
+    if (historyFeed) {
+        historyFeed.textContent = '';
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'text-stone-500 italic text-center mt-6';
+        msgDiv.textContent = 'The battlefield awaits...';
+        historyFeed.appendChild(msgDiv);
+    }
 
     const btn2P = document.getElementById('btn2P');
     const btnAI = document.getElementById('btnAI');
