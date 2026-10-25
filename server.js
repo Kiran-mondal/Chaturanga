@@ -34,7 +34,7 @@ app.post('/api/save-strategy', async (req, res) => {
         await pool.query('INSERT INTO strategy_traps (move) VALUES ($1)', [move]);
         res.json({ success: true });
     } catch (err) {
-        console.error("Database error in /api/save-strategy:", err);
+        console.error("Database error in /api/save-strategy:", err.message); // Prevent leaking full database error/stack trace in logs
         res.status(500).json({ success: false, error: "Internal server error" });
     }
 });
