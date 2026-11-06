@@ -208,12 +208,14 @@ function showEndGameModal(title, description, icon, userWon) {
 
 function checkLegalMove(piece, fromR, fromC, toR, toC) {
     if (toR < 0 || toR > 7 || toC < 0 || toC > 7 || (fromR === toR && fromC === toC)) return false;
-    const rowDiff = Math.abs(toR - fromR), colDiff = Math.abs(toC - fromC), target = initialSetup[`${toR}-${toC}`];
+    // ⚡ BOLT OPTIMIZATION: Replaced dynamic string allocation (`${toR}-${toC}`) with SQUARE_KEYS lookup
+    // This reduces massive garbage collection overhead since checkLegalMove is called millions of times in minimax
+    const rowDiff = Math.abs(toR - fromR), colDiff = Math.abs(toC - fromC), target = initialSetup[SQUARE_KEYS[toR][toC]];
     if (target && target.isWhite === piece.isWhite) return false;
 
     switch (piece.name) {
         case 'Padati': const dir = piece.isWhite ? -1 : 1; if (fromC === toC && toR === fromR + dir) return !target; if (colDiff === 1 && toR === fromR + dir) return target && target.isWhite !== piece.isWhite; return false;
-        case 'Ratha': if (fromR !== toR && fromC !== toC) return false; const stepR = fromR === toR ? 0 : (toR > fromR ? 1 : -1), stepC = fromC === toC ? 0 : (toC > fromC ? 1 : -1); let checkR = fromR + stepR, checkC = fromC + stepC; while (checkR !== toR || checkC !== toC) { if (initialSetup[`${checkR}-${checkC}`]) return false; checkR += stepR; checkC += stepC; } return true;
+        case 'Ratha': if (fromR !== toR && fromC !== toC) return false; const stepR = fromR === toR ? 0 : (toR > fromR ? 1 : -1), stepC = fromC === toC ? 0 : (toC > fromC ? 1 : -1); let checkR = fromR + stepR, checkC = fromC + stepC; while (checkR !== toR || checkC !== toC) { if (initialSetup[SQUARE_KEYS[checkR][checkC]]) return false; checkR += stepR; checkC += stepC; } return true;
         case 'Ashva': return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
         case 'Gaja': return rowDiff === 2 && colDiff === 2;
         case 'Raja': return rowDiff <= 1 && colDiff <= 1;
