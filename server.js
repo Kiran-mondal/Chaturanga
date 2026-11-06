@@ -7,14 +7,18 @@ const { Server } = require("socket.io");
 
 const app = express();
 const server = http.createServer(app); 
+
+const corsOptions = {
+  origin: "https://chaturanga.quarry.dpdns.org", // আপনার Vercel ফ্রন্টএন্ড লিংক
+  methods: ["GET", "POST"]
+};
+
 const io = new Server(server, {
-  cors: {
-    origin: "https://chaturanga.quarry.dpdns.org", // আপনার Vercel ফ্রন্টএন্ড লিংক
-    methods: ["GET", "POST"]
-  }
+  cors: corsOptions
 });
 
-app.use(cors());
+// 🛡️ Sentinel: Enforce strict CORS policy for all Express routes to prevent unauthorized cross-origin requests
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Database connection

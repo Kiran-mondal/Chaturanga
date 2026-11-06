@@ -16,3 +16,8 @@
 **Vulnerability:** Use of innerHTML to inject content into the DOM in `triggerReset` inside `script.js`. Even if the string is static currently, it's a poor practice.
 **Learning:** Using `innerHTML` can inadvertently introduce Cross-Site Scripting (XSS) vulnerabilities if dynamic or unsanitized user input is ever included. It's safer to avoid it altogether for UI updates.
 **Prevention:** Always use safe DOM manipulation methods such as `document.createElement()`, `textContent`, and `appendChild()` instead of `innerHTML` when building UI elements to prevent potential injection vectors.
+
+## 2024-05-24 - Overly Permissive CORS Configuration
+**Vulnerability:** The Express backend was configured with `app.use(cors())` which defaults to allowing all origins (`*`). This is overly permissive and can allow malicious domains to interact with sensitive API endpoints (e.g. `/api/save-strategy`).
+**Learning:** Default configurations in libraries often favor ease of use over security. Using `cors()` without options is a common misconfiguration that exposes APIs to cross-origin abuse.
+**Prevention:** Always define explicit, restricted origins in CORS configurations (e.g. `{ origin: 'https://allowed-domain.com' }`) for API routes. Ensure consistency between REST and WebSocket CORS policies by using a shared configuration object.
