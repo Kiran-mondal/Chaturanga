@@ -20,7 +20,7 @@ app.use(express.json());
 // Database connection
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: process.env.NODE_ENV === 'production' ? true : false }
+    ssl: { rejectUnauthorized: true }
 });
 
 pool.query(`CREATE TABLE IF NOT EXISTS strategy_traps (id SERIAL PRIMARY KEY, move TEXT NOT NULL);`)
