@@ -57,7 +57,16 @@ io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
     socket.on('playerMove', (moveData) => {
-        socket.broadcast.emit('updateBoard', moveData); 
+        // 🛡️ Sentinel: Validate Socket.IO payload to prevent broadcasting malformed or malicious data
+        if (moveData && typeof moveData.from === 'string' && typeof moveData.to === 'string' && typeof moveData.nextTurn === 'boolean' && moveData.from.length <= 10 && moveData.to.length <= 10) {
+            socket.broadcast.emit('updateBoard', {
+                from: moveData.from,
+                to: moveData.to,
+                nextTurn: moveData.nextTurn
+            });
+        } else {
+            console.warn(`Invalid playerMove payload from ${socket.id}`);
+        }
     });
 
     socket.on('disconnect', () => {

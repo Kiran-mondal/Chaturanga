@@ -21,3 +21,8 @@
 **Vulnerability:** The Express backend was configured with `app.use(cors())` which defaults to allowing all origins (`*`). This is overly permissive and can allow malicious domains to interact with sensitive API endpoints (e.g. `/api/save-strategy`).
 **Learning:** Default configurations in libraries often favor ease of use over security. Using `cors()` without options is a common misconfiguration that exposes APIs to cross-origin abuse.
 **Prevention:** Always define explicit, restricted origins in CORS configurations (e.g. `{ origin: 'https://allowed-domain.com' }`) for API routes. Ensure consistency between REST and WebSocket CORS policies by using a shared configuration object.
+
+## 2024-05-24 - Unvalidated Socket.IO Payloads
+**Vulnerability:** The `playerMove` Socket.IO event handler in `server.js` was blindly broadcasting the `moveData` payload from one client to all other connected clients without any validation. An attacker could send malformed data or execute malicious payloads that would be executed by the clients' browsers.
+**Learning:** Blindly broadcasting client payloads propagates malformed data or attacks to all other clients. Any data received from a client must be treated as untrusted, even if it is immediately forwarded to other clients.
+**Prevention:** Always validate and sanitize WebSocket/Socket.IO message payloads on the server. Ensure that the structure, types, and lengths of the payload match expected formats before processing or broadcasting them. Destructure the payload to only include necessary fields, preventing unexpected data leakage.
